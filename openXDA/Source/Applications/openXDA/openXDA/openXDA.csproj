@@ -1,0 +1,1180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0C461E89-2430-4E47-B5C4-97FCA86E0E21}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>openXDA</RootNamespace>
+    <AssemblyName>openXDA</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ApplicationIcon>XDA.ico</ApplicationIcon>
+    <TargetFrameworkProfile />
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+    <AppConfig Condition="'$(Configuration)' == 'Debug'">AppDebug.config</AppConfig>
+    <AppConfig Condition="'$(Configuration)' != 'Debug'">App.config</AppConfig>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
+    <TypeScriptToolsVersion>4.5</TypeScriptToolsVersion>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\Build\Output\Debug\Applications\openXDA\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\..\Build\Output\Release\Applications\openXDA\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\..\..\Build\Output\Debug\Applications\openXDA\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\openFLE.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>..\..\..\..\Build\Output\Release\Applications\openXDA\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\openFLE.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime">
+      <HintPath>..\..\..\Dependencies\GSF\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Ciloci.Flee, Version=0.9.26.0, Culture=neutral, PublicKeyToken=c8526a021ef298ed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Dependencies\FLEE\Ciloci.Flee.dll</HintPath>
+    </Reference>
+    <Reference Include="CsvHelper, Version=27.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\CsvHelper.27.2.1\lib\net47\CsvHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.Communication">
+      <HintPath>..\..\..\Dependencies\GSF\GSF.Communication.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.COMTRADE">
+      <HintPath>..\..\..\Dependencies\GSF\GSF.COMTRADE.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.Core">
+      <HintPath>..\..\..\Dependencies\GSF\GSF.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.PhasorProtocols">
+      <HintPath>..\..\..\Dependencies\GSF\GSF.PhasorProtocols.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.PQDIF">
+      <HintPath>..\..\..\Dependencies\GSF\GSF.PQDIF.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.Security">
+      <HintPath>..\..\..\Dependencies\GSF\GSF.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.ServiceProcess">
+      <HintPath>..\..\..\Dependencies\GSF\GSF.ServiceProcess.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.TimeSeries">
+      <HintPath>..\..\..\Dependencies\GSF\GSF.TimeSeries.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.Web">
+      <HintPath>..\..\..\Dependencies\GSF\GSF.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="HIDS, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\HIDS.1.2.0\lib\netstandard2.0\HIDS.dll</HintPath>
+    </Reference>
+    <Reference Include="InfluxDB.Client, Version=3.2.0.0, Culture=neutral, PublicKeyToken=2ffdb0e6ebde0d3f, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\InfluxDB.Client.3.2.0\lib\netstandard2.0\InfluxDB.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="InfluxDB.Client.Core, Version=3.2.0.0, Culture=neutral, PublicKeyToken=2ffdb0e6ebde0d3f, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\InfluxDB.Client.Core.3.2.0\lib\netstandard2.0\InfluxDB.Client.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zlib">
+      <HintPath>..\..\..\Dependencies\DotNetZip\Ionic.Zlib.dll</HintPath>
+    </Reference>
+    <Reference Include="JsonSubTypes, Version=1.8.0.0, Culture=neutral, PublicKeyToken=ee75fc290dbc1176, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\JsonSubTypes.1.8.0\lib\net47\JsonSubTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=3.1.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\log4net.3.1.0\lib\net462\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core">
+      <HintPath>..\..\..\Dependencies\GSF\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.Bcl.HashCode.1.1.1\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.ObjectPool, Version=5.0.7.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.Extensions.ObjectPool.5.0.7\lib\net461\Microsoft.Extensions.ObjectPool.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.Extensions.Primitives.5.0.0\lib\net461\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Graph, Version=4.52.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\GSF\Microsoft.Graph.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Graph.Core, Version=2.0.14.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\..\..\Dependencies\GSF\Microsoft.Graph.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Net.Http.Headers, Version=2.2.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.Net.Http.Headers.2.2.8\lib\netstandard2.0\Microsoft.Net.Http.Headers.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin">
+      <HintPath>..\..\..\Dependencies\GSF\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Cors">
+      <HintPath>..\..\..\Dependencies\GSF\Microsoft.Owin.Cors.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.HttpListener">
+      <HintPath>..\..\..\Dependencies\GSF\Microsoft.Owin.Host.HttpListener.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Hosting">
+      <HintPath>..\..\..\Dependencies\GSF\Microsoft.Owin.Hosting.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security">
+      <HintPath>..\..\..\Dependencies\GSF\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NodaTime, Version=3.0.5.0, Culture=neutral, PublicKeyToken=4226afe0d9b296d1, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\NodaTime.3.0.5\lib\netstandard2.0\NodaTime.dll</HintPath>
+    </Reference>
+    <Reference Include="NodaTime.Serialization.JsonNet, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4226afe0d9b296d1, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\NodaTime.Serialization.JsonNet.3.0.0\lib\netstandard2.0\NodaTime.Serialization.JsonNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\..\..\Dependencies\GSF\Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="RazorEngine, Version=3.10.0.0, Culture=neutral, PublicKeyToken=9ee697374c7e744a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Dependencies\GSF\RazorEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="RestSharp, Version=106.12.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\RestSharp.106.12.0\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Collections.Immutable.5.0.0\lib\net461\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.ConfigurationManager, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Configuration.ConfigurationManager.5.0.0\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Diagnostics.DiagnosticSource.8.0.1\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Linq.Async, Version=4.1.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Linq.Async.4.1.1\lib\net461\System.Linq.Async.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Management" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http, Version=4.1.1.3, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Net.Http.4.3.4\lib\net46\System.Net.Http.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting">
+      <HintPath>..\..\..\Dependencies\GSF\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive, Version=5.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Reactive.5.0.0\lib\net472\System.Reactive.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Runtime.4.3.0\lib\net462\System.Runtime.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Security.AccessControl, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Security.AccessControl.6.0.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Security.Cryptography.Algorithms.4.3.0\lib\net463\System.Security.Cryptography.Algorithms.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Encoding, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Security.Cryptography.Encoding.4.3.0\lib\net46\System.Security.Cryptography.Encoding.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Security.Cryptography.Primitives.4.3.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Security.Cryptography.X509Certificates.4.3.0\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Permissions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Security.Permissions.5.0.0\lib\net461\System.Security.Permissions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Security.Principal.Windows.5.0.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=8.0.0.5, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Text.Json.8.0.5\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Dependencies\GSF\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Cors">
+      <HintPath>..\..\..\Dependencies\GSF\System.Web.Http.Cors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Owin">
+      <HintPath>..\..\..\Dependencies\GSF\System.Web.Http.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.AspNet.Mvc.5.2.4\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.AspNet.Razor.3.2.4\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\Dependencies\NuGet\Microsoft.AspNet.WebPages.3.2.4\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppModel.cs" />
+    <Compile Include="Controllers\AuthenticationService\AuthenticationController.cs" />
+    <Compile Include="Controllers\Config\EmailTemplateController.cs" />
+    <Compile Include="Controllers\Config\QueryController.cs" />
+    <Compile Include="Controllers\DataPusher\DataPusherController.cs" />
+    <Compile Include="Controllers\ModelController.cs" />
+    <Compile Include="Controllers\SPCTools\Controllers.cs" />
+    <Compile Include="Controllers\SPCTools\AssetGroupController.cs" />
+    <Compile Include="Controllers\WebAPI\LightningController.cs" />
+    <Compile Include="Controllers\WebAPI\TrenDAPController.cs" />
+    <Compile Include="Controllers\WebAPI\AlarmValueController.cs" />
+    <Compile Include="Controllers\WebAPI\EmailController.cs" />
+    <Compile Include="Controllers\WebAPI\ControllerHelpers.cs" />
+    <Compile Include="Controllers\WebAPI\Grafana.cs" />
+    <Compile Include="Controllers\WebAPI\LSCVSController.cs" />
+    <Compile Include="Controllers\Widgets\EventTagViewController.cs" />
+    <Compile Include="Controllers\Widgets\CustomerEventRestriction.cs" />
+    <Compile Include="Controllers\Widgets\StandardMagDurCurveController.cs" />
+    <Compile Include="Controllers\Widgets\TrendController.cs" />
+    <Compile Include="Controllers\Widgets\MeterController.cs" />
+    <Compile Include="Controllers\Widgets\PQIController.cs" />
+    <Compile Include="Controllers\WebAPI\WebAPI.cs" />
+    <Compile Include="Controllers\SystemCenter\SystemCenterController.cs" />
+    <Compile Include="Controllers\Widgets\OpenSEEController.cs" />
+    <Compile Include="Controllers\Widgets\EventWidgetViewController.cs" />
+    <Compile Include="Controllers\Workbench\DataFileController.cs" />
+    <Compile Include="DatabaseConnectionFactory.cs" />
+    <Compile Include="DebugHost.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DebugHost.Designer.cs">
+      <DependentUpon>DebugHost.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Logging\FileSkippedExceptionFilter.cs" />
+    <Compile Include="Logging\RollingFileTraceListener.cs" />
+    <Compile Include="ServiceConnection.cs" />
+    <Compile Include="ServiceHub.cs" />
+    <Compile Include="WebHosting\HostAuthenticationMiddleware.cs" />
+    <Compile Include="WebHosting\UseWhenExtensions.cs" />
+    <Compile Include="WebHosting\XDAActionSelector.cs" />
+    <Compile Include="WebHosting\XDARazorEngine.cs" />
+    <Compile Include="WebHosting\XDAWebHost.cs" />
+    <Compile Include="WebHosting\XDAControllerActivator.cs" />
+    <Compile Include="WebHosting\XDAControllerSelector.cs" />
+    <Compile Include="Logging\SimpleLogger.cs" />
+    <Compile Include="Logging\ServiceHelperAppender.cs" />
+    <Compile Include="ServiceHost.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ServiceHost.Designer.cs">
+      <DependentUpon>ServiceHost.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DebugHost.resx">
+      <DependentUpon>DebugHost.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ServiceHost.resx">
+      <DependentUpon>ServiceHost.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Libraries\FaultAlgorithms\FaultAlgorithms.csproj">
+      <Project>{24EB0E7B-9F79-4E3A-94FB-87BD4D06A400}</Project>
+      <Name>FaultAlgorithms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\FaultData\FaultData.csproj">
+      <Project>{11ae594d-2b2b-473c-8550-6bf62914c3e2}</Project>
+      <Name>FaultData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openXDA.Adapters\openXDA.Adapters.csproj">
+      <Project>{ec5adf62-c5c8-4a0a-955a-abeb54e78816}</Project>
+      <Name>openXDA.Adapters</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openHistorian.XDALink\openHistorian.XDALink.csproj">
+      <Project>{7f731255-fa83-4dbf-9e0f-c22ae4845e76}</Project>
+      <Name>openHistorian.XDALink</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openXDA.APIMiddleware\openXDA.APIMiddleware.csproj">
+      <Project>{ab824302-d4f1-4173-a46e-5328c31f4d65}</Project>
+      <Name>openXDA.APIMiddleware</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openXDA.Configuration\openXDA.Configuration.csproj">
+      <Project>{83d8122c-2bcc-4813-b449-224d9f7e5aee}</Project>
+      <Name>openXDA.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openXDA.HIDS\openXDA.HIDS.csproj">
+      <Project>{2528ec50-0be9-4a9f-8ac3-77fc42afe8ce}</Project>
+      <Name>openXDA.HIDS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openXDA.DataPusher\openXDA.DataPusher.csproj">
+      <Project>{666eb8a6-fba9-454c-8537-9113c2ee68d4}</Project>
+      <Name>openXDA.DataPusher</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openXDA.Model\openXDA.Model.csproj">
+      <Project>{a1a0bc13-50ed-4dc9-8c1e-3293b0b69281}</Project>
+      <Name>openXDA.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openXDA.Nodes\openXDA.Nodes.csproj">
+      <Project>{565e38b7-24c0-48b6-9f28-2521b2ccd87d}</Project>
+      <Name>openXDA.Nodes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\OpenXDA.NotificationDataSources\openXDA.NotificationDataSources.csproj">
+      <Project>{2813a92f-8cb5-4ec3-976c-8690c90c6dd0}</Project>
+      <Name>openXDA.NotificationDataSources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openXDA.PQI\openXDA.PQI.csproj">
+      <Project>{3DEC81F1-9A02-4BBF-8325-F332AC63393E}</Project>
+      <Name>openXDA.PQI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openXDA.Reports\openXDA.Reports.csproj">
+      <Project>{656f97d9-4fb6-4f65-a9a6-1a1dde3af634}</Project>
+      <Name>openXDA.Reports</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\openXDA.XMLConfigLoader\openXDA.XMLConfig.csproj">
+      <Project>{280f475d-7d5c-4bb7-98be-db0f3cbe40bb}</Project>
+      <Name>openXDA.XMLConfig</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\PQMark.DataAggregator\PQMark.DataAggregator.csproj">
+      <Project>{9f5bacf2-025c-4a54-94bd-ec0ceb618bf0}</Project>
+      <Name>PQMark.DataAggregator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\SPCTools\SPCTools.csproj">
+      <Project>{5017948c-141e-48b5-9915-ef81775aacb2}</Project>
+      <Name>SPCTools</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wwwroot\Content\BigTable.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-datepicker3.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-datepicker3.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-datetimepicker.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-sidebar.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme-cerulean.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme-cosmo.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme-cyborg.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme-readable.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme-sandstone.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme-slate.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme-united.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme.css.map">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\bootstrap-theme.min.css.map">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\daterangepicker.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fileinput.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\fontawesome-webfont.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\fontawesome-webfont.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\fontawesome-webfont.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\fontawesome-webfont.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\fontawesome-webfont.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\FontAwesome.otf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\glyphicons-halflings-regular.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\glyphicons-halflings-regular.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\glyphicons-halflings-regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\glyphicons-halflings-regular.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\glyphicons-halflings-regular.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\jsglyph.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\jsglyph.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\jsglyph.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fonts\jsglyph.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fullscreenselect\bootstrap-fullscreen-select.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\fullscreenselect\bootstrap-fullscreen-select.css.map">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\loading-sm.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\loading.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-bg_glass_55_fbf9ee_1x400.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-bg_glass_65_ffffff_1x400.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-bg_glass_75_dadada_1x400.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-bg_glass_75_e6e6e6_1x400.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-bg_glass_95_fef1ec_1x400.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-bg_highlight-soft_75_cccccc_1x100.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-icons_222222_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-icons_2e83ff_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-icons_333333_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-icons_454545_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-icons_888888_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-icons_cd0a0a_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\images\ui-icons_ffffff_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\jquery.jspanel.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\jquery.jspanel.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\jquery.jspanel.sass">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\jquery.multiselect.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\jquery.multiselect.filter.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\OpenSEE.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\OpenSTE.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\Popup.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\primeui.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\Site.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\animated-overlay.gif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-bg_flat_0_aaaaaa_40x100.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-bg_flat_55_fbec88_40x100.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-bg_glass_75_d0e5f5_1x400.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-bg_glass_85_dfeffc_1x400.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-bg_glass_95_fef1ec_1x400.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-bg_gloss-wave_55_5c9ccc_500x100.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-bg_inset-hard_100_f5f8f9_1x100.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-bg_inset-hard_100_fcfdfd_1x100.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-icons_217bc0_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-icons_2e83ff_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-icons_469bdd_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-icons_6da8d5_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-icons_cd0a0a_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-icons_d8e7f3_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\images\ui-icons_f9bd01_256x240.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\jquery-ui.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\jquery-ui.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\themes\redmond\theme.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\_jsglyph.sass">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\_themes.sass">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Content\_themes_mdl_styles.sass">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Docs\openXDAsettings.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\fontawesome-webfont.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\fontawesome-webfont.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\fontawesome-webfont.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\fontawesome-webfont.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\fontawesome-webfont.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\FontAwesome.otf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\glyphicons-halflings-regular.eot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\glyphicons-halflings-regular.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\glyphicons-halflings-regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\glyphicons-halflings-regular.woff">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\fonts\glyphicons-halflings-regular.woff2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\2-Line - 500.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Analytics Coming Soon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Analytics old.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Analytics.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Assetolds.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Assets.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Config old.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Config.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Export.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Impact.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Reports.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Workbench old.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dD Workbench.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\dDSplashBackground.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\GPA-Logo---30-pix%28on-white%29.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\GPA-Logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\gpa-smalllock.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\apple-touch-icon-114x114.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\apple-touch-icon-120x120.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\apple-touch-icon-144x144.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\apple-touch-icon-152x152.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\apple-touch-icon-57x57.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\apple-touch-icon-60x60.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\apple-touch-icon-72x72.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\apple-touch-icon-76x76.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\favicon-128.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\favicon-16x16.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\favicon-196x196.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\favicon-32x32.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\favicon-96x96.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\mstile-144x144.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\mstile-150x150.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\mstile-310x150.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\mstile-310x310.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\mstile-70x70.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\openXDA.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Icons\Thumbs.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\Impact Coming Soon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\openMIC.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\openMICBanner.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\openSEE - Waveform Viewer Header.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\openSEELogo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\openSEET.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\openSTE.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\openXDA.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\sync.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\Images\XDA.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\index.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="wwwroot\Images\Tiles\NotificationPages.png" />
+    <Content Include="wwwroot\Images\Tiles\PQBrowser.png" />
+    <Content Include="wwwroot\Layout.cshtml" />
+    <Content Include="wwwroot\Logout.cshtml" />
+    <None Include="wwwroot\RestoreEventEmail.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="wwwroot\Images\dDSPCtools.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\EPRILogo.png" />
+    <Content Include="wwwroot\Images\SPCTools.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\dD_Assets.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\dD_Config.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\dD_Export.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\dD_Reports.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\dD_Workbench.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\LSCVS.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\miMD.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\openMIC.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\PQDashboard.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\PQDigest.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\SPCTools.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\SystemCenter.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\TrenDAP.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\Images\Tiles\VoltageRegReport.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\index.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap-grid.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap-grid.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap-reboot.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap-reboot.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.bundle.js.map" />
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.bundle.min.js.map" />
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.js.map" />
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.min.js.map" />
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap-grid.css.map" />
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap-grid.min.css.map" />
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap-reboot.css.map" />
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap-reboot.min.css.map" />
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap.css.map" />
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\CSS\bootstrap.min.css.map" />
+    <Content Include="wwwroot\SPCTools\package.json" />
+    <Content Include="wwwroot\SPCTools\tsconfig.json" />
+    <None Include="AppDebug.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="PostBuildSetup.bat" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web.config">
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.bundle.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.bundle.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\D3\d3.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\Scripts\js\SPCTools.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wwwroot\SPCTools\webpack.config.js" />
+    <Content Include="XDA.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\ChannelOverview\ChannelOverview.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\Wizard\AlarmTrendingCard.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\CommonComponents\FunctionHelp.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\Wizard\DynamicTimeRange.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\CommonComponents\Requirments.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\Wizard\SelectStatisticsData.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\Wizard\SetPointCreator.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\Wizard\EPRINote.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\Wizard\WizardTest.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\global.d.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\AlarmGroup\AlarmGroup.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\MeterOverview\MeterOverview.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\NavBar.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\SPCTools.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\Wizard\GeneralSettings.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\Wizard\WizardHome.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\Wizard\DynamicWizzardSlice.tsx" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\SeveritySlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\SetpointParseSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\WizardAffectedChannelSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\SeriesTypeSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\AlarmTypeSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\WizardVoltageOptionSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\WizardPhaseOptionSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\MeasurmentTypeSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\AlarmDaySlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\AlarmDayGroupSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\MeterAlarmGroupSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\ChannelAlarmGroupSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\MeterSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\ChannelOverviewSlice.ts" />
+    <TypeScriptCompile Include="wwwroot\SPCTools\Scripts\TSX\store\store.ts" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
+  <Target Name="AfterBuild">
+    <CallTarget Targets="SignBuild" />
+    <CallTarget Targets="CopyBuild" />
+  </Target>
+  <Target Name="SignBuild" Condition="'$(SIGNTOOL)' != ''">
+    <Exec Command="$(SIGNTOOL) $(TargetPath)" />
+  </Target>
+  <Target Name="CopyBuild">
+    <ItemGroup>
+      <FilesToCopy Include="$(TargetDir)*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(ProjectDir)bin" />
+  </Target>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:52132/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+          <servers defaultServer="SelfHostServer">
+            <server name="SelfHostServer" exePath="" cmdArgs="" url="http://localhost:8989/" workingDir="" />
+          </servers>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PreBuildEvent>CALL cd "$(ProjectDir)wwwroot\SPCTools"
+      if $(ConfigurationName) == Debug npm run builddebug
+      if $(ConfigurationName) == Release npm run buildrelease
+
+</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>COPY "$(SolutionDir)Dependencies\GSF\ValidateAssemblyBindings.exe" "$(TargetDir)"
+"$(TargetDir)\ValidateAssemblyBindings.exe" "$(TargetPath).config"
+DEL "$(TargetDir)\ValidateAssemblyBindings.exe"
+CALL "$(ProjectDir)PostBuildSetup.bat" "$(ProjectDir)bin" "$(SolutionDir)Dependencies\GSF\*.*"
+CALL "$(ProjectDir)PostBuildSetup.bat" "$(ProjectDir)bin" "$(TargetDir)*.dll"
+CALL "$(ProjectDir)PostBuildSetup.bat" "$(ProjectDir)bin" "%25SystemRoot%25\Microsoft.NET\assembly\GAC_MSIL\System.Core\v4.0_4.0.0.0__b77a5c561934e089\System.Core.dll"
+CALL "$(ProjectDir)PostBuildSetup.bat" "$(ProjectDir)bin" "%25SystemRoot%25\Microsoft.NET\assembly\GAC_MSIL\System.Data.DataSetExtensions\v4.0_4.0.0.0__b77a5c561934e089\System.Data.DataSetExtensions.dll"
+CALL "$(ProjectDir)PostBuildSetup.bat" "$(ProjectDir)bin" "%25SystemRoot%25\Microsoft.NET\assembly\GAC_MSIL\System.Net.Http\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Net.Http.dll"
+CALL "$(ProjectDir)PostBuildSetup.bat" "$(ProjectDir)bin" "%25SystemRoot%25\Microsoft.NET\assembly\GAC_MSIL\System.Data.Linq\v4.0_4.0.0.0__b77a5c561934e089\System.Data.Linq.dll"</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="..\..\..\Dependencies\NuGet\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\..\Dependencies\NuGet\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\..\..\Dependencies\NuGet\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\..\..\Dependencies\NuGet\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  -->
+</Project>

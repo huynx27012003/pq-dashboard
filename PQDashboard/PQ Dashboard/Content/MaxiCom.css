@@ -1,0 +1,1818 @@
+/* ============================================================
+   MaxiCom Theme - PQ Dashboard Modern UI
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ============================================================
+   CSS Variables
+   ============================================================ */
+:root {
+    /* Primary Brand Colors */
+    --primary-color: #012596;
+    --primary-light: #3654b3;
+    --primary-dark: #011b6e;
+    --primary-rgb: 1, 37, 150;
+
+    /* Accent Colors */
+    --accent-color: #FF6D00;
+    --accent-light: #FF8F33;
+
+    /* Semantic Colors */
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+
+    /* Neutral Colors */
+    --background-color: #f4f6f9;
+    --surface-color: #ffffff;
+    --surface-hover: #f8f9fa;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --border-color: #e5e7eb;
+    --border-light: #f3f4f6;
+
+    /* Layout Dimensions */
+    --header-height: 56px;
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 60px;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --content-padding: 24px;
+
+    /* Border Radius */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    /* Typography */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-size-xs: 12px;
+    --font-size-sm: 13px;
+    --font-size-base: 14px;
+    --font-size-md: 15px;
+    --font-size-lg: 17px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 24px;
+    --line-height: 1.6;
+
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.2s ease;
+    --transition-slow: 0.3s ease;
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: var(--font-size-base);
+}
+
+body {
+    font-family: var(--font-family) !important;
+    font-size: var(--font-size-md);
+    line-height: var(--line-height);
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* ============================================================
+   App Layout Structure
+   ============================================================ */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* ============================================================
+   Header Styles
+   ============================================================ */
+.app-header {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    height: var(--header-height);
+    background: var(--primary-color);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--content-padding);
+    z-index: 1000;
+    transition: left var(--transition-normal);
+}
+
+.app-wrapper.sidebar-collapsed .app-header {
+    left: var(--sidebar-collapsed-width);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.header-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.header-logo {
+    height: 30px;
+    width: auto;
+}
+
+.header-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    transition: background var(--transition-fast);
+    text-decoration: none;
+}
+
+.header-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    text-decoration: none;
+}
+
+.header-btn i {
+    font-size: 14px;
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+}
+
+.header-user i {
+    font-size: 18px;
+}
+
+.header-user-name {
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+}
+
+/* ============================================================
+   Sidebar Styles
+   ============================================================ */
+.app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--surface-color);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 1001;
+    transition: width var(--transition-normal);
+    overflow: hidden;
+}
+
+.app-wrapper.sidebar-collapsed .app-sidebar {
+    width: var(--sidebar-collapsed-width);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    gap: var(--spacing-md);
+    flex-shrink: 0;
+}
+
+.sidebar-toggle {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.sidebar-toggle:hover {
+    background: var(--surface-hover);
+}
+
+.sidebar-toggle i {
+    font-size: 18px;
+}
+
+.sidebar-logo {
+    height: 28px;
+    width: auto;
+    max-width: 170px;
+    object-fit: contain;
+    transition: opacity var(--transition-fast);
+}
+
+.app-wrapper.sidebar-collapsed .sidebar-logo {
+    opacity: 0;
+    width: 0;
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md) 0;
+}
+
+.menu-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.menu-group-title {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.app-wrapper.sidebar-collapsed .menu-group-title {
+    opacity: 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin: 2px var(--spacing-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    gap: var(--spacing-md);
+}
+
+.menu-item:hover {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.menu-item.active {
+    background: rgba(var(--primary-rgb), 0.1);
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.menu-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.menu-item-text {
+    white-space: nowrap;
+    overflow: hidden;
+    transition: opacity var(--transition-fast);
+}
+
+.app-wrapper.sidebar-collapsed .menu-item-text {
+    opacity: 0;
+    width: 0;
+}
+
+.menu-item-badge {
+    margin-left: auto;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: var(--font-size-xs);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.app-wrapper.sidebar-collapsed .menu-item-badge {
+    display: none;
+}
+
+/* ============================================================
+   Main Content Area
+   ============================================================ */
+.app-main {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    margin-top: var(--header-height);
+    padding: var(--content-padding);
+    min-height: calc(100vh - var(--header-height));
+    transition: margin-left var(--transition-normal);
+    /* Needed for absolutely positioned overlays (e.g., daterangepicker) when attached via parentEl. */
+    position: relative;
+}
+
+.app-wrapper.sidebar-collapsed .app-main {
+    margin-left: var(--sidebar-collapsed-width);
+}
+
+/* Page Header (within content) */
+.page-header {
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.page-title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* ============================================================
+   Content Modal / Overlay (for replacing window.open)
+   ============================================================ */
+.content-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: var(--spacing-lg);
+}
+
+.content-overlay.active {
+    display: flex;
+}
+
+.content-modal {
+    background: var(--surface-color);
+    border-radius: var(--radius-lg);
+    width: 95%;
+    max-width: 1400px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+}
+
+.content-modal-header {
+    background: var(--primary-color);
+    color: #fff;
+    padding: var(--spacing-md) var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.content-modal-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin: 0;
+}
+
+.content-modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: background var(--transition-fast);
+}
+
+.content-modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.content-modal-body {
+    flex: 1;
+    overflow: hidden;
+}
+
+.content-modal-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* ============================================================
+   Card / Portlet Styles
+   ============================================================ */
+.card,
+.portlet {
+    background: var(--surface-color);
+    border: none !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-lg);
+    overflow: hidden;
+}
+
+.card-header,
+.portlet-header {
+    background: var(--surface-color) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+    font-weight: 600;
+    font-size: var(--font-size-md);
+    color: var(--primary-color) !important;
+}
+
+.card-body,
+.portlet-content {
+    padding: var(--spacing-lg);
+}
+
+.portlet-header-text {
+    font-size: var(--font-size-md);
+}
+
+/* ============================================================
+   Portlet Header Controls (Column 2: Map/Grid, Site Set, Heatmap)
+   ============================================================ */
+/* The markup uses inline `position: absolute;` on `.siteselectdropdown` which causes overlap/cropping.
+   Override it to a responsive flex layout. */
+.portlet-header .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    position: relative;
+    min-height: 44px;
+}
+
+.portlet-header .siteselectdropdown {
+    position: static !important;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.portlet-header .siteselectdropdown select,
+.portlet-header .siteselectdropdown button {
+    height: 38px;
+}
+
+.portlet-header .siteselectdropdown select.smallbutton {
+    min-width: 140px;
+    max-width: 260px;
+}
+
+.portlet-header .overlaydate {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .portlet-header .siteselectdropdown {
+        width: 100%;
+    }
+
+    .portlet-header .siteselectdropdown select.smallbutton {
+        flex: 1 1 150px;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .portlet-header .overlaydate {
+        width: 100%;
+        justify-content: flex-end;
+        opacity: 0.85;
+    }
+}
+
+/* ============================================================
+   Button Styles
+   ============================================================ */
+.btn {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md) !important;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: var(--primary-color) !important;
+    color: #fff !important;
+}
+
+.btn-primary:hover {
+    background: var(--primary-light) !important;
+}
+
+.btn-secondary,
+.btn-default {
+    background: var(--surface-color);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color) !important;
+}
+
+.btn-secondary:hover,
+.btn-default:hover {
+    background: var(--surface-hover);
+    border-color: var(--text-muted) !important;
+}
+
+.btn-success {
+    background: var(--success-color) !important;
+    color: #fff !important;
+}
+
+.btn-danger {
+    background: var(--danger-color) !important;
+    color: #fff !important;
+}
+
+.btn-sm {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+}
+
+.btn-lg {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-md);
+}
+
+/* Back Button */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    margin-bottom: var(--spacing-md);
+}
+
+.back-btn:hover {
+    color: var(--primary-color);
+    background: var(--surface-hover);
+    text-decoration: none;
+}
+
+/* ============================================================
+   Form Elements
+   ============================================================ */
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-sm) !important;
+    background: var(--surface-color);
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    height: 38px;
+}
+
+.form-control:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary-color) !important;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1) !important;
+}
+
+textarea.form-control {
+    height: auto;
+    min-height: 100px;
+}
+
+.form-label,
+label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+    display: block;
+}
+
+.smallbutton {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+}
+
+.smallbutton:hover {
+    border-color: var(--primary-color);
+}
+
+/* ============================================================
+   Table Styles
+   ============================================================ */
+.table,
+table {
+    width: 100%;
+    background: var(--surface-color);
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+}
+
+.table thead th,
+table thead th {
+    background: var(--primary-color);
+    color: #fff;
+    font-weight: 600;
+    padding: var(--spacing-md);
+    text-align: left;
+    border: none;
+    white-space: nowrap;
+}
+
+.table tbody tr,
+table tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    transition: background var(--transition-fast);
+}
+
+.table tbody tr:nth-child(even),
+table tbody tr:nth-child(even) {
+    background: var(--surface-hover);
+}
+
+.table tbody tr:hover,
+table tbody tr:hover {
+    background: rgba(var(--primary-rgb), 0.05);
+}
+
+.table tbody td,
+table tbody td {
+    padding: var(--spacing-md);
+    vertical-align: middle;
+}
+
+/* PrimeUI DataTable */
+.pui-datatable thead th {
+    background: var(--primary-color) !important;
+    color: #fff !important;
+    font-weight: 600;
+    padding: var(--spacing-md) !important;
+}
+
+.pui-datatable tbody tr:nth-child(even) {
+    background: var(--surface-hover);
+}
+
+.pui-datatable tbody tr:hover {
+    background: rgba(var(--primary-rgb), 0.05) !important;
+}
+
+/* ============================================================
+   Modal Styles
+   ============================================================ */
+.modal-content {
+    border-radius: var(--radius-lg);
+    border: none;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: var(--primary-color);
+    color: #fff;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: none;
+    border-radius: 0;
+}
+
+.modal-header .modal-title {
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+}
+
+.modal-header .close {
+    color: #fff;
+    opacity: 0.8;
+    text-shadow: none;
+    font-size: 24px;
+}
+
+.modal-header .close:hover {
+    opacity: 1;
+}
+
+.modal-body {
+    padding: var(--spacing-lg);
+}
+
+.modal-footer {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Large Modal for Content Viewing */
+.modal-xl {
+    max-width: 95vw;
+}
+
+.modal-fullscreen .modal-dialog {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    margin: 0;
+}
+
+.modal-fullscreen .modal-content {
+    height: 100%;
+    border-radius: 0;
+}
+
+/* ============================================================
+   Tabs (jQuery UI)
+   ============================================================ */
+.ui-tabs {
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.ui-tabs-nav,
+#application-tabs>ul {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid var(--border-color) !important;
+    padding: 0 var(--spacing-md) !important;
+    margin: 0 !important;
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.ui-tabs-nav li,
+#application-tabs>ul>li {
+    background: transparent !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Keep legacy Extensions tab in DOM (for JS compatibility) but hidden from UI */
+#tabsExtensions,
+#tabs-Extensions {
+    display: none !important;
+}
+
+.ui-tabs-nav li a,
+#application-tabs>ul>li>a {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    transition: all var(--transition-fast);
+    display: block;
+}
+
+.ui-tabs-nav li a:hover,
+#application-tabs>ul>li>a:hover {
+    color: var(--primary-color) !important;
+    background: transparent !important;
+}
+
+.ui-tabs-nav li.ui-state-active a,
+.ui-tabs-nav li.ui-tabs-active a,
+#application-tabs>ul>li.ui-state-active>a,
+#application-tabs>ul>li.ui-tabs-active>a {
+    color: var(--primary-color) !important;
+    border-bottom-color: var(--primary-color) !important;
+    font-weight: 600;
+}
+
+.ui-tabs-panel {
+    padding: var(--spacing-lg) !important;
+    border: none !important;
+}
+
+/* ============================================================
+   jQuery UI Dialog Override
+   ============================================================ */
+.ui-dialog {
+    padding: 0 !important;
+    border-radius: var(--radius-lg) !important;
+    border: none !important;
+    box-shadow: var(--shadow-xl) !important;
+    font-family: var(--font-family) !important;
+}
+
+.ui-dialog-titlebar {
+    background: var(--primary-color) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+}
+
+.ui-dialog-title {
+    font-weight: 600;
+    font-size: var(--font-size-md);
+}
+
+.ui-dialog-titlebar-close {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
+    border-radius: var(--radius-sm) !important;
+}
+
+.ui-dialog-titlebar-close:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.ui-dialog-content {
+    padding: var(--spacing-lg) !important;
+}
+
+.ui-dialog-buttonpane {
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+/* ============================================================
+   Date Range Picker
+   ============================================================ */
+#dateRange {
+    background: var(--surface-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    transition: border-color var(--transition-fast);
+}
+
+#dateRange:hover {
+    border-color: var(--primary-color) !important;
+}
+
+/* ============================================================
+   Dashboard Toolbar (HeaderStrip)
+   ============================================================ */
+/* Default.css adds a heavy black border; override with a flat card. */
+.headerStrip {
+    border: none !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-sm);
+}
+
+#headerStrip {
+    margin-bottom: var(--spacing-md);
+}
+
+.dash-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.dash-toolbar__group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-width: 0;
+}
+
+.dash-label {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+.dash-muted {
+    color: var(--text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.dash-select {
+    height: 38px;
+    min-width: 160px;
+    max-width: 320px;
+}
+
+.dash-date-range {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    max-width: min(420px, 100%);
+}
+
+#dateRangeSpan {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.dash-date-range__caret {
+    margin-left: var(--spacing-xs);
+    opacity: 0.75;
+}
+
+@media (max-width: 1100px) {
+    .dash-toolbar {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .dash-toolbar__group--right {
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .dash-toolbar__group {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .dash-toolbar__group--right {
+        justify-content: flex-start;
+    }
+
+    .dash-select {
+        min-width: 0;
+        flex: 1 1 220px;
+    }
+
+    #dateRange {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .dash-muted {
+        white-space: normal;
+        flex: 1 0 100%;
+    }
+}
+
+/* ============================================================
+   Daterangepicker (Calendar Popup)
+   ============================================================ */
+/* Default.css forces `position: fixed` which breaks positioning in an inner scroll container. */
+.app-main .daterangepicker {
+    position: absolute !important;
+    z-index: 3000 !important;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+}
+
+.app-main .daterangepicker .ranges li {
+    border-radius: var(--radius-sm);
+}
+
+.app-main .daterangepicker .ranges li.active {
+    background: rgba(var(--primary-rgb), 0.12);
+    color: var(--primary-color);
+}
+
+@media (min-width: 992px) {
+
+    /* Encourage horizontal layout (ranges + 2 calendars) on desktop. */
+    .app-main .daterangepicker {
+        min-width: 760px;
+        max-width: calc(100vw - 24px);
+    }
+
+    .app-main .daterangepicker .calendar {
+        float: left !important;
+        display: inline-block !important;
+    }
+}
+
+@media (max-width: 576px) {
+
+    /* Full-width popup on small screens. */
+    .app-main .daterangepicker {
+        left: 8px !important;
+        right: 8px !important;
+        width: auto !important;
+        max-width: none;
+    }
+}
+
+/* ============================================================
+   Flat Cards + Gutters
+   ============================================================ */
+.column {
+    padding: var(--spacing-md);
+    box-sizing: border-box;
+}
+
+.portlet {
+    margin: 0 0 var(--spacing-lg) 0 !important;
+}
+
+.portlet-header {
+    border-bottom-color: var(--border-light) !important;
+}
+
+/* Kill any leftover heavy borders from jQuery UI themes */
+.ui-widget-content,
+.ui-tabs,
+.ui-tabs .ui-tabs-panel {
+    border: none !important;
+}
+
+/* ============================================================
+   Matrix/Grid (Tile View)
+   ============================================================ */
+/* Keep grid readable and "flat". Sizing is controlled by JS (resizeMatrixCells). */
+.theMatrixStyle {
+    padding: 10px;
+    background: transparent;
+    overflow: auto !important;
+}
+
+.theMatrixStyle .matrix {
+    margin: 10px !important;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    transform: translateZ(0);
+    /* help crisp rendering on some browsers */
+    display: flex !important;
+    flex-direction: column;
+}
+
+.theMatrixStyle .faultgridtitle {
+    padding: 10px 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    line-height: 1.1;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Sparkline strip at bottom */
+.theMatrixStyle .sparkbox {
+    /* Make spark area large for easy visual comparison */
+    flex: 1 1 auto;
+    height: auto !important;
+    min-height: 79% !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(6px);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    /* Anchor the chart to the bottom like a "tab" panel */
+    padding: 10px 12px 12px !important;
+    display: flex;
+    align-items: flex-end;
+}
+
+/* Default.css forces 45x45 canvases; let sparkline render at the size we request in JS */
+.theMatrixStyle .sparkbox canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    margin-top: auto;
+}
+
+/* Ensure hover/tooltip works reliably */
+.theMatrixStyle .sparkbox,
+.theMatrixStyle .sparkbox canvas {
+    pointer-events: auto;
+}
+
+/* Ensure sparkline tooltip is visible above cards/scroll containers */
+.jqstooltip,
+.jqsfield {
+    z-index: 5000 !important;
+}
+
+/* ============================================================
+   Utility Classes
+   ============================================================ */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-success {
+    color: var(--success-color) !important;
+}
+
+.text-warning {
+    color: var(--warning-color) !important;
+}
+
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.bg-surface {
+    background-color: var(--surface-color) !important;
+}
+
+.bg-background {
+    background-color: var(--background-color) !important;
+}
+
+.rounded {
+    border-radius: var(--radius-md) !important;
+}
+
+.rounded-lg {
+    border-radius: var(--radius-lg) !important;
+}
+
+.shadow {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.shadow-lg {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.p-0 {
+    padding: 0 !important;
+}
+
+.p-sm {
+    padding: var(--spacing-sm) !important;
+}
+
+.p-md {
+    padding: var(--spacing-md) !important;
+}
+
+.p-lg {
+    padding: var(--spacing-lg) !important;
+}
+
+.m-0 {
+    margin: 0 !important;
+}
+
+.mt-md {
+    margin-top: var(--spacing-md) !important;
+}
+
+.mb-md {
+    margin-bottom: var(--spacing-md) !important;
+}
+
+.mb-lg {
+    margin-bottom: var(--spacing-lg) !important;
+}
+
+.d-flex {
+    display: flex !important;
+}
+
+.align-center {
+    align-items: center !important;
+}
+
+.justify-between {
+    justify-content: space-between !important;
+}
+
+.gap-sm {
+    gap: var(--spacing-sm) !important;
+}
+
+.gap-md {
+    gap: var(--spacing-md) !important;
+}
+
+.flex-1 {
+    flex: 1 !important;
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.h-100 {
+    height: 100% !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+/* ============================================================
+   Responsive Adjustments
+   ============================================================ */
+@media (max-width: 1280px) {
+    :root {
+        --sidebar-width: 220px;
+        --content-padding: 20px;
+    }
+
+    .content-modal {
+        width: 98%;
+        height: 95vh;
+    }
+}
+
+@media (max-width: 992px) {
+    .app-sidebar {
+        transform: translateX(-100%);
+    }
+
+    .app-wrapper.sidebar-open .app-sidebar {
+        transform: translateX(0);
+    }
+
+    .app-header {
+        left: 0;
+    }
+
+    .app-main {
+        margin-left: 0;
+    }
+
+    .header-user-name {
+        display: none;
+    }
+}
+
+/* ============================================================
+   Print Styles
+   ============================================================ */
+@media print {
+
+    .app-sidebar,
+    .app-header,
+    .back-btn,
+    .content-overlay {
+        display: none !important;
+    }
+
+    .app-main {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+
+/* ============================================================
+   Legacy Overrides (for existing elements)
+   ============================================================ */
+
+/* Header Strip from Home.cshtml */
+.headerStrip {
+    background: var(--surface-color) !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+}
+
+/* Well class */
+.well {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Grid header */
+.gridheader {
+    background: var(--primary-color);
+    color: #fff;
+    padding: var(--spacing-md);
+    font-weight: 600;
+}
+
+/* UI Widget */
+.ui-widget-content {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+}
+
+.ui-widget-header {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+}
+
+/* Navbar Override */
+.navbar-inverse {
+    background-color: var(--primary-color) !important;
+    border: none;
+    box-shadow: var(--shadow-md);
+}
+
+.navbar-inverse .navbar-brand {
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.navbar-inverse .navbar-nav>li>a {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.navbar-inverse .navbar-nav>li>a:hover,
+.navbar-inverse .navbar-nav>.active>a {
+    background-color: var(--primary-dark) !important;
+    color: #fff !important;
+}
+
+/* ============================================================
+   Floating Window System
+   ============================================================ */
+.floating-window {
+    position: fixed;
+    background: var(--surface-color);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10000;
+    min-width: 400px;
+    min-height: 300px;
+    animation: windowOpen 0.2s ease-out;
+}
+
+@keyframes windowOpen {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.floating-window.closing {
+    animation: windowClose 0.2s ease-in forwards;
+}
+
+@keyframes windowClose {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.floating-window.dragging {
+    cursor: move;
+    user-select: none;
+}
+
+.floating-window.resizing {
+    user-select: none;
+}
+
+.floating-window.maximized {
+    border-radius: 0;
+}
+
+/* Floating Window Header */
+.floating-window-header {
+    background: var(--primary-color);
+    color: #fff;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: move;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.floating-window-title {
+    font-weight: 600;
+    font-size: var(--font-size-md);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 16px;
+}
+
+.floating-window-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.window-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: background 0.15s ease;
+}
+
+.window-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.window-close:hover {
+    background: #ef4444;
+}
+
+/* Floating Window Body */
+.floating-window-body {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: var(--background-color);
+}
+
+.floating-window-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #fff;
+}
+
+.floating-window-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--primary-color);
+    display: none;
+}
+
+/* Floating Window Resize Handle */
+.floating-window-resize {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+    background: linear-gradient(135deg, transparent 50%, var(--border-color) 50%);
+}
+
+.floating-window-resize::before {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+}
+
+/* ============================================================
+   Responsive Layout - Dashboard
+   ============================================================ */
+@media (max-width: 1400px) {
+    .app-main {
+        padding: var(--spacing-md);
+    }
+
+    #ApplicationContent {
+        overflow-x: auto;
+    }
+
+    .column {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 1200px) {
+
+    /* Make portlets stack on medium screens.
+       Note: `Home.cshtml` repeats `id="column_1/column_2"` inside each tab panel, so we can't rely on IDs here. */
+    .ui-tabs-panel .column {
+        width: 100% !important;
+        float: none !important;
+        max-width: 100% !important;
+    }
+
+    .portlet {
+        margin-bottom: var(--spacing-md);
+    }
+
+    /* Resizable split is not useful once stacked; hide the handle to avoid weird drags. */
+    .ui-resizable-handle {
+        display: none !important;
+    }
+
+    /* Adjust header for smaller screens */
+    .header-right {
+        gap: var(--spacing-sm);
+    }
+
+    .header-btn span {
+        display: none;
+    }
+
+    .header-user-name {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+@media (max-width: 992px) {
+
+    /* Auto-collapse sidebar on tablet */
+    .app-wrapper {
+        --sidebar-width: var(--sidebar-collapsed-width);
+    }
+
+    .app-wrapper .app-sidebar {
+        width: var(--sidebar-collapsed-width);
+    }
+
+    .app-wrapper .menu-group-title,
+    .app-wrapper .menu-item-text,
+    .app-wrapper .menu-item-badge,
+    .app-wrapper .sidebar-brand-name {
+        display: none;
+    }
+
+    .app-wrapper .app-header {
+        left: var(--sidebar-collapsed-width);
+    }
+
+    .app-wrapper .app-main {
+        margin-left: var(--sidebar-collapsed-width);
+    }
+
+    /* Tab navigation scroll */
+    #application-tabs>ul {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Hide sidebar completely on mobile */
+    .app-wrapper .app-sidebar {
+        display: none;
+    }
+
+    .app-wrapper .app-header {
+        left: 0;
+    }
+
+    .app-wrapper .app-main {
+        margin-left: 0;
+        padding: var(--spacing-sm);
+    }
+
+    /* Floating windows full width on mobile */
+    .floating-window {
+        left: 0 !important;
+        top: 56px !important;
+        width: 100% !important;
+        height: calc(100vh - 56px) !important;
+        border-radius: 0;
+    }
+
+    /* Header adjustments */
+    .header-logo {
+        display: none;
+    }
+
+    .header-title {
+        font-size: var(--font-size-md);
+    }
+
+    /* headerStrip responsive */
+    #headerStrip .d-flex {
+        flex-wrap: wrap;
+    }
+
+    #dateRange {
+        min-width: auto;
+    }
+}
+
+/* ============================================================
+   Dashboard Content Responsive
+   ============================================================ */
+/* Prevent content overflow */
+#ApplicationContent {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.theDockOverviewStyle,
+.theDockDetailStyle {
+    min-height: 200px;
+    overflow: hidden;
+}
+
+/* Chart responsive */
+.chart-container {
+    width: 100% !important;
+    max-width: 100%;
+}
+
+/* Matrix grid responsive */
+.theMatrixStyle {
+    overflow: auto;
+    max-width: 100%;
+}
+
+/* Map/Matrix portlet body should not waste space with padding; it needs full-bleed canvas. */
+[id^="MapMatrix"] {
+    padding: 0 !important;
+    overflow: auto !important;
+}
+
+/* Make map/matrix containers fill the portlet body so height math is stable */
+.theMapStyle,
+.theMatrixStyle {
+    height: 100%;
+    width: 100%;
+}
+
+/* Date picker responsive */
+#dateRange {
+    flex-shrink: 1;
+}
+
+/* Tab content scroll */
+.ui-tabs-panel {
+    overflow: auto;
+}
+
+@media (max-width: 992px) {
+
+    /* On small screens, prefer horizontal scroll for charts/tables over squeezing. */
+    .theDockOverviewStyle,
+    .theDockDetailStyle {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Let chart SVGs keep a readable minimum width. */
+    .theDockOverviewStyle svg,
+    .theDockDetailStyle svg {
+        min-width: 720px;
+    }
+
+    /* PrimeUI / HTML tables: horizontal scroll instead of wrapping into unreadable columns. */
+    .pui-datatable,
+    table {
+        min-width: 720px;
+    }
+}
+
+/* Embedded content container */
+#embeddedContentContainer {
+    background: var(--background-color);
+}
+
+#embeddedContentFrame {
+    background: #fff;
+}
+
+#jqstooltip {
+    color: #000;
+}

@@ -1,0 +1,5 @@
+.idea/
+public/uploads/cards_img/
+bin/
+obj/
+*.user

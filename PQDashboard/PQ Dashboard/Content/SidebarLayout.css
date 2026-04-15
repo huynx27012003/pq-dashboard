@@ -1,0 +1,286 @@
+/* SidebarLayout.css - MaxiCom Theme */
+:root {
+    --header-height: 60px;
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 60px;
+    --primary-color: #012596;
+    --text-primary: #333;
+    --bg-light: #f4f7f6;
+    --white: #ffffff;
+    --border-color: #e0e0e0;
+    --transition-speed: 0.3s;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    overflow: hidden;
+    /* Main scroll handled by content div */
+}
+
+/* Layout Container */
+.wrapper {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Sidebar */
+#sidebar {
+    width: var(--sidebar-width);
+    background: var(--white);
+    color: var(--text-primary);
+    transition: all var(--transition-speed);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+#sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+.sidebar-header {
+    height: var(--header-height);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    justify-content: center;
+}
+
+.sidebar-header img {
+    max-width: 100%;
+    max-height: 40px;
+}
+
+#sidebar.collapsed .sidebar-header img {
+    display: none;
+}
+
+#sidebar.collapsed .sidebar-header::after {
+    content: 'AT';
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 20px 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.sidebar-menu li {
+    padding: 5px 10px;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: #555;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.sidebar-menu li a:hover,
+.sidebar-menu li a.active {
+    background-color: rgba(1, 37, 150, 0.05);
+    /* Light blue tint */
+    color: var(--primary-color);
+}
+
+.sidebar-menu li a i {
+    min-width: 30px;
+    font-size: 1.2em;
+}
+
+.sidebar-menu li a span {
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+#sidebar.collapsed .sidebar-menu li a span {
+    display: none;
+}
+
+.menu-category {
+    color: #999;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    padding: 10px 25px 5px;
+    font-weight: 600;
+}
+
+#sidebar.collapsed .menu-category {
+    display: none;
+}
+
+/* Main Content Area */
+#content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-light);
+    min-width: 0;
+    position: relative;
+    /* Ensure z-index context */
+}
+
+/* The container for legacy content */
+#main-view {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+    /* Ensure it fills width */
+    display: block;
+    /* Explicitly block to handle floats */
+}
+
+/* Top Header */
+.top-header {
+    height: var(--header-height);
+    background-color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    color: var(--white);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+#sidebarCollapse {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 1.5em;
+    cursor: pointer;
+    margin-right: 20px;
+}
+
+.page-title {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-right a,
+.header-right button {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s;
+}
+
+.header-right a:hover {
+    color: var(--white);
+}
+
+/* Tab Redesign (Horizontal, Gentle) */
+#application-tabs {
+    background: var(--white);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 20px;
+    margin-bottom: 20px;
+}
+
+#application-tabs ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 30px;
+    /* Even spacing */
+}
+
+#application-tabs ul li {
+    margin: 0;
+    padding: 0;
+}
+
+#application-tabs ul li a {
+    display: block;
+    padding: 15px 5px;
+    color: #666;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    font-size: 1.05em;
+}
+
+#application-tabs ul li.ui-tabs-active a,
+#application-tabs ul li a:hover {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* Hide legacy jQuery UI tab classes default styling issues */
+.ui-tabs .ui-tabs-nav {
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.ui-tabs .ui-tabs-nav li {
+    background: none;
+    border: none;
+}
+
+/* Page Viewer Overlay */
+#page-viewer-overlay {
+    display: none;
+    position: fixed;
+    top: var(--header-height);
+    right: 0;
+    bottom: 0;
+    left: var(--sidebar-width);
+    background: white;
+    z-index: 2000;
+    transition: transform 0.3s ease-in-out;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.wrapper.collapsed-mode #page-viewer-overlay {
+    left: var(--sidebar-collapsed-width);
+}
+
+#page-viewer-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.overlay-header {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}

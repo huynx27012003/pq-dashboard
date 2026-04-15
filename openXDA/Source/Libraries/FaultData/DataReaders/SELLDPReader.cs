@@ -1,0 +1,407 @@
+﻿//******************************************************************************************************
+//  SELLDPReader.cs - Gbtc
+//
+//  Copyright © 2020, Grid Protection Alliance.  All Rights Reserved.
+//
+//  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
+//  the NOTICE file distributed with this work for additional information regarding copyright ownership.
+//  The GPA licenses this file to you under the Eclipse Public License -v 1.0 (the "License"); you may
+//  not use this file except in compliance with the License. You may obtain a copy of the License at:
+//
+//      http://www.opensource.org/licenses/eclipse-1.0.php
+//
+//  Unless agreed to in writing, the subject software distributed under the License is distributed on an
+//  "AS-IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. Refer to the
+//  License for the specific language governing permissions and limitations.
+//
+//  Code Modification History:
+//  ----------------------------------------------------------------------------------------------------
+//  06/26/2020 - C. Lackner
+//       Generated original version of source code.
+//
+//******************************************************************************************************
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using FaultData.DataAnalysis;
+using FaultData.DataSets;
+using log4net;
+using openXDA.Model;
+
+namespace FaultData.DataReaders
+{
+    /// <summary>
+    /// Reads an LDP file to produce a <see cref="MeterDataSet"/>.
+    /// </summary>
+    public class SELLDPReader : IDataReader
+    {
+        #region [ Member Classes ]
+
+        private class Record
+        {
+            public RecordType Type { get; set; }
+            public byte[] Data { get; set; }
+            public int Length { get; set; }
+            public int Checksum { get; set; }
+
+            public static Record ParseNext(byte[] data, int offset)
+            {
+                ushort recordType = ParseUInt16(data, offset + 0);
+                Record result = new Record();
+                result.Type = (RecordType)recordType;
+
+                ushort size = ParseUInt16(data, offset + 2);
+                result.Length = size;
+                result.Data = new byte[(result.Length - 2)];
+                Buffer.BlockCopy(data, offset + 4, result.Data, 0, result.Length - 2);
+
+                ushort checkSum = ParseUInt16(data, offset + result.Length + 2);
+                result.Checksum = checkSum;
+
+                return result;
+            }
+        }
+        
+        enum RecordType: ushort
+        { 
+            MeterConfig = 0x0064,
+            MeterStatus = 0x066,
+            CurrentValues = 0x0065,
+            LDPData = 0x0067,
+            SERData = 0x0068
+        }
+
+        private class RecordChannel
+        {
+            public string Name { get; set; }
+            public double Scalar { get; set; }
+            public double Multiplier { get; set; }
+            public string Function { get; set; }
+            public ChannelType Type { get; set; }
+        }
+
+        enum ChannelType: uint
+        {
+            CurrentPhase =	0,
+            CurrentNeutral = 1,
+            Voltage	= 2,
+            PowerReal = 50,
+            PowerReactive = 51,
+            PowerApparent = 52,
+            EnergyReal = 100,
+            EnergyReactive = 101,
+            EnergyApparent = 102,
+            AmpHoursPhase = 103,
+            AmpHoursNeutral = 104,
+            VoltHours = 105,
+            Angle = 150,
+            Frequency = 151,
+            Percent = 152,
+            Registers =	153,
+            Miscellaneous = 200
+        }
+
+        #endregion
+
+        #region [ Methods ]
+
+        public bool IsReadyForLoad(FileInfo[] fileList) =>
+            fileList.All(fileInfo => fileInfo.Length > 0L);
+
+        public DataFile GetPrimaryDataFile(FileGroup fileGroup) =>
+            fileGroup.DataFiles.First();
+
+        public MeterDataSet Parse(string hexData)
+        {
+            byte[] data = ReadHex(hexData);
+            return Parse(data);
+        }
+        public MeterDataSet Parse(FileGroup fileGroup)
+        {
+            DataFile dataFile = GetPrimaryDataFile(fileGroup);
+            byte[] data = ReadFile(dataFile);
+            return Parse(data);
+        }
+
+        public MeterDataSet Parse(byte[] data)
+        {
+            MeterDataSet meterDataSet = new MeterDataSet();
+            meterDataSet.Meter = new Meter();
+            List<Record> records = new List<Record>();
+            int offset = 0;
+
+            while (offset < data.Length)
+            {
+                records.Add(Record.ParseNext(data, offset));
+                offset += records.Last().Length + 4;
+            }
+
+            Meter meter = meterDataSet.Meter;
+            meter.Location = new Location();
+            meter.Channels = new List<Channel>();
+            meter.AssetKey = "";
+            meter.Name = "";
+            meter.ShortName = "";
+
+            Location meterLocation = meter.Location;
+            meterLocation.Meters = new List<Meter>() { meter };
+            meterLocation.LocationKey = "";
+            meterLocation.Name = "";
+            meterLocation.ShortName = "";
+            meterLocation.Description = "";
+
+            List<RecordChannel> channels = ReadMeterConfiguration(records[0]);
+
+            for (int i = 0; i < channels.Count; i++)
+            {
+                Channel channel = ParseSeries(channels[i], i);
+                channel.Meter = meter;
+
+                DataSeries dataSeries = new DataSeries();
+                dataSeries.SeriesInfo = channel.Series[0];
+
+                meter.Channels.Add(channel);
+
+                while (meterDataSet.DataSeries.Count <= i)
+                    meterDataSet.DataSeries.Add(new DataSeries());
+
+                meterDataSet.DataSeries[i] = dataSeries;
+            }
+
+            try
+            {
+                foreach (Record record in records)
+                {
+                    if (record.Type != RecordType.LDPData)
+                        continue;
+
+                    int index = 0;
+                    while (index < record.Data.Count())
+                    {
+                        DateTime TS;
+
+                        index++;
+                        int year = ParseUInt16(record.Data, index);
+                        index = index + 2;
+                        int day = ParseUInt16(record.Data, index);
+                        index = index + 2;
+                        long ticks = ParseUInt32(record.Data, index) * TimeSpan.TicksPerMillisecond / 10L;
+                        index = index + 4;
+
+                        TS = new DateTime(year, 1, 1)
+                            + TimeSpan.FromDays(day - 1) // Convert "Julian day" to zero-based days since Jan 1
+                            + TimeSpan.FromTicks(ticks);
+
+                        for (int i = 0; i < channels.Count; i++)
+                        {
+                            double value = ParseFloat32(record.Data, index);
+                            index = index + 4;
+                            meterDataSet.DataSeries[i].DataPoints.Add(new DataPoint() { Time = TS, Value = channels[i].Scalar * value });
+                        }
+                    }
+
+                }
+                //Parse Values and TimeStamps
+
+
+                // Process 
+
+            }
+            catch (InvalidOperationException ex)
+            {
+                Log.Warn(ex.Message, ex);
+            }
+
+            return meterDataSet;
+        }
+
+        private byte[] ReadFile(DataFile dataFile)
+        {
+            byte[] fileData = dataFile.FileBlob.Blob;
+            string hexData = Encoding.UTF8.GetString(fileData);
+            return ReadHex(hexData);
+        }
+
+        private byte[] ReadHex(string hexData)
+        {
+            byte[] data = new byte[hexData.Length / 2];
+
+            for (int index = 0; index < data.Length; index++)
+            {
+                string byteValue = hexData.Substring(index * 2, 2);
+                data[index] = byte.Parse(byteValue, NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            }
+
+            return data;
+        }
+
+        private List<RecordChannel> ReadMeterConfiguration(Record meterConfiguration)
+        {
+            List<RecordChannel> channels = new List<RecordChannel>();
+
+            if (meterConfiguration.Type != RecordType.MeterConfig)
+                return channels;
+
+            int nChannels = ParseUInt16(meterConfiguration.Data, 151);
+            int index = 153;
+            
+            //Get Names of Channels
+            for (int i =0; i < nChannels; i++)
+            {
+                RecordChannel channel = new RecordChannel()
+                {
+                    Multiplier = 1.0,
+                    Scalar = 1.0,
+                    Name = "",
+                    Function = ""
+                };
+
+                while(meterConfiguration.Data[index] != 0x00)
+                {
+
+                    channel.Name = channel.Name + Convert.ToChar(meterConfiguration.Data[index]);
+                    index++;
+                }
+
+                channels.Add(channel);
+                index++;
+            }
+
+            index++;
+
+            //Get Channel Functions
+            for (int i = 0; i < nChannels; i++)
+            {
+                while (meterConfiguration.Data[index] != 0x00)
+                {
+
+                    channels[i].Function = channels[i].Function + Convert.ToChar(meterConfiguration.Data[index]);
+                    index++;
+                }
+
+                index++;
+            }
+            index++;
+
+            //Get Channel Type
+            for (int i = 0; i < nChannels; i++)
+            {
+                channels[i].Type = (ChannelType)ParseUInt32(meterConfiguration.Data, index);
+                index = index + 4;
+            }
+
+            // Get Channel Multiplier
+            for (int i = 0; i < nChannels; i++)
+            {
+                channels[i].Multiplier = ParseFloat32(meterConfiguration.Data, index);
+                index = index + 4;
+            }
+
+            // Get Channel Scalar
+            for (int i = 0; i < nChannels; i++)
+            {
+                channels[i].Scalar = ParseFloat32(meterConfiguration.Data, index);
+                index = index + 4;
+            }
+
+            return channels;
+
+        }
+
+        private static ushort ParseUInt16(byte[] data, int start)
+        {
+            byte[] adjData = new byte[2];
+            if (BitConverter.IsLittleEndian)
+            {
+                adjData[0] = data[start + 1];
+                adjData[1] = data[start];
+            }
+            else
+            {
+                adjData[1] = data[start + 1];
+                adjData[0] = data[start];
+            }
+
+            return BitConverter.ToUInt16(adjData, 0);
+
+        }
+
+        private static uint ParseUInt32(byte[] data, int start)
+        {
+            byte[] adjData = new byte[4];
+            if (BitConverter.IsLittleEndian)
+            {
+                adjData[0] = data[start + 3];
+                adjData[1] = data[start + 2];
+                adjData[2] = data[start + 1];
+                adjData[3] = data[start];
+            }
+            else
+            {
+                adjData[0] = data[start];
+                adjData[1] = data[start + 1];
+                adjData[2] = data[start + 2];
+                adjData[3] = data[start + 3];
+            }
+
+            return BitConverter.ToUInt32(adjData, 0);
+
+        }
+
+        private static float ParseFloat32(byte[] data, int start)
+        {
+            byte[] adjData = new byte[4];
+            if (BitConverter.IsLittleEndian)
+            {
+                adjData[0] = data[start + 3];
+                adjData[1] = data[start + 2];
+                adjData[2] = data[start + 1];
+                adjData[3] = data[start];
+            }
+            else
+            {
+                adjData[0] = data[start];
+                adjData[1] = data[start + 1];
+                adjData[2] = data[start + 2];
+                adjData[3] = data[start + 3];
+            }
+
+            return BitConverter.ToSingle(adjData, 0);
+
+        }
+
+        private Channel ParseSeries(RecordChannel record, int index)
+        {
+
+            Series series = new Series();
+            series.Channel = new Channel();
+            series.SeriesType = new SeriesType() { Name = "Average" };
+            series.SourceIndexes = (index + 1).ToString();
+
+            Channel channel = series.Channel;
+            channel.Series = new List<Series>() { series };
+            channel.MeasurementType = new MeasurementType() { Name = "Unknown" };
+            channel.MeasurementCharacteristic = new MeasurementCharacteristic() { Name = "Unknown" };
+            channel.Phase = new Phase() { Name = "Unknown" };
+            channel.Name = record.Name;
+            channel.Description = record.Name;
+            channel.HarmonicGroup = 0;
+            channel.Trend = true;
+
+            return channel;
+        }
+
+        #endregion
+
+        #region [ Static ]
+
+        // Static Fields
+        private static readonly ILog Log = LogManager.GetLogger(typeof(SELLDPReader));
+
+        #endregion
+    }
+}

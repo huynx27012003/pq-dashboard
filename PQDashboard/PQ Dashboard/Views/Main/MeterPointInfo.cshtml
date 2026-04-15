@@ -1,0 +1,508 @@
+@using System.Web
+@{
+    Layout = "";
+}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Meter Point Info</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="@Url.Content("~/@GSF/Web/Shared/Content/bootstrap.css")" rel="stylesheet">
+    <link href="@Url.Content("~/@GSF/Web/Shared/Content/font-awesome.css")" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/MaxiCom.css?v=20260211" />
+
+    <style>
+        :root {
+            --primary-color: #0f2b8f;
+            --primary-light: #eef2ff;
+            --success-color: #17a34a;
+            --danger-color: #dc3545;
+            --info-color: #0ea5c6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --bg-body: #f3f6fb;
+            --bg-card: #ffffff;
+            --border-color: #e3e9f5;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            font-family: 'Inter', "Segoe UI", system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page-container {
+            padding: 20px 30px;
+        }
+
+        /* Header block */
+        .page-header {
+            margin-bottom: 20px;
+        }
+
+        .btn-back {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            outline: none;
+            padding: 0 10px 0 0;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-back i { font-size: 16px; font-weight: bold; }
+        
+        .meter-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: inline-block;
+            margin: 0;
+            vertical-align: middle;
+        }
+
+        .meter-subtitle {
+            margin-top: 6px;
+            margin-left: 28px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        .status-pill::before {
+            content: ''; width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1;
+        }
+        .status-pill.connected { color: #15803d; background: #f0fdf4; }
+        .status-pill.connected::before { background: #22c55e; }
+        .status-pill.failed { color: #b91c1c; background: #fef2f2; }
+        .status-pill.failed::before { background: #ef4444; }
+
+        /* Panels */
+        .tm-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tm-card-header {
+            padding: 12px 20px;
+            background: var(--primary-color);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tm-card-body { padding: 0; }
+
+        .info-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .info-col {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Tabs */
+        .tabs-header {
+            display: flex;
+            background: var(--primary-color);
+            color: #fff;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .tab-btn.active {
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+            border-bottom-color: #ffffff;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: #fff;
+        }
+
+        .filter-group { display: flex; align-items: center; gap: 12px; }
+
+        /* Form elements */
+        .premium-select, .premium-input {
+            position: relative;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            min-width: 130px;
+        }
+
+        .premium-select label, .premium-input label {
+            position: absolute;
+            top: -9px;
+            left: 8px;
+            background: #fff;
+            padding: 0 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .premium-select select, .premium-input input {
+            width: 100%; border: none; outline: none; background: transparent;
+            font-size: 13px; font-weight: 600; color: var(--text-primary);
+        }
+
+        .btn-apply {
+            background: #1e40af; color: #fff; border: none; border-radius: 6px;
+            padding: 8px 16px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+        }
+
+        .btn-export {
+            background: #f59e0b; color: #fff; border: none; border-radius: 6px;
+            padding: 8px 16px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+        }
+
+        /* Table */
+        .table-responsive { width: 100%; overflow-x: auto; background: #fff; min-height: 200px; }
+        .table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+        .table thead th {
+            text-align: left; padding: 12px 16px; font-size: 10px; font-weight: 700;
+            text-transform: uppercase; color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color); background: #fafafa;
+        }
+        .table tbody td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .chart-container {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: #fafafa;
+            min-height: 300px;
+        }
+        .chart-title {
+            font-size: 13px; font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px;
+        }
+        .grid-lines {
+            margin-top: 15px; height: 180px; position: relative; border-left: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;
+        }
+        .grid-lines::before {
+            content: '1.0\A 0.9\A 0.8\A 0.7\A 0.6\A 0.5\A 0.4\A 0.3\A 0.2\A 0.1\A 0';
+            white-space: pre; position: absolute; left: -25px; top: -5px; font-size: 9px; line-height: 16px; color: var(--text-secondary); text-align: right; pointer-events: none;
+        }
+        .grid-line-h { width: 100%; height: 1px; background: #f3f4f6; margin-bottom: 15px; }
+        .x-axis-label { text-align: center; font-size: 10px; color: var(--text-secondary); margin-top: 8px; }
+
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <!-- Header -->
+        <div class="page-header">
+            <div style="display:flex; align-items:center;">
+                <button class="btn-back" onclick="goBack()"><i class="fa fa-arrow-left"></i></button>
+                <h2 class="meter-title" id="mheader-name">BESS_02</h2>
+            </div>
+            <div class="meter-subtitle">
+                <span><i class="fa fa-th"></i> <span id="mheader-type">M-2</span></span>
+                <span># S/N: <span id="mheader-sn">253319562</span></span>
+                <span id="mheader-status" class="status-pill failed">Failed</span>
+            </div>
+        </div>
+
+        <!-- Meter Point Info -->
+        <div class="tm-card">
+            <div class="tm-card-header">
+                <i class="fa fa-info-circle"></i> Meter Point Information
+            </div>
+            <div class="tm-card-body">
+                <div class="info-grid">
+                    <div class="info-col">
+                        <span class="info-label">Meter Point Code - IMEI</span>
+                        <span class="info-value" id="minfo-imei">--</span>
+                    </div>
+                    <div class="info-col">
+                        <span class="info-label">Location</span>
+                        <span class="info-value">N/A</span>
+                    </div>
+                    <div class="info-col">
+                        <span class="info-label">Meter Type</span>
+                        <span class="info-value" id="minfo-type">--</span>
+                    </div>
+                    <div class="info-col">
+                        <span class="info-label">Multiplier</span>
+                        <span class="info-value">1</span>
+                    </div>
+                    <div class="info-col">
+                        <span class="info-label">Total Records</span>
+                        <span class="info-value">0 records</span>
+                    </div>
+                    <div class="info-col">
+                        <span class="info-label">Last Updated</span>
+                        <span class="info-value" id="minfo-updated">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Tabs -->
+        <div class="tm-card">
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="switchTab('op-metrics')">Operation Metrics</button>
+                <button class="tab-btn" onclick="switchTab('pl-profile')">Power Load Profile</button>
+                <button class="tab-btn" onclick="switchTab('fn-readings')">Finalized Readings</button>
+            </div>
+            <div class="tm-card-body">
+                
+                <!-- Tab 1: Operation Metrics -->
+                <div id="tab-op-metrics" class="tab-content active">
+                    <div class="toolbar">
+                        <div class="filter-group">
+                            <div class="premium-input"><label>From</label><input type="date" id="op-from"></div>
+                            <div class="premium-input"><label>To</label><input type="date" id="op-to"></div>
+                        </div>
+                        <div class="filter-group">
+                            <button class="btn-apply"><i class="fa fa-search"></i> Apply</button>
+                            <button class="btn-export"><i class="fa fa-download"></i> Export Excel</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Total Import (kWh)</th>
+                                    <th>Total Export (kWh)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="3" style="text-align:center; padding: 40px; color: var(--text-secondary);">No Operation Metrics data found for this period.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Power Load Profile -->
+                <div id="tab-pl-profile" class="tab-content">
+                    <div class="toolbar">
+                        <div class="filter-group">
+                            <div class="premium-input"><label>From Date</label><input type="date" id="pl-from"></div>
+                            <div class="premium-input"><label>To Date</label><input type="date" id="pl-to"></div>
+                            <div class="premium-select">
+                                <label>Interval / Survey</label>
+                                <select id="pl-interval" onchange="toggleSurveyView()">
+                                    <option value="1m">1m</option>
+                                    <option value="5m">5m</option>
+                                    <option value="15m">15m</option>
+                                    <option value="survey">Survey</option>
+                                </select>
+                            </div>
+                            <!-- Appears when survey is selected -->
+                            <div class="premium-input" id="pl-time-from" style="display:none;"><label>Time From</label><input type="time"></div>
+                            <div class="premium-input" id="pl-time-to" style="display:none;"><label>Time To</label><input type="time"></div>
+                            
+                            <div class="premium-select">
+                                <label>Select Columns</label>
+                                <select><option>Phase A voltage (V), Phase...</option></select>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <button class="btn-apply"><i class="fa fa-search"></i> Apply</button>
+                            <button class="btn-export"><i class="fa fa-download"></i> Export Excel</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fa fa-line-chart"></i> <span id="pl-chart-title">Operating Parameters Chart</span>
+                        </div>
+                        <div class="grid-lines">
+                            <!-- 10 lines for 0 to 1.0 grid -->
+                            <div class="grid-line-h"></div><div class="grid-line-h"></div><div class="grid-line-h"></div>
+                            <div class="grid-line-h"></div><div class="grid-line-h"></div><div class="grid-line-h"></div>
+                            <div class="grid-line-h"></div><div class="grid-line-h"></div><div class="grid-line-h"></div>
+                            <div class="grid-line-h"></div><div class="grid-line-h"></div>
+                        </div>
+                        <div class="x-axis-label">Time</div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table" id="pl-table-main">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Phase A Voltage (V)</th>
+                                    <th>Phase B Voltage (V)</th>
+                                    <th>Phase C Voltage (V)</th>
+                                    <th>Phase A Current (A)</th>
+                                    <th>Phase B Current (A)</th>
+                                    <th>Phase C Current (A)</th>
+                                    <th>Total Active Power (W)</th>
+                                    <th>Power Factor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="9" style="text-align:center; padding: 40px; color: var(--text-secondary);">No Power Load Profile data.</td></tr>
+                            </tbody>
+                        </table>
+                        
+                        <table class="table" id="pl-table-survey" style="display:none;">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td style="text-align:center; padding: 40px; color: var(--text-secondary);">No Survey data found.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Finalized Readings -->
+                <div id="tab-fn-readings" class="tab-content">
+                     <div class="table-responsive" style="padding: 40px; text-align: center; color: var(--text-secondary);">
+                        <i class="fa fa-lock" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>No finalized readings available.</p>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Init dates
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('op-from').value = todayStr;
+        document.getElementById('op-to').value = todayStr;
+        document.getElementById('pl-from').value = todayStr;
+        document.getElementById('pl-to').value = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
+        // Parse Meter info from Session Storage
+        document.addEventListener('DOMContentLoaded', () => {
+             const meterJson = sessionStorage.getItem('selectedMeterInfo');
+             if (meterJson) {
+                 try {
+                     const m = JSON.parse(meterJson);
+                     
+                     // Header
+                     document.getElementById('mheader-name').textContent = m.meter_name || '--';
+                     document.getElementById('mheader-sn').textContent = m.serial_number || '--';
+                     document.getElementById('mheader-type').textContent = `M-${m.meter_id || '0'}`;
+                     
+                     const isConnected = m._isConnected;
+                     const rawStatus = (m._statusText || '').toLowerCase();
+                     const isFailed = rawStatus.includes('failed') || rawStatus === 'disconnected' || rawStatus === 'idle';
+                     
+                     const stEl = document.getElementById('mheader-status');
+                     stEl.textContent = isConnected ? 'Connected' : (isFailed ? 'Failed' : m._statusText || 'Disconnected');
+                     stEl.className = 'status-pill ' + (isConnected ? 'connected' : (isFailed ? 'failed' : ''));
+
+                     // Info Panel
+                     document.getElementById('minfo-imei').textContent = m.serial_number || '--';
+                     const typeLabel = (m.type || 'N/A').toUpperCase().includes('DMI') ? 'EDMI ' + (m.model||'') : (m.model || m.type || 'Mk6E');
+                     document.getElementById('minfo-type').textContent = typeLabel;
+                     
+                     const lastUpd = sessionStorage.getItem('tariff_last_status') ? new Date().toLocaleString([], {year:'numeric', month:'numeric', day:'numeric', hour:'numeric', minute:'2-digit'}) : 'N/A';
+                     document.getElementById('minfo-updated').textContent = lastUpd;
+                     
+                 } catch(e) { console.error('Failed parsing meter:', e); }
+             }
+        });
+
+        // Communication to parent
+        function goBack() {
+             if (window.parent && window.parent.document.getElementById('back-to-meter-list')) {
+                 window.parent.document.getElementById('back-to-meter-list').click();
+             }
+        }
+
+        // Tabs logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        function toggleSurveyView() {
+            const val = document.getElementById('pl-interval').value;
+            const isSurvey = val === 'survey';
+            
+            document.getElementById('pl-time-from').style.display = isSurvey ? 'block' : 'none';
+            document.getElementById('pl-time-to').style.display = isSurvey ? 'block' : 'none';
+            
+            document.getElementById('pl-table-main').style.display = isSurvey ? 'none' : 'table';
+            document.getElementById('pl-table-survey').style.display = isSurvey ? 'table' : 'none';
+            
+            document.getElementById('pl-chart-title').innerHTML = isSurvey ? 'Load survey (LS02) N/A sampling interval' : 'Operating Parameters Chart';
+        }
+
+    </script>
+</body>
+</html>

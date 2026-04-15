@@ -1,0 +1,615 @@
+<Include>
+<ComponentGroup Id="wwwroot_Components" Directory="wwwroot_WWWROOTFOLDER">
+  <Component Id="wwwroot_index_cshtml">
+    <File Id="wwwroot_._index.cshtml" Name="index.cshtml" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\index.cshtml" />
+  </Component>
+  <Component Id="wwwroot_Layout_cshtml">
+	 <File Id="wwwroot_._Layout.cshtml" Name="Layout.cshtml" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Layout.cshtml" />
+  </Component>
+  <Component Id="wwwroot_Logout_cshtml">
+    <File Id="wwwroot_._Logout.cshtml" Name="Logout.cshtml" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Logout.cshtml" />
+  </Component>
+  <Component Id="wwwroot_README_md">
+    <File Id="wwwroot_._README.md" Name="README.md" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\README.md" />
+  </Component>
+  <Component Id="wwwroot_RestoreEventEmail_cshtml">
+    <File Id="wwwroot_._RestoreEventEmail.cshtml" Name="RestoreEventEmail.cshtml" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\RestoreEventEmail.cshtml" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Content_Components" Directory="wwwroot_CONTENTFOLDER">
+  <Component Id="wwwroot_Content_BigTable_css">
+    <File Id="wwwroot_Content_BigTable.css" Name="BigTable.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\BigTable.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_datepicker3_css">
+    <File Id="wwwroot_Content_bootstrap_datepicker3.css" Name="bootstrap-datepicker3.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-datepicker3.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_datepicker3_min_css">
+    <File Id="wwwroot_Content_bootstrap_datepicker3.min.css" Name="bootstrap-datepicker3.min.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-datepicker3.min.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_datetimepicker_css">
+    <File Id="wwwroot_Content_bootstrap_datetimepicker.css" Name="bootstrap-datetimepicker.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-datetimepicker.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_sidebar_css">
+    <File Id="wwwroot_Content_bootstrap_sidebar.css" Name="bootstrap-sidebar.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-sidebar.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_cerulean_css">
+    <File Id="wwwroot_Content_bootstrap_theme_cerulean.css" Name="bootstrap-theme-cerulean.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme-cerulean.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_cosmo_css">
+    <File Id="wwwroot_Content_bootstrap_theme_cosmo.css" Name="bootstrap-theme-cosmo.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme-cosmo.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_cyborg_css">
+    <File Id="wwwroot_Content_bootstrap_theme_cyborg.css" Name="bootstrap-theme-cyborg.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme-cyborg.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_readable_css">
+    <File Id="wwwroot_Content_bootstrap_theme_readable.css" Name="bootstrap-theme-readable.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme-readable.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_sandstone_css">
+    <File Id="wwwroot_Content_bootstrap_theme_sandstone.css" Name="bootstrap-theme-sandstone.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme-sandstone.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_slate_css">
+    <File Id="wwwroot_Content_bootstrap_theme_slate.css" Name="bootstrap-theme-slate.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme-slate.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_united_css">
+    <File Id="wwwroot_Content_bootstrap_theme_united.css" Name="bootstrap-theme-united.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme-united.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_css">
+    <File Id="wwwroot_Content_bootstrap_theme.css" Name="bootstrap-theme.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_css_map">
+    <File Id="wwwroot_Content_bootstrap_theme.css.map" Name="bootstrap-theme.css.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme.css.map" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_min_css">
+    <File Id="wwwroot_Content_bootstrap_theme.min.css" Name="bootstrap-theme.min.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme.min.css" />
+  </Component>
+  <Component Id="wwwroot_Content_bootstrap_theme_min_css_map">
+    <File Id="wwwroot_Content_bootstrap_theme.min.css.map" Name="bootstrap-theme.min.css.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\bootstrap-theme.min.css.map" />
+  </Component>
+  <Component Id="wwwroot_Content_daterangepicker_css">
+    <File Id="wwwroot_Content_daterangepicker.css" Name="daterangepicker.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\daterangepicker.css" />
+  </Component>
+  <Component Id="wwwroot_Content_fileinput_css">
+    <File Id="wwwroot_Content_fileinput.css" Name="fileinput.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fileinput.css" />
+  </Component>
+  <Component Id="wwwroot_Content_jquery_jspanel_css">
+    <File Id="wwwroot_Content_jquery.jspanel.css" Name="jquery.jspanel.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\jquery.jspanel.css" />
+  </Component>
+  <Component Id="wwwroot_Content_jquery_jspanel_min_css">
+    <File Id="wwwroot_Content_jquery.jspanel.min.css" Name="jquery.jspanel.min.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\jquery.jspanel.min.css" />
+  </Component>
+  <Component Id="wwwroot_Content_jquery_jspanel_sass">
+    <File Id="wwwroot_Content_jquery.jspanel.sass" Name="jquery.jspanel.sass" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\jquery.jspanel.sass" />
+  </Component>
+  <Component Id="wwwroot_Content_jquery_multiselect_css">
+    <File Id="wwwroot_Content_jquery.multiselect.css" Name="jquery.multiselect.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\jquery.multiselect.css" />
+  </Component>
+  <Component Id="wwwroot_Content_jquery_multiselect_filter_css">
+    <File Id="wwwroot_Content_jquery.multiselect.filter.css" Name="jquery.multiselect.filter.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\jquery.multiselect.filter.css" />
+  </Component>
+  <Component Id="wwwroot_Content_OpenSEE_css">
+    <File Id="wwwroot_Content_OpenSEE.css" Name="OpenSEE.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\OpenSEE.css" />
+  </Component>
+  <Component Id="wwwroot_Content_OpenSTE_css">
+    <File Id="wwwroot_Content_OpenSTE.css" Name="OpenSTE.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\OpenSTE.css" />
+  </Component>
+  <Component Id="wwwroot_Content_Popup_css">
+    <File Id="wwwroot_Content_Popup.css" Name="Popup.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\Popup.css" />
+  </Component>
+  <Component Id="wwwroot_Content_primeui_min_css">
+    <File Id="wwwroot_Content_primeui.min.css" Name="primeui.min.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\primeui.min.css" />
+  </Component>
+  <Component Id="wwwroot_Content_Site_css">
+    <File Id="wwwroot_Content_Site.css" Name="Site.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\Site.css" />
+  </Component>
+  <Component Id="wwwroot_Content_jsglyph_sass">
+    <File Id="wwwroot_Content_jsglyph.sass" Name="_jsglyph.sass" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\_jsglyph.sass" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_sass">
+    <File Id="wwwroot_Content_themes.sass" Name="_themes.sass" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\_themes.sass" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_mdl_styles_sass">
+    <File Id="wwwroot_Content_themes_mdl_styles.sass" Name="_themes_mdl_styles.sass" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\_themes_mdl_styles.sass" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Content_fonts_Components" Directory="wwwroot_CONTENTFONTSFOLDER">
+  <Component Id="wwwroot_Content_fonts_fontawesome_webfont_eot">
+    <File Id="wwwroot_Content_fonts_fontawesome_webfont.eot" Name="fontawesome-webfont.eot" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\fontawesome-webfont.eot" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_fontawesome_webfont_svg">
+    <File Id="wwwroot_Content_fonts_fontawesome_webfont.svg" Name="fontawesome-webfont.svg" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\fontawesome-webfont.svg" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_fontawesome_webfont_ttf">
+    <File Id="wwwroot_Content_fonts_fontawesome_webfont.ttf" Name="fontawesome-webfont.ttf" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\fontawesome-webfont.ttf" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_fontawesome_webfont_woff">
+    <File Id="wwwroot_Content_fonts_fontawesome_webfont.woff" Name="fontawesome-webfont.woff" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\fontawesome-webfont.woff" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_fontawesome_webfont_woff2">
+    <File Id="wwwroot_Content_fonts_fontawesome_webfont.woff2" Name="fontawesome-webfont.woff2" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\fontawesome-webfont.woff2" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_FontAwesome_otf">
+    <File Id="wwwroot_Content_fonts_FontAwesome.otf" Name="FontAwesome.otf" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\FontAwesome.otf" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_glyphicons_halflings_regular_eot">
+    <File Id="wwwroot_Content_fonts_glyphicons_halflings_regular.eot" Name="glyphicons-halflings-regular.eot" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\glyphicons-halflings-regular.eot" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_glyphicons_halflings_regular_svg">
+    <File Id="wwwroot_Content_fonts_glyphicons_halflings_regular.svg" Name="glyphicons-halflings-regular.svg" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\glyphicons-halflings-regular.svg" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_glyphicons_halflings_regular_ttf">
+    <File Id="wwwroot_Content_fonts_glyphicons_halflings_regular.ttf" Name="glyphicons-halflings-regular.ttf" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\glyphicons-halflings-regular.ttf" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_glyphicons_halflings_regular_woff">
+    <File Id="wwwroot_Content_fonts_glyphicons_halflings_regular.woff" Name="glyphicons-halflings-regular.woff" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\glyphicons-halflings-regular.woff" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_glyphicons_halflings_regular_woff2">
+    <File Id="wwwroot_Content_fonts_glyphicons_halflings_regular.woff2" Name="glyphicons-halflings-regular.woff2" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\glyphicons-halflings-regular.woff2" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_jsglyph_eot">
+    <File Id="wwwroot_Content_fonts_jsglyph.eot" Name="jsglyph.eot" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\jsglyph.eot" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_jsglyph_svg">
+    <File Id="wwwroot_Content_fonts_jsglyph.svg" Name="jsglyph.svg" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\jsglyph.svg" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_jsglyph_ttf">
+    <File Id="wwwroot_Content_fonts_jsglyph.ttf" Name="jsglyph.ttf" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\jsglyph.ttf" />
+  </Component>
+  <Component Id="wwwroot_Content_fonts_jsglyph_woff">
+    <File Id="wwwroot_Content_fonts_jsglyph.woff" Name="jsglyph.woff" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fonts\jsglyph.woff" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Content_fullscreenselect_Components" Directory="wwwroot_CONTENTFULLSCREENSELECTFOLDER">
+  <Component Id="wwwroot_Content_fullscreenselect_bootstrap_fullscreen_select_css">
+    <File Id="wwwroot_Content_fullscreenselect_bootstrap_fullscreen_select.css" Name="bootstrap-fullscreen-select.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fullscreenselect\bootstrap-fullscreen-select.css" />
+  </Component>
+  <Component Id="wwwroot_Content_fullscreenselect_bootstrap_fullscreen_select_css_map">
+    <File Id="wwwroot_Content_fullscreenselect_bootstrap_fullscreen_select.css.map" Name="bootstrap-fullscreen-select.css.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\fullscreenselect\bootstrap-fullscreen-select.css.map" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Content_images_Components" Directory="wwwroot_CONTENTIMAGESFOLDER">
+  <Component Id="wwwroot_Content_images_loading_sm_gif">
+    <File Id="wwwroot_Content_images_loading_sm.gif" Name="loading-sm.gif" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\loading-sm.gif" />
+  </Component>
+  <Component Id="wwwroot_Content_images_loading_gif">
+    <File Id="wwwroot_Content_images_loading.gif" Name="loading.gif" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\loading.gif" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_bg_glass_55_fbf9ee_1x400_png">
+    <File Id="wwwroot_Content_images_ui_bg_glass_55_fbf9ee_1x400.png" Name="ui-bg_glass_55_fbf9ee_1x400.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_bg_glass_65_ffffff_1x400_png">
+    <File Id="wwwroot_Content_images_ui_bg_glass_65_ffffff_1x400.png" Name="ui-bg_glass_65_ffffff_1x400.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-bg_glass_65_ffffff_1x400.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_bg_glass_75_dadada_1x400_png">
+    <File Id="wwwroot_Content_images_ui_bg_glass_75_dadada_1x400.png" Name="ui-bg_glass_75_dadada_1x400.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-bg_glass_75_dadada_1x400.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_bg_glass_75_e6e6e6_1x400_png">
+    <File Id="wwwroot_Content_images_ui_bg_glass_75_e6e6e6_1x400.png" Name="ui-bg_glass_75_e6e6e6_1x400.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_bg_glass_95_fef1ec_1x400_png">
+    <File Id="wwwroot_Content_images_ui_bg_glass_95_fef1ec_1x400.png" Name="ui-bg_glass_95_fef1ec_1x400.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-bg_glass_95_fef1ec_1x400.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_bg_highlight_soft_75_cccccc_1x100_png">
+    <File Id="wwwroot_Content_images_ui_bg_highlight_soft_75_cccccc_1x100.png" Name="ui-bg_highlight-soft_75_cccccc_1x100.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_icons_222222_256x240_png">
+    <File Id="wwwroot_Content_images_ui_icons_222222_256x240.png" Name="ui-icons_222222_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-icons_222222_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_icons_2e83ff_256x240_png">
+    <File Id="wwwroot_Content_images_ui_icons_2e83ff_256x240.png" Name="ui-icons_2e83ff_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-icons_2e83ff_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_icons_333333_256x240_png">
+    <File Id="wwwroot_Content_images_ui_icons_333333_256x240.png" Name="ui-icons_333333_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-icons_333333_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_icons_454545_256x240_png">
+    <File Id="wwwroot_Content_images_ui_icons_454545_256x240.png" Name="ui-icons_454545_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-icons_454545_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_icons_888888_256x240_png">
+    <File Id="wwwroot_Content_images_ui_icons_888888_256x240.png" Name="ui-icons_888888_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-icons_888888_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_icons_cd0a0a_256x240_png">
+    <File Id="wwwroot_Content_images_ui_icons_cd0a0a_256x240.png" Name="ui-icons_cd0a0a_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-icons_cd0a0a_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_images_ui_icons_ffffff_256x240_png">
+    <File Id="wwwroot_Content_images_ui_icons_ffffff_256x240.png" Name="ui-icons_ffffff_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\images\ui-icons_ffffff_256x240.png" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Content_themes_Components" Directory="wwwroot_CONTENTTHEMESFOLDER">
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Content_themes_redmond_Components" Directory="wwwroot_CONTENTTHEMESREDMONDFOLDER">
+  <Component Id="wwwroot_Content_themes_redmond_jquery_ui_css">
+    <File Id="wwwroot_Content_themes_redmond_jquery_ui.css" Name="jquery-ui.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\jquery-ui.css" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_jquery_ui_min_css">
+    <File Id="wwwroot_Content_themes_redmond_jquery_ui.min.css" Name="jquery-ui.min.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\jquery-ui.min.css" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_theme_css">
+    <File Id="wwwroot_Content_themes_redmond_theme.css" Name="theme.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\theme.css" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Content_themes_redmond_images_Components" Directory="wwwroot_CONTENTTHEMESREDMONDIMAGESFOLDER">
+  <Component Id="wwwroot_Content_themes_redmond_images_animated_overlay_gif">
+    <File Id="wwwroot_Content_themes_redmond_images_animated_overlay.gif" Name="animated-overlay.gif" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\animated-overlay.gif" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_bg_flat_0_aaaaaa_40x100_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_bg_flat_0_aaaaaa_40x100.png" Name="ui-bg_flat_0_aaaaaa_40x100.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_bg_flat_55_fbec88_40x100_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_bg_flat_55_fbec88_40x100.png" Name="ui-bg_flat_55_fbec88_40x100.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-bg_flat_55_fbec88_40x100.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_bg_glass_75_d0e5f5_1x400_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_bg_glass_75_d0e5f5_1x400.png" Name="ui-bg_glass_75_d0e5f5_1x400.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-bg_glass_75_d0e5f5_1x400.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_bg_glass_85_dfeffc_1x400_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_bg_glass_85_dfeffc_1x400.png" Name="ui-bg_glass_85_dfeffc_1x400.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-bg_glass_85_dfeffc_1x400.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_bg_glass_95_fef1ec_1x400_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_bg_glass_95_fef1ec_1x400.png" Name="ui-bg_glass_95_fef1ec_1x400.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-bg_glass_95_fef1ec_1x400.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_bg_gloss_wave_55_5c9ccc_500x100_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_bg_gloss_wave_55_5c9ccc_500x100.png" Name="ui-bg_gloss-wave_55_5c9ccc_500x100.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-bg_gloss-wave_55_5c9ccc_500x100.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_bg_inset_hard_100_f5f8f9_1x100_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_bg_inset_hard_100_f5f8f9_1x100.png" Name="ui-bg_inset-hard_100_f5f8f9_1x100.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-bg_inset-hard_100_f5f8f9_1x100.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_bg_inset_hard_100_fcfdfd_1x100_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_bg_inset_hard_100_fcfdfd_1x100.png" Name="ui-bg_inset-hard_100_fcfdfd_1x100.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-bg_inset-hard_100_fcfdfd_1x100.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_icons_217bc0_256x240_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_icons_217bc0_256x240.png" Name="ui-icons_217bc0_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-icons_217bc0_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_icons_2e83ff_256x240_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_icons_2e83ff_256x240.png" Name="ui-icons_2e83ff_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-icons_2e83ff_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_icons_469bdd_256x240_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_icons_469bdd_256x240.png" Name="ui-icons_469bdd_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-icons_469bdd_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_icons_6da8d5_256x240_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_icons_6da8d5_256x240.png" Name="ui-icons_6da8d5_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-icons_6da8d5_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_icons_cd0a0a_256x240_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_icons_cd0a0a_256x240.png" Name="ui-icons_cd0a0a_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-icons_cd0a0a_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_icons_d8e7f3_256x240_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_icons_d8e7f3_256x240.png" Name="ui-icons_d8e7f3_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-icons_d8e7f3_256x240.png" />
+  </Component>
+  <Component Id="wwwroot_Content_themes_redmond_images_ui_icons_f9bd01_256x240_png">
+    <File Id="wwwroot_Content_themes_redmond_images_ui_icons_f9bd01_256x240.png" Name="ui-icons_f9bd01_256x240.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Content\themes\redmond\images\ui-icons_f9bd01_256x240.png" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Docs_Components" Directory="wwwroot_DOCSFOLDER">
+  <Component Id="wwwroot_Docs_openXDAsettings_pdf">
+    <File Id="wwwroot_Docs_openXDAsettings.pdf" Name="openXDAsettings.pdf" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Docs\openXDAsettings.pdf" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_fonts_Components" Directory="wwwroot_FONTSFOLDER">
+  <Component Id="wwwroot_fonts_fontawesome_webfont_eot">
+    <File Id="wwwroot_fonts_fontawesome_webfont.eot" Name="fontawesome-webfont.eot" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\fontawesome-webfont.eot" />
+  </Component>
+  <Component Id="wwwroot_fonts_fontawesome_webfont_svg">
+    <File Id="wwwroot_fonts_fontawesome_webfont.svg" Name="fontawesome-webfont.svg" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\fontawesome-webfont.svg" />
+  </Component>
+  <Component Id="wwwroot_fonts_fontawesome_webfont_ttf">
+    <File Id="wwwroot_fonts_fontawesome_webfont.ttf" Name="fontawesome-webfont.ttf" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\fontawesome-webfont.ttf" />
+  </Component>
+  <Component Id="wwwroot_fonts_fontawesome_webfont_woff">
+    <File Id="wwwroot_fonts_fontawesome_webfont.woff" Name="fontawesome-webfont.woff" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\fontawesome-webfont.woff" />
+  </Component>
+  <Component Id="wwwroot_fonts_fontawesome_webfont_woff2">
+    <File Id="wwwroot_fonts_fontawesome_webfont.woff2" Name="fontawesome-webfont.woff2" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\fontawesome-webfont.woff2" />
+  </Component>
+  <Component Id="wwwroot_fonts_FontAwesome_otf">
+    <File Id="wwwroot_fonts_FontAwesome.otf" Name="FontAwesome.otf" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\FontAwesome.otf" />
+  </Component>
+  <Component Id="wwwroot_fonts_glyphicons_halflings_regular_eot">
+    <File Id="wwwroot_fonts_glyphicons_halflings_regular.eot" Name="glyphicons-halflings-regular.eot" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\glyphicons-halflings-regular.eot" />
+  </Component>
+  <Component Id="wwwroot_fonts_glyphicons_halflings_regular_svg">
+    <File Id="wwwroot_fonts_glyphicons_halflings_regular.svg" Name="glyphicons-halflings-regular.svg" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\glyphicons-halflings-regular.svg" />
+  </Component>
+  <Component Id="wwwroot_fonts_glyphicons_halflings_regular_ttf">
+    <File Id="wwwroot_fonts_glyphicons_halflings_regular.ttf" Name="glyphicons-halflings-regular.ttf" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\glyphicons-halflings-regular.ttf" />
+  </Component>
+  <Component Id="wwwroot_fonts_glyphicons_halflings_regular_woff">
+    <File Id="wwwroot_fonts_glyphicons_halflings_regular.woff" Name="glyphicons-halflings-regular.woff" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\glyphicons-halflings-regular.woff" />
+  </Component>
+  <Component Id="wwwroot_fonts_glyphicons_halflings_regular_woff2">
+    <File Id="wwwroot_fonts_glyphicons_halflings_regular.woff2" Name="glyphicons-halflings-regular.woff2" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\fonts\glyphicons-halflings-regular.woff2" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Images_Components" Directory="wwwroot_IMAGESFOLDER">
+  <Component Id="wwwroot_Images_2_Line_500_png">
+    <File Id="wwwroot_Images_2_Line_500.png" Name="2-Line - 500.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\2-Line - 500.png" />
+  </Component>
+  <Component Id="wwwroot_Images_AnalyticsComingSoon_png">
+    <File Id="wwwroot_Images_AnalyticsComingSoon.png" Name="Analytics Coming Soon.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Analytics Coming Soon.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDAnalyticsold_png">
+    <File Id="wwwroot_Images_dDAnalyticsold.png" Name="dD Analytics old.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Analytics old.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDAnalytics_png">
+    <File Id="wwwroot_Images_dDAnalytics.png" Name="dD Analytics.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Analytics.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDAssetolds_png">
+    <File Id="wwwroot_Images_dDAssetolds.png" Name="dD Assetolds.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Assetolds.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDAssets_png">
+    <File Id="wwwroot_Images_dDAssets.png" Name="dD Assets.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Assets.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDConfigold_png">
+    <File Id="wwwroot_Images_dDConfigold.png" Name="dD Config old.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Config old.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDConfig_png">
+    <File Id="wwwroot_Images_dDConfig.png" Name="dD Config.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Config.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDExport_png">
+    <File Id="wwwroot_Images_dDExport.png" Name="dD Export.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Export.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDImpact_png">
+    <File Id="wwwroot_Images_dDImpact.png" Name="dD Impact.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Impact.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDReports_png">
+    <File Id="wwwroot_Images_dDReports.png" Name="dD Reports.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Reports.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDTools_png">
+    <File Id="wwwroot_Images_dDTools.png" Name="dD Tools.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Tools.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDWorkbenchold_png">
+    <File Id="wwwroot_Images_dDWorkbenchold.png" Name="dD Workbench old.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Workbench old.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDWorkbench_png">
+    <File Id="wwwroot_Images_dDWorkbench.png" Name="dD Workbench.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dD Workbench.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDSPCtools_png">
+    <File Id="wwwroot_Images_dDSPCtools.png" Name="dDSPCtools.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dDSPCtools.png" />
+  </Component>
+  <Component Id="wwwroot_Images_dDSplashBackground_png">
+    <File Id="wwwroot_Images_dDSplashBackground.png" Name="dDSplashBackground.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\dDSplashBackground.png" />
+  </Component>
+  <Component Id="wwwroot_Images_EPRILogo_png">
+    <File Id="wwwroot_Images_EPRILogo.png" Name="EPRILogo.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\EPRILogo.png" />
+  </Component>
+  <Component Id="wwwroot_Images_GPA_Logo_30_pix_on_white_png">
+    <File Id="wwwroot_Images_GPA_Logo_30_pix_on_white.png" Name="GPA-Logo---30-pix(on-white).png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\GPA-Logo---30-pix(on-white).png" />
+  </Component>
+  <Component Id="wwwroot_Images_GPA_Logo_png">
+    <File Id="wwwroot_Images_GPA_Logo.png" Name="GPA-Logo.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\GPA-Logo.png" />
+  </Component>
+  <Component Id="wwwroot_Images_gpa_smalllock_png">
+    <File Id="wwwroot_Images_gpa_smalllock.png" Name="gpa-smalllock.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\gpa-smalllock.png" />
+  </Component>
+  <Component Id="wwwroot_Images_ImpactComingSoon_png">
+    <File Id="wwwroot_Images_ImpactComingSoon.png" Name="Impact Coming Soon.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Impact Coming Soon.png" />
+  </Component>
+  <Component Id="wwwroot_Images_openMIC_png">
+    <File Id="wwwroot_Images_openMIC.png" Name="openMIC.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\openMIC.png" />
+  </Component>
+  <Component Id="wwwroot_Images_openMICBanner_png">
+    <File Id="wwwroot_Images_openMICBanner.png" Name="openMICBanner.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\openMICBanner.png" />
+  </Component>
+  <Component Id="wwwroot_Images_openSEE_WaveformViewerHeader_png">
+    <File Id="wwwroot_Images_openSEE_WaveformViewerHeader.png" Name="openSEE - Waveform Viewer Header.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\openSEE - Waveform Viewer Header.png" />
+  </Component>
+  <Component Id="wwwroot_Images_openSEELogo_png">
+    <File Id="wwwroot_Images_openSEELogo.png" Name="openSEELogo.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\openSEELogo.png" />
+  </Component>
+  <Component Id="wwwroot_Images_openSEET_png">
+    <File Id="wwwroot_Images_openSEET.png" Name="openSEET.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\openSEET.png" />
+  </Component>
+  <Component Id="wwwroot_Images_openSTE_png">
+    <File Id="wwwroot_Images_openSTE.png" Name="openSTE.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\openSTE.png" />
+  </Component>
+  <Component Id="wwwroot_Images_openXDA_png">
+    <File Id="wwwroot_Images_openXDA.png" Name="openXDA.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\openXDA.png" />
+  </Component>
+  <Component Id="wwwroot_Images_PQProducts_png">
+    <File Id="wwwroot_Images_PQProducts.png" Name="PQProducts.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\PQProducts.png" />
+  </Component>
+  <Component Id="wwwroot_Images_SPCTools_png">
+    <File Id="wwwroot_Images_SPCTools.png" Name="SPCTools.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\SPCTools.png" />
+  </Component>
+  <Component Id="wwwroot_Images_sync_png">
+    <File Id="wwwroot_Images_sync.png" Name="sync.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\sync.png" />
+  </Component>
+  <Component Id="wwwroot_Images_XDA_ico">
+    <File Id="wwwroot_Images_XDA.ico" Name="XDA.ico" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\XDA.ico" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Images_Icons_Components" Directory="wwwroot_IMAGESICONSFOLDER">
+  <Component Id="wwwroot_Images_Icons_apple_touch_icon_114x114_png">
+    <File Id="wwwroot_Images_Icons_apple_touch_icon_114x114.png" Name="apple-touch-icon-114x114.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\apple-touch-icon-114x114.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_apple_touch_icon_120x120_png">
+    <File Id="wwwroot_Images_Icons_apple_touch_icon_120x120.png" Name="apple-touch-icon-120x120.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\apple-touch-icon-120x120.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_apple_touch_icon_144x144_png">
+    <File Id="wwwroot_Images_Icons_apple_touch_icon_144x144.png" Name="apple-touch-icon-144x144.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\apple-touch-icon-144x144.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_apple_touch_icon_152x152_png">
+    <File Id="wwwroot_Images_Icons_apple_touch_icon_152x152.png" Name="apple-touch-icon-152x152.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\apple-touch-icon-152x152.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_apple_touch_icon_57x57_png">
+    <File Id="wwwroot_Images_Icons_apple_touch_icon_57x57.png" Name="apple-touch-icon-57x57.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\apple-touch-icon-57x57.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_apple_touch_icon_60x60_png">
+    <File Id="wwwroot_Images_Icons_apple_touch_icon_60x60.png" Name="apple-touch-icon-60x60.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\apple-touch-icon-60x60.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_apple_touch_icon_72x72_png">
+    <File Id="wwwroot_Images_Icons_apple_touch_icon_72x72.png" Name="apple-touch-icon-72x72.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\apple-touch-icon-72x72.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_apple_touch_icon_76x76_png">
+    <File Id="wwwroot_Images_Icons_apple_touch_icon_76x76.png" Name="apple-touch-icon-76x76.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\apple-touch-icon-76x76.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_favicon_128_png">
+    <File Id="wwwroot_Images_Icons_favicon_128.png" Name="favicon-128.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\favicon-128.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_favicon_16x16_png">
+    <File Id="wwwroot_Images_Icons_favicon_16x16.png" Name="favicon-16x16.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\favicon-16x16.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_favicon_196x196_png">
+    <File Id="wwwroot_Images_Icons_favicon_196x196.png" Name="favicon-196x196.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\favicon-196x196.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_favicon_32x32_png">
+    <File Id="wwwroot_Images_Icons_favicon_32x32.png" Name="favicon-32x32.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\favicon-32x32.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_favicon_96x96_png">
+    <File Id="wwwroot_Images_Icons_favicon_96x96.png" Name="favicon-96x96.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\favicon-96x96.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_favicon_ico">
+    <File Id="wwwroot_Images_Icons_favicon.ico" Name="favicon.ico" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\favicon.ico" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_mstile_144x144_png">
+    <File Id="wwwroot_Images_Icons_mstile_144x144.png" Name="mstile-144x144.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\mstile-144x144.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_mstile_150x150_png">
+    <File Id="wwwroot_Images_Icons_mstile_150x150.png" Name="mstile-150x150.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\mstile-150x150.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_mstile_310x150_png">
+    <File Id="wwwroot_Images_Icons_mstile_310x150.png" Name="mstile-310x150.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\mstile-310x150.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_mstile_310x310_png">
+    <File Id="wwwroot_Images_Icons_mstile_310x310.png" Name="mstile-310x310.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\mstile-310x310.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_mstile_70x70_png">
+    <File Id="wwwroot_Images_Icons_mstile_70x70.png" Name="mstile-70x70.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\mstile-70x70.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Icons_openXDA_png">
+    <File Id="wwwroot_Images_Icons_openXDA.png" Name="openXDA.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Icons\openXDA.png" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_Images_Tiles_Components" Directory="wwwroot_IMAGESTILESFOLDER">
+  <Component Id="wwwroot_Images_Tiles_dD_Assets_png">
+    <File Id="wwwroot_Images_Tiles_dD_Assets.png" Name="dD_Assets.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\dD_Assets.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_dD_Config_png">
+    <File Id="wwwroot_Images_Tiles_dD_Config.png" Name="dD_Config.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\dD_Config.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_dD_Export_png">
+    <File Id="wwwroot_Images_Tiles_dD_Export.png" Name="dD_Export.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\dD_Export.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_dD_Reports_png">
+    <File Id="wwwroot_Images_Tiles_dD_Reports.png" Name="dD_Reports.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\dD_Reports.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_dD_Workbench_png">
+    <File Id="wwwroot_Images_Tiles_dD_Workbench.png" Name="dD_Workbench.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\dD_Workbench.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_LSCVS_png">
+    <File Id="wwwroot_Images_Tiles_LSCVS.png" Name="LSCVS.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\LSCVS.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_miMD_png">
+    <File Id="wwwroot_Images_Tiles_miMD.png" Name="miMD.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\miMD.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_NotificationPages_png">
+    <File Id="wwwroot_Images_Tiles_NotificationPages.png" Name="NotificationPages.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\NotificationPages.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_openMIC_png">
+    <File Id="wwwroot_Images_Tiles_openMIC.png" Name="openMIC.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\openMIC.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_PQBrowser_png">
+    <File Id="wwwroot_Images_Tiles_PQBrowser.png" Name="PQBrowser.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\PQBrowser.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_PQDashboard_png">
+    <File Id="wwwroot_Images_Tiles_PQDashboard.png" Name="PQDashboard.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\PQDashboard.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_PQDigest_png">
+    <File Id="wwwroot_Images_Tiles_PQDigest.png" Name="PQDigest.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\PQDigest.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_SPCTools_png">
+    <File Id="wwwroot_Images_Tiles_SPCTools.png" Name="SPCTools.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\SPCTools.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_SystemCenter_png">
+    <File Id="wwwroot_Images_Tiles_SystemCenter.png" Name="SystemCenter.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\SystemCenter.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_TrenDAP_png">
+    <File Id="wwwroot_Images_Tiles_TrenDAP.png" Name="TrenDAP.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\TrenDAP.png" />
+  </Component>
+  <Component Id="wwwroot_Images_Tiles_VoltageRegReport_png">
+    <File Id="wwwroot_Images_Tiles_VoltageRegReport.png" Name="VoltageRegReport.png" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\Images\Tiles\VoltageRegReport.png" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_SPCTools_Components" Directory="wwwroot_SPCTOOLSFOLDER">
+  <Component Id="wwwroot_SPCTools_Index_cshtml">
+    <File Id="wwwroot_SPCTools_Index.cshtml" Name="Index.cshtml" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Index.cshtml" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_tsconfig_json">
+    <File Id="wwwroot_SPCTools_tsconfig.json" Name="tsconfig.json" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\tsconfig.json" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_SPCTools_Scripts_Components" Directory="wwwroot_SPCTOOLSSCRIPTSFOLDER">
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_SPCTools_Scripts_Bootstrap_Components" Directory="wwwroot_SPCTOOLSSCRIPTSBOOTSTRAPFOLDER">
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_SPCTools_Scripts_Bootstrap_css_Components" Directory="wwwroot_SPCTOOLSSCRIPTSBOOTSTRAPCSSFOLDER">
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_grid_css">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_grid.css" Name="bootstrap-grid.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap-grid.css" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_grid_css_map">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_grid.css.map" Name="bootstrap-grid.css.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap-grid.css.map" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_grid_min_css">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_grid.min.css" Name="bootstrap-grid.min.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap-grid.min.css" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_grid_min_css_map">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_grid.min.css.map" Name="bootstrap-grid.min.css.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap-grid.min.css.map" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_reboot_css">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_reboot.css" Name="bootstrap-reboot.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap-reboot.css" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_reboot_css_map">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_reboot.css.map" Name="bootstrap-reboot.css.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap-reboot.css.map" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_reboot_min_css">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_reboot.min.css" Name="bootstrap-reboot.min.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap-reboot.min.css" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_reboot_min_css_map">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_reboot.min.css.map" Name="bootstrap-reboot.min.css.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap-reboot.min.css.map" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_css">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap.css" Name="bootstrap.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap.css" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_css_map">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap.css.map" Name="bootstrap.css.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap.css.map" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_min_css">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap.min.css" Name="bootstrap.min.css" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap.min.css" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap_min_css_map">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_css_bootstrap.min.css.map" Name="bootstrap.min.css.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\css\bootstrap.min.css.map" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_SPCTools_Scripts_Bootstrap_js_Components" Directory="wwwroot_SPCTOOLSSCRIPTSBOOTSTRAPJSFOLDER">
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap_bundle_js">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap.bundle.js" Name="bootstrap.bundle.js" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.bundle.js" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap_bundle_js_map">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap.bundle.js.map" Name="bootstrap.bundle.js.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.bundle.js.map" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap_bundle_min_js">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap.bundle.min.js" Name="bootstrap.bundle.min.js" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.bundle.min.js" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap_bundle_min_js_map">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap.bundle.min.js.map" Name="bootstrap.bundle.min.js.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.bundle.min.js.map" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap_js">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap.js" Name="bootstrap.js" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.js" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap_js_map">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap.js.map" Name="bootstrap.js.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.js.map" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap_min_js">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap.min.js" Name="bootstrap.min.js" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.min.js" />
+  </Component>
+  <Component Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap_min_js_map">
+    <File Id="wwwroot_SPCTools_Scripts_Bootstrap_js_bootstrap.min.js.map" Name="bootstrap.min.js.map" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\Bootstrap\js\bootstrap.min.js.map" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_SPCTools_Scripts_D3_Components" Directory="wwwroot_SPCTOOLSSCRIPTSD3FOLDER">
+  <Component Id="wwwroot_SPCTools_Scripts_D3_d3_js">
+    <File Id="wwwroot_SPCTools_Scripts_D3_d3.js" Name="d3.js" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\D3\d3.js" />
+  </Component>
+</ComponentGroup>
+<ComponentGroup Id="wwwroot_SPCTools_Scripts_js_Components" Directory="wwwroot_SPCTOOLSSCRIPTSJSFOLDER">
+  <Component Id="wwwroot_SPCTools_Scripts_js_SPCTools_js">
+    <File Id="wwwroot_SPCTools_Scripts_js_SPCTools.js" Name="SPCTools.js" Source="$(var.SolutionDir)Applications\openXDA\openXDA\wwwroot\SPCTools\Scripts\js\SPCTools.js" />
+  </Component>
+</ComponentGroup>
+</Include>

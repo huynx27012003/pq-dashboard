@@ -1,0 +1,2889 @@
+@*******************************************************************************************************
+    //  TariffOverview.cshtml - Tariff Meter pages in PQ Dashboard
+    //*****************************************************************************************************@
+@using System.Web
+@{
+    Layout = "";
+    string currentPage = (Request.QueryString["page"] ?? "dashboard").Trim().ToLowerInvariant();
+    string initialMeter = Request.QueryString["meter"] ?? "";
+}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>ATDigital Meter :: Tariff Meter</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="@Url.Content("~/@GSF/Web/Shared/Content/bootstrap.css")" rel="stylesheet">
+    <link href="@Url.Content("~/@GSF/Web/Shared/Content/font-awesome.css")" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/MaxiCom.css?v=20260211" />
+    <!-- Added ECharts for modern charting -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+
+    <style>
+        :root {
+            --primary-color: #0f2b8f;
+            --primary-light: #eef2ff;
+            --success-color: #17a34a;
+            --danger-color: #dc3545;
+            --info-color: #0ea5c6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --bg-body: #f3f6fb;
+            --bg-card: #ffffff;
+            --border-color: #e3e9f5;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            /* Fluid spacing scale */
+            --space-xs: clamp(4px, 0.5vw, 8px);
+            --space-sm: clamp(8px, 1vw, 12px);
+            --space-md: clamp(12px, 1.5vw, 20px);
+            --space-lg: clamp(16px, 2vw, 24px);
+            --space-xl: clamp(20px, 2.5vw, 32px);
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            font-family: 'Inter', "Segoe UI", system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            font-size: clamp(11px, 0.85vw, 15px);
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        .tariff-shell {
+            width: 100%;
+            max-width: 100%;
+            padding: clamp(10px, 1.5vw, 20px);
+            box-sizing: border-box;
+            animation: fadeIn 0.4s ease-out;
+            overflow-x: hidden;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tariff-title {
+            margin: 0 0 6px;
+            font-size: clamp(15px, 1.8vw, 22px);
+            font-weight: 800;
+            color: var(--primary-color);
+            letter-spacing: -0.025em;
+        }
+
+        .tariff-subtitle {
+            margin: 0 0 clamp(14px, 2vw, 24px);
+            font-size: clamp(11px, 1vw, 14px);
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Stats Cards */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(110px, 12vw, 150px), 1fr));
+            gap: clamp(8px, 1.2vw, 16px);
+            margin-bottom: clamp(12px, 1.5vw, 20px);
+        }
+
+        .stat-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: clamp(6px, 0.8vw, 10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: clamp(4px, 0.6vw, 8px);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
+        }
+
+        .stat-icon {
+            width: clamp(28px, 2.5vw, 40px);
+            height: clamp(28px, 2.5vw, 40px);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(14px, 1.25vw, 18px);
+            flex-shrink: 0;
+            color: #fff;
+        }
+
+        .stat-icon.blue { background: #6b21a8; }
+        .stat-icon.green { background: #22c55e; }
+        .stat-icon.red { background: #ef4444; }
+        .stat-icon.cyan { background: #ecfeff; color: #0ea5c6; }
+        .stat-icon.teal { background: #14b8a6; }
+
+        .stat-number {
+            font-size: clamp(12px, 1.6vw, 24px);
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: clamp(10px, 0.85vw, 11px);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+
+
+        /* Generic Cards */
+        .tm-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: clamp(14px, 2vw, 24px);
+            overflow: hidden;
+        }
+
+        .tm-card-header {
+            padding: clamp(8px, 1vw, 12px) clamp(12px, 1.5vw, 20px);
+            background: var(--primary-color);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tm-card-title {
+            font-size: clamp(11px, 1vw, 14px);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tm-card-body { padding: clamp(10px, 1.2vw, 16px); }
+
+        /* Tabs */
+        .tabs-header {
+            display: flex;
+            gap: 2px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: clamp(12px, 1.5vw, 20px);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            padding: clamp(5px, 0.6vw, 8px) clamp(8px, 1.2vw, 16px);
+            font-size: clamp(10px, 0.9vw, 13px);
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(0,0,0,0.02);
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table { width: 100%; border-collapse: collapse; }
+        .table thead th {
+            text-align: left;
+            padding: clamp(6px, 0.8vw, 10px) clamp(8px, 1vw, 12px);
+            font-size: clamp(9px, 0.75vw, 10px);
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            background: #fdfdfd;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            padding: clamp(6px, 1vw, 12px) clamp(10px, 1.2vw, 16px);
+            font-size: clamp(10px, 1vw, 14px);
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .table tr:last-child td { border-bottom: none; }
+
+        /* Status Dot */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: clamp(10px, 0.8vw, 14px);
+            font-weight: 700;
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .status-pill::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            flex-shrink: 0;
+        }
+
+        .status-pill.connected {
+            color: #15803d;
+            background: #f0fdf4;
+        }
+        .status-pill.connected::before {
+            background: #22c55e;
+            animation: pulse-green 2s infinite;
+        }
+
+        .status-pill.failed {
+            color: #b91c1c;
+            background: #fef2f2;
+        }
+        .status-pill.failed::before {
+            background: #ef4444;
+        }
+
+        @@keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); opacity: 1; }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); opacity: 0.6; }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); opacity: 1; }
+        }
+
+        .btn-action {
+            width: clamp(28px, 2.5vw, 34px);
+            height: clamp(28px, 2.5vw, 34px);
+            font-size: clamp(12px, 1.1vw, 15px);
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-action.delete:hover {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        .tm-btn-sm {
+            padding: clamp(4px, 0.5vw, 6px) clamp(8px, 1vw, 12px);
+            font-size: clamp(11px, 0.9vw, 12px);
+            font-weight: 600;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .tm-btn-primary { background: var(--primary-color); color: #fff; }
+
+        /* Energy Summary Grid */
+        .energy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 18vw, 200px), 1fr));
+            gap: clamp(10px, 1.2vw, 16px);
+            margin-bottom: clamp(14px, 2vw, 24px);
+        }
+
+        .energy-summary-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: clamp(10px, 1.4vw, 18px) clamp(8px, 1.2vw, 14px);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s;
+        }
+        .energy-summary-card:hover { transform: translateY(-4px); }
+
+        .energy-summary-card .icon {
+            width: clamp(28px, 2.5vw, 36px);
+            height: clamp(28px, 2.5vw, 36px);
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto clamp(8px, 1vw, 12px);
+            font-size: clamp(14px, 1.3vw, 18px);
+        }
+
+        .energy-summary-card.bess .icon { background: #0ea5e9; }
+        .energy-summary-card.rts .icon { background: #22c55e; }
+        .energy-summary-card.inq .icon { background: #64748b; }
+
+        .energy-summary-card .val { font-size: clamp(12px, 1.6vw, 24px); font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+        .energy-summary-card .unit { font-size: clamp(10px, 0.85vw, 11px); font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* Energy Reports Header & Selectors */
+        .page-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: clamp(14px, 2vw, 24px);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(8px, 1.2vw, 16px);
+            align-items: center;
+        }
+
+        .premium-select {
+            position: relative;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: clamp(5px, 0.7vw, 8px) clamp(8px, 1vw, 12px);
+            min-width: clamp(90px, 10vw, 120px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .premium-select label {
+            position: absolute;
+            top: -10px;
+            left: 12px;
+            background: #f3f6fb;
+            padding: 0 4px;
+            font-size: clamp(10px, 0.85vw, 11px);
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .premium-select select {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: clamp(12px, 1vw, 14px);
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .btn-export {
+            background: #1e3a8a;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: clamp(6px, 0.7vw, 8px) clamp(12px, 1.5vw, 20px);
+            font-size: clamp(11px, 0.95vw, 13px);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .btn-export:hover { background: #1a306d; }
+
+        /* Secondary Grid for History */
+        .history-card { margin-top: 20px; }
+        
+        /* Animation for tabs */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+        /* Scenarios in tables */
+        .scenario-pill {
+            padding: clamp(2px, 0.3vw, 4px) clamp(6px, 0.7vw, 10px);
+            border-radius: 20px;
+            font-size: clamp(10px, 0.8vw, 12px);
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .scenario-pill.normal { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .scenario-pill.warning { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+        /* Loader */
+        .loader-ring {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin { to { transform: rotate(360deg); } }
+
+        .page-block {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Modal Centering & Shade */
+        #fault-info-modal.in, #fault-info-modal.show {
+            background-color: rgba(15, 23, 42, 0.6) !important;
+            backdrop-filter: blur(4px);
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #fault-info-modal .modal-dialog {
+            margin: 0;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        #fault-info-modal .modal-content {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        .page-block.active {
+            display: block;
+        }
+
+        /* ----- Meter Details Page Specific CSS ----- */
+        .page-header { margin-bottom: clamp(12px, 1.5vw, 20px); }
+        .btn-back { background: none; border: none; color: var(--text-primary); cursor: pointer; outline: none; padding: 0 8px 0 0; display: inline-flex; align-items: center; }
+        .btn-back i { font-size: clamp(13px, 1.2vw, 16px); font-weight: bold; }
+        .meter-title { font-size: clamp(15px, 1.6vw, 20px); font-weight: 700; display: inline-block; margin: 0; vertical-align: middle; }
+        .meter-subtitle { margin-top: 4px; margin-left: 22px; font-size: clamp(10px, 0.9vw, 12px); font-weight: 600; color: var(--text-secondary); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .info-grid { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: clamp(10px, 2vw, 24px); align-items: flex-start; padding: clamp(10px, 1.2vw, 15px) clamp(12px, 1.5vw, 20px); }
+        .info-col { display: flex; flex-direction: column; gap: 3px; min-width: 100px; }
+        .info-label { font-size: clamp(9px, 0.8vw, 10px); font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
+        .info-value { font-size: clamp(11px, 1vw, 13px); font-weight: 600; color: var(--text-primary); }
+        .toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: clamp(10px, 1.2vw, 16px) clamp(12px, 1.5vw, 20px); border-bottom: 1px solid var(--border-color); background: #fff; }
+        .premium-input, .premium-select { position: relative; background: #fff; border: 1px solid var(--border-color); border-radius: 6px; padding: clamp(5px, 0.6vw, 6px) clamp(8px, 1vw, 12px); min-width: clamp(100px, 10vw, 130px); margin-top: 8px; display: flex; align-items: center; }
+        .premium-input > label, .premium-select > label { position: absolute; top: -9px; left: 8px; background: #fff; padding: 0 4px; font-size: clamp(10px, 0.85vw, 11px); font-weight: 600; color: var(--text-secondary); }
+        .premium-input > input, .premium-select > select { width: 100%; border: none; outline: none; background: transparent; font-size: clamp(12px, 1vw, 13px); font-weight: 600; color: var(--text-primary); }
+        .btn-apply { background: #1e40af; color: #fff; border: none; border-radius: 6px; padding: clamp(6px, 0.7vw, 8px) clamp(10px, 1.2vw, 16px); font-size: clamp(11px, 0.95vw, 13px); font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
+        .chart-container-pl { padding: clamp(12px, 1.5vw, 20px); border: 1px solid var(--border-color); border-radius: 8px; background: #fafafa; margin: clamp(8px, 1.2vw, 16px); margin-bottom: clamp(14px, 2vw, 24px); min-height: clamp(200px, 25vh, 300px); box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .detail-table-container { border: 1px solid var(--border-color); border-radius: 8px; background: #fff; margin: 0 clamp(8px, 1.2vw, 16px) clamp(8px, 1.2vw, 16px); box-shadow: 0 1px 2px rgba(0,0,0,0.03); overflow-x: auto; }
+        .chart-title { font-size: clamp(11px, 1vw, 13px); font-weight: 700; color: var(--primary-color); display: flex; align-items: center; gap: 6px; }
+        .grid-lines { margin-top: 15px; height: clamp(120px, 15vh, 180px); position: relative; border-left: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; }
+        .grid-lines::before { content: '1.0\A 0.9\A 0.8\A 0.7\A 0.6\A 0.5\A 0.4\A 0.3\A 0.2\A 0.1\A 0'; white-space: pre; position: absolute; left: -25px; top: -5px; font-size: 9px; line-height: 16px; color: var(--text-secondary); text-align: right; pointer-events: none; }
+        .grid-line-h { width: 100%; height: 1px; background: #f3f4f6; margin-bottom: 15px; }
+        .x-axis-label { text-align: center; font-size: 10px; color: var(--text-secondary); margin-top: 8px; }
+        .detail-tab-btn { flex: 1; padding: clamp(8px, 1vw, 12px) clamp(10px, 1.5vw, 20px); font-size: clamp(12px, 1.1vw, 14px); font-weight: 600; border: none; background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; text-align: center; transition: all 0.2s; border-bottom: 3px solid transparent; white-space: nowrap; }
+        .detail-tab-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .detail-tab-btn.active { background: rgba(255,255,255,0.1); color: #ffffff; border-bottom-color: #ffffff; }
+
+        /* Custom Multiselect */
+        .custom-multiselect { position: relative; cursor: pointer; user-select: none; display: flex; align-items: center; }
+        .custom-multiselect .ms-display { width: 100%; border: none; background: transparent; font-size: clamp(12px, 1vw, 13px); font-weight: 600; color: var(--text-primary); display: flex; justify-content: space-between; align-items: center; }
+        .custom-multiselect .ms-display span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: clamp(120px, 15vw, 200px); }
+        .custom-multiselect .ms-dropdown { position: absolute; top: calc(100% + 5px); left: 0; min-width: clamp(220px, 25vw, 320px); background: #fff; border: 1px solid var(--border-color); border-radius: 6px; box-shadow: var(--shadow-lg); z-index: 9999; max-height: clamp(200px, 30vh, 350px); overflow-y: auto; display: none; padding: 8px 0; }
+        .custom-multiselect .ms-dropdown.show { display: block; }
+        .custom-multiselect .ms-dropdown label { position: relative; top: auto; left: auto; background: transparent; white-space: nowrap; display: flex; align-items: center; gap: 10px; padding: clamp(6px, 0.8vw, 8px) clamp(8px, 1vw, 12px); font-size: clamp(11px, 0.95vw, 13px); font-weight: 500; color: var(--text-primary); cursor: pointer; transition: background 0.1s; margin: 0; border-bottom: 1px solid #f3f4f6; }
+        .custom-multiselect .ms-dropdown label:hover { background: var(--bg-body); }
+        .custom-multiselect .ms-dropdown label:last-child { border-bottom: none; }
+        .custom-multiselect .ms-dropdown input[type="checkbox"] { flex-shrink: 0; width: 14px; height: 14px; border-radius: 3px; cursor: pointer; accent-color: var(--primary-color); margin: 0; }
+
+        /* ===== Responsive Breakpoints ===== */
+        @@media (max-width: 1200px) {
+            .activity-card { grid-template-columns: 2fr 1fr 1fr; }
+            .activity-card > *:last-child { display: none; }
+        }
+
+        @@media (max-width: 900px) {
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .energy-grid { grid-template-columns: repeat(2, 1fr); }
+            .activity-card { grid-template-columns: 1fr 1fr; }
+            .info-grid { gap: 16px; }
+            .toolbar { flex-direction: column; align-items: flex-start; }
+            .filter-group { flex-wrap: wrap; }
+        }
+
+        @@media (max-width: 640px) {
+            .tariff-shell { padding: 10px; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .energy-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .activity-card { grid-template-columns: 1fr; gap: 6px; }
+            .tab-btn { font-size: 11px; padding: 8px 10px; }
+            .toolbar { gap: 8px; }
+            .premium-input, .premium-select { min-width: 100px; }
+            .custom-multiselect .ms-dropdown { min-width: 260px; }
+        }
+
+        @@media (max-width: 480px) {
+            .tariff-shell { padding: 8px; }
+            .stat-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+            .energy-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+            .stat-number { font-size: 18px; }
+            .energy-summary-card .val { font-size: 16px; }
+            .tariff-title { font-size: 16px; }
+            .tm-card-body { padding: 10px; }
+            .filter-group { flex-direction: column; align-items: stretch; }
+            .btn-apply, .btn-export { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="tariff-shell">
+        <h1 class="tariff-title">Tariff Meter</h1>
+        <p class="tariff-subtitle">@((currentPage == "dashboard") ? "Dashboard" : (currentPage == "energy-reports") ? "Energy Reports" : (currentPage == "meter-management") ? "Meter Management" : (currentPage == "alerts") ? "Alerts" : "Dashboard")</p>
+
+        <!-- Dashboard Page -->
+        <div id="page-dashboard" class="page-block @(currentPage == "dashboard" ? "active" : "")">
+            <div id="tariff-dashboard-view">
+                <!-- Monthly Energy Chart -->
+                <div class="tm-card" id="energy-chart-card">
+                    <div class="tm-card-header" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="tm-card-title"><i class="fa fa-bar-chart"></i> Energy Overview</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <select id="chart-year-select" onchange="fetchYearlySummary()" style="padding: 5px 12px; font-size: clamp(10px, 0.9vw, 12px); background: var(--primary-color); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; outline: none; appearance: auto;">
+                                    <option value="2026" selected>2026</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                        </div>
+                    </div>
+                    <div class="tm-card-body" style="padding: 12px;">
+                        <div class="energy-grid" style="margin-bottom: 20px;">
+                            <div class="energy-summary-card">
+                                <div class="icon"><i class="fa fa-bolt"></i></div>
+                                <div class="val" id="yearly-total-energy">--</div>
+                                <div class="unit">Total Energy</div>
+                            </div>
+                            <div class="energy-summary-card bess">
+                                <div class="icon"><i class="fa fa-battery-half"></i></div>
+                                <div class="val" id="yearly-bess-energy">--</div>
+                                <div class="unit">BESS Total</div>
+                            </div>
+                            <div class="energy-summary-card rts">
+                                <div class="icon"><i class="fa fa-plug"></i></div>
+                                <div class="val" id="yearly-rts-energy">--</div>
+                                <div class="unit">RTS Total</div>
+                            </div>
+                            <div class="energy-summary-card">
+                                <div class="icon"><i class="fa fa-calendar-check-o"></i></div>
+                                <div class="val" id="yearly-avg-energy">--</div>
+                                <div class="unit">Avg / Month</div>
+                            </div>
+                        </div>
+                        <div id="monthly-energy-chart" style="width: 100%; height: clamp(200px, 30vh, 280px);"></div>
+                    </div>
+                </div>
+
+                <!-- Top Overview Cards -->
+                <div class="tm-card">
+                    <div class="tm-card-header">
+                        <div class="tm-card-title"><i class="fa fa-info-circle"></i> Current Meter Status</div>
+                    </div>
+                    <div class="tm-card-body">
+                        <div class="stat-grid">
+                            <div class="stat-item">
+                                <div class="stat-icon blue"><i class="fa fa-map-marker"></i></div>
+                                <div class="stat-number" id="stat-total-meters">--</div>
+                                <div class="stat-label">Total Meters</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon green"><i class="fa fa-wifi"></i></div>
+                                <div class="stat-number" id="stat-connected-meters">--</div>
+                                <div class="stat-label">Connected</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon red"><i class="fa fa-plug"></i></div>
+                                <div class="stat-number" id="stat-disconnected-meters">--</div>
+                                <div class="stat-label">Disconnected</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon teal"><i class="fa fa-refresh"></i></div>
+                                <div class="stat-number" id="stat-reading-meters">--</div>
+                                <div class="stat-label">Reading Data</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tm-card">
+                    <div class="tm-card-header">
+                        <div class="tm-card-title"><i class="fa fa-list"></i> Meter List</div>
+                    </div>
+                    <div class="tm-card-body">
+                        <div class="table-responsive" style="max-height: calc(100vh - 350px);">
+                            <table class="table" id="meter-list-table">
+                                <thead>
+                                    <tr>
+                                        <th>Serial Number</th>
+                                        <th>Meter Name</th>
+                                        <th>Outstation</th>
+                                        <th>Type</th>
+                                        <th>Model</th>
+                                        <th>Connection Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="meter-list-body">
+                                    <tr id="initial-loading-row">
+                                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                                            <div class="loader-ring" style="border-top-color: var(--primary-color); width: 30px; height: 30px; margin-bottom: 10px;"></div>
+                                            <div>Loading meter data...</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail View (Nested in Dashboard) -->
+            <div id="tariff-meter-detail" style="display:none; padding-top: 10px;">
+                <div class="page-header">
+                    <div style="display:flex; align-items:center;">
+                        <button class="btn-back" id="back-to-meter-list"><i class="fa fa-arrow-left"></i></button>
+                        <h2 class="meter-title" id="mheader-name">--</h2>
+                    </div>
+                    <div class="meter-subtitle">
+                        <span><i class="fa fa-th"></i> <span id="mheader-type">--</span></span>
+                        <span># S/N: <span id="mheader-sn">--</span></span>
+                        <span id="mheader-status" class="status-pill failed">--</span>
+                    </div>
+                </div>
+
+                <!-- Meter Point Info -->
+                <div class="tm-card">
+                    <div class="tm-card-header">
+                        <i class="fa fa-info-circle"></i> Meter Point Information
+                    </div>
+                    <div class="tm-card-body">
+                        <div class="info-grid">
+                            <div class="info-col">
+                                <span class="info-label">Meter Point Code - IMEI</span>
+                                <span class="info-value" id="minfo-imei">--</span>
+                            </div>
+                            <div class="info-col">
+                                <span class="info-label">Meter Type</span>
+                                <span class="info-value" id="minfo-type">--</span>
+                            </div>
+                            <div class="info-col">
+                                <span class="info-label">CT Ratio Primary</span>
+                                <span class="info-value" id="minfo-ct-pri">--</span>
+                            </div>
+                            <div class="info-col">
+                                <span class="info-label">CT Ratio Secondary</span>
+                                <span class="info-value" id="minfo-ct-sec">--</span>
+                            </div>
+                            <div class="info-col">
+                                <span class="info-label">VT Ratio Primary</span>
+                                <span class="info-value" id="minfo-vt-pri">--</span>
+                            </div>
+                            <div class="info-col">
+                                <span class="info-label">VT Ratio Secondary</span>
+                                <span class="info-value" id="minfo-vt-sec">--</span>
+                            </div>
+                            <div class="info-col">
+                                <span class="info-label">Last Updated</span>
+                                <span class="info-value" id="minfo-updated">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Tabs -->
+                <div class="tm-card">
+                    <div class="tabs-header" style="background:var(--primary-color);">
+                        <button class="tab-btn detail-tab-btn active" onclick="switchDetailTab('op-metrics', this)">Operation Metrics</button>
+                        <button class="tab-btn detail-tab-btn" onclick="switchDetailTab('pl-profile', this)">Power Load Profile</button>
+                        <button class="tab-btn detail-tab-btn" onclick="switchDetailTab('fn-readings', this)">Finalized Readings</button>
+                    </div>
+                    <div class="tm-card-body">
+                        
+                        <!-- Tab 1: Operation Metrics -->
+                        <div id="dtab-op-metrics" class="tab-content detail-tab-content active">
+                            <div class="toolbar" style="flex-wrap: wrap; gap: 10px;">
+                                <div class="filter-group">
+                                    <div class="premium-input"><label>From Date</label><input type="date" id="op-from"></div>
+                                    <div class="premium-input"><label>To Date</label><input type="date" id="op-to"></div>
+                                    <div class="premium-select" style="margin-top:8px;">
+                                        <label>Interval / Survey</label>
+                                        <select id="op-interval" onchange="toggleOpSurveyView()">
+                                            <option value="1m">1m</option>
+                                            <option value="5m">5m</option>
+                                            <option value="15m">15m</option>
+                                            <option value="survey">Survey</option>
+                                        </select>
+                                    </div>
+                                    <div class="premium-input" id="op-time-from" style="display:none;"><label>Time From</label><input type="time" value="00:00"></div>
+                                    <div class="premium-input" id="op-time-to" style="display:none;"><label>Time To</label><input type="time" value="23:59"></div>
+                                    
+                                    <div class="premium-select custom-multiselect" id="op-col-wrapper" style="margin-top:8px; min-width:240px;" onclick="toggleOpMultiSelect(event)">
+                                        <label>Select Columns</label>
+                                        <div class="ms-display">
+                                            <span id="op-col-text">52 columns selected</span>
+                                            <i class="fa fa-caret-down" style="color:#9ca3af; font-size:14px;"></i>
+                                        </div>
+                                        <div class="ms-dropdown" id="op-col-dropdown" onclick="event.stopPropagation()">
+                                            <label><input type="checkbox" value="current_multiplier" onchange="handleOpCheckboxChange(this)"> Current Multiplier</label>
+                                            <label><input type="checkbox" value="voltage_multiplier" onchange="handleOpCheckboxChange(this)"> Voltage Multiplier</label>
+                                            <label><input type="checkbox" value="current_divisor" onchange="handleOpCheckboxChange(this)"> Current Divisor</label>
+                                            <label><input type="checkbox" value="voltage_divisor" onchange="handleOpCheckboxChange(this)"> Voltage Divisor</label>
+                                            <label><input type="checkbox" checked value="phase_a_voltage" onchange="handleOpCheckboxChange(this)"> Phase A Voltage</label>
+                                            <label><input type="checkbox" checked value="phase_b_voltage" onchange="handleOpCheckboxChange(this)"> Phase B Voltage</label>
+                                            <label><input type="checkbox" checked value="phase_c_voltage" onchange="handleOpCheckboxChange(this)"> Phase C Voltage</label>
+                                            <label><input type="checkbox" checked value="phase_a_current" onchange="handleOpCheckboxChange(this)"> Phase A Current</label>
+                                            <label><input type="checkbox" checked value="phase_b_current" onchange="handleOpCheckboxChange(this)"> Phase B Current</label>
+                                            <label><input type="checkbox" checked value="phase_c_current" onchange="handleOpCheckboxChange(this)"> Phase C Current</label>
+                                            <label><input type="checkbox" value="phase_a_angle" onchange="handleOpCheckboxChange(this)"> Phase A Angle</label>
+                                            <label><input type="checkbox" value="phase_b_angle" onchange="handleOpCheckboxChange(this)"> Phase B Angle</label>
+                                            <label><input type="checkbox" value="phase_c_angle" onchange="handleOpCheckboxChange(this)"> Phase C Angle</label>
+                                            <label><input type="checkbox" value="vta_vtb_angle" onchange="handleOpCheckboxChange(this)"> VTA VTB Angle</label>
+                                            <label><input type="checkbox" value="vta_vtc_angle" onchange="handleOpCheckboxChange(this)"> VTA VTC Angle</label>
+                                            <label><input type="checkbox" value="phase_a_watts" onchange="handleOpCheckboxChange(this)"> Phase A Watts</label>
+                                            <label><input type="checkbox" value="phase_b_watts" onchange="handleOpCheckboxChange(this)"> Phase B Watts</label>
+                                            <label><input type="checkbox" value="phase_c_watts" onchange="handleOpCheckboxChange(this)"> Phase C Watts</label>
+                                            <label><input type="checkbox" value="phase_a_vars" onchange="handleOpCheckboxChange(this)"> Phase A Vars</label>
+                                            <label><input type="checkbox" value="phase_b_vars" onchange="handleOpCheckboxChange(this)"> Phase B Vars</label>
+                                            <label><input type="checkbox" value="phase_c_vars" onchange="handleOpCheckboxChange(this)"> Phase C Vars</label>
+                                            <label><input type="checkbox" value="phase_a_va" onchange="handleOpCheckboxChange(this)"> Phase A VA</label>
+                                            <label><input type="checkbox" value="phase_b_va" onchange="handleOpCheckboxChange(this)"> Phase B VA</label>
+                                            <label><input type="checkbox" value="phase_c_va" onchange="handleOpCheckboxChange(this)"> Phase C VA</label>
+                                            <label><input type="checkbox" value="power_factor" onchange="handleOpCheckboxChange(this)"> Power Factor</label>
+                                            <label><input type="checkbox" value="frequency" onchange="handleOpCheckboxChange(this)"> Frequency</label>
+                                            <label><input type="checkbox" value="rate_1_import_kwh" onchange="handleOpCheckboxChange(this)"> Rate 1 Import kWh</label>
+                                            <label><input type="checkbox" value="rate_2_import_kwh" onchange="handleOpCheckboxChange(this)"> Rate 2 Import kWh</label>
+                                            <label><input type="checkbox" value="rate_3_import_kwh" onchange="handleOpCheckboxChange(this)"> Rate 3 Import kWh</label>
+                                            <label><input type="checkbox" value="total_import_kwh" onchange="handleOpCheckboxChange(this)"> Total Import kWh</label>
+                                            <label><input type="checkbox" value="total_import_kvar" onchange="handleOpCheckboxChange(this)"> Total Import kVar</label>
+                                            <label><input type="checkbox" value="rate_1_export_kwh" onchange="handleOpCheckboxChange(this)"> Rate 1 Export kWh</label>
+                                            <label><input type="checkbox" value="rate_2_export_kwh" onchange="handleOpCheckboxChange(this)"> Rate 2 Export kWh</label>
+                                            <label><input type="checkbox" value="rate_3_export_kwh" onchange="handleOpCheckboxChange(this)"> Rate 3 Export kWh</label>
+                                            <label><input type="checkbox" value="total_export_kwh" onchange="handleOpCheckboxChange(this)"> Total Export kWh</label>
+                                            <label><input type="checkbox" value="total_export_kvar" onchange="handleOpCheckboxChange(this)"> Total Export kVar</label>
+                                            <label><input type="checkbox" value="thd_voltage_a" onchange="handleOpCheckboxChange(this)"> THD Voltage A</label>
+                                            <label><input type="checkbox" value="thd_voltage_b" onchange="handleOpCheckboxChange(this)"> THD Voltage B</label>
+                                            <label><input type="checkbox" value="thd_voltage_c" onchange="handleOpCheckboxChange(this)"> THD Voltage C</label>
+                                            <label><input type="checkbox" value="thd_current_a" onchange="handleOpCheckboxChange(this)"> THD Current A</label>
+                                            <label><input type="checkbox" value="thd_current_b" onchange="handleOpCheckboxChange(this)"> THD Current B</label>
+                                            <label><input type="checkbox" value="thd_current_c" onchange="handleOpCheckboxChange(this)"> THD Current C</label>
+                                            <label><input type="checkbox" value="p_total" onchange="handleOpCheckboxChange(this)"> P Total</label>
+                                            <label><input type="checkbox" value="q_total" onchange="handleOpCheckboxChange(this)"> Q Total</label>
+                                            <label><input type="checkbox" value="s_total" onchange="handleOpCheckboxChange(this)"> S Total</label>
+                                            <label><input type="checkbox" checked value="ct_ratio_primary" onchange="handleOpCheckboxChange(this)"> CT Ratio Primary</label>
+                                            <label><input type="checkbox" checked value="ct_ratio_secondary" onchange="handleOpCheckboxChange(this)"> CT Ratio Secondary</label>
+                                            <label><input type="checkbox" checked value="vt_ratio_primary" onchange="handleOpCheckboxChange(this)"> VT Ratio Primary</label>
+                                            <label><input type="checkbox" checked value="vt_ratio_secondary" onchange="handleOpCheckboxChange(this)"> VT Ratio Secondary</label>
+                                            <label><input type="checkbox" value="error_code" onchange="handleOpCheckboxChange(this)"> Error Code</label>
+                                            <label><input type="checkbox" value="max_demand_kwh_import" onchange="handleOpCheckboxChange(this)"> Max Demand kWh Import</label>
+                                            <label><input type="checkbox" value="max_demand_kwh_export" onchange="handleOpCheckboxChange(this)"> Max Demand kWh Export</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="filter-group">
+                                    <button class="btn-apply" onclick="fetchOperationMetrics()"><i class="fa fa-search"></i> Apply</button>
+                                    <button class="btn-export"><i class="fa fa-download"></i> Export Excel</button>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container-pl">
+                                <div class="chart-title">
+                                    <i class="fa fa-line-chart"></i> <span id="op-chart-title">Operating Parameters Chart</span>
+                                </div>
+                                <div id="op-chart" style="width: 100%; height: 350px; margin-top: 15px;"></div>
+                            </div>
+
+                            <div class="table-responsive detail-table-container" style="max-height: 350px; overflow-y: auto;">
+                                <style>
+                                    #op-table-main { table-layout: auto; }
+                                    #op-table-main th, #op-table-main td { white-space: nowrap; min-width: 150px; }
+                                    #op-table-main th:first-child, #op-table-main td:first-child { min-width: 210px; white-space: nowrap; }
+                                </style>
+                                <table class="table" id="op-table-main">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Current Multiplier</th>
+                                            <th>Voltage Multiplier</th>
+                                            <th>Current Divisor</th>
+                                            <th>Voltage Divisor</th>
+                                            <th>Phase A Voltage</th>
+                                            <th>Phase B Voltage</th>
+                                            <th>Phase C Voltage</th>
+                                            <th>Phase A Current</th>
+                                            <th>Phase B Current</th>
+                                            <th>Phase C Current</th>
+                                            <th>Phase A Angle</th>
+                                            <th>Phase B Angle</th>
+                                            <th>Phase C Angle</th>
+                                            <th>VTA VTB Angle</th>
+                                            <th>VTA VTC Angle</th>
+                                            <th>Phase A Watts</th>
+                                            <th>Phase B Watts</th>
+                                            <th>Phase C Watts</th>
+                                            <th>Phase A Vars</th>
+                                            <th>Phase B Vars</th>
+                                            <th>Phase C Vars</th>
+                                            <th>Phase A VA</th>
+                                            <th>Phase B VA</th>
+                                            <th>Phase C VA</th>
+                                            <th>Power Factor</th>
+                                            <th>Frequency</th>
+                                            <th>Rate 1 Import kWh</th>
+                                            <th>Rate 2 Import kWh</th>
+                                            <th>Rate 3 Import kWh</th>
+                                            <th>Total Import kWh</th>
+                                            <th>Total Import kVar</th>
+                                            <th>Rate 1 Export kWh</th>
+                                            <th>Rate 2 Export kWh</th>
+                                            <th>Rate 3 Export kWh</th>
+                                            <th>Total Export kWh</th>
+                                            <th>Total Export kVar</th>
+                                            <th>THD Voltage A</th>
+                                            <th>THD Voltage B</th>
+                                            <th>THD Voltage C</th>
+                                            <th>THD Current A</th>
+                                            <th>THD Current B</th>
+                                            <th>THD Current C</th>
+                                            <th>P Total</th>
+                                            <th>Q Total</th>
+                                            <th>S Total</th>
+                                            <th>CT Ratio Primary</th>
+                                            <th>CT Ratio Secondary</th>
+                                            <th>VT Ratio Primary</th>
+                                            <th>VT Ratio Secondary</th>
+                                            <th>Error Code</th>
+                                            <th>Max Demand kWh Import</th>
+                                            <th>Max Demand kWh Export</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="53" style="text-align:center; padding: 40px; color: var(--text-secondary);">No Operation Metrics data found for this period.</td></tr>
+                                    </tbody>
+                                </table>
+                                
+                                <table class="table" id="op-table-survey" style="display:none;">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td style="text-align:center; padding: 40px; color: var(--text-secondary);">No Survey data found.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Power Load Profile -->
+                        <div id="dtab-pl-profile" class="tab-content detail-tab-content">
+                            <div class="toolbar" style="flex-wrap: wrap; gap: 10px;">
+                                <div class="filter-group">
+                                    <div class="premium-input"><label>From</label><input type="date" id="pl-from"></div>
+                                    <div class="premium-input pl-time-picker"><label>Time</label><input type="time" value="00:00" id="pl-time-from"></div>
+                                    <div class="premium-input"><label>To</label><input type="date" id="pl-to"></div>
+                                    <div class="premium-input pl-time-picker"><label>Time</label><input type="time" value="23:59" id="pl-time-to"></div>
+                                    <div class="premium-select" style="margin-top:8px;">
+                                        <label id="pl-mode-label">Survey</label>
+                                        <select id="pl-survey">
+                                            <option value="LS01">LS01</option>
+                                            <option value="LS02" selected>LS02</option>
+                                            <option value="LS03">LS03</option>
+                                            <option value="LS04">LS04</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="premium-select custom-multiselect" id="pl-col-wrapper" style="margin-top:8px; min-width: 240px;" onclick="togglePlMultiSelect(event)">
+                                        <label>Select Columns</label>
+                                        <div class="ms-display" style="min-height: 20px; display: flex; align-items: center; padding-top: 0;">
+                                            <span id="pl-col-text">Record Status, DateTime, T...</span>
+                                            <i class="fa fa-caret-down" style="color:#9ca3af; font-size:14px;"></i>
+                                        </div>
+                                        <div class="ms-dropdown" id="pl-col-dropdown" onclick="event.stopPropagation()">
+                                            <label><input type="checkbox" checked value="Record Status" onchange="window.handlePlCheckboxChange(this)"> Record Status</label>
+                                            <label><input type="checkbox" checked value="DateTime" onchange="window.handlePlCheckboxChange(this)"> DateTime</label>
+                                            <label><input type="checkbox" checked value="Total Energy Tot IMP Wh &#64;" onchange="window.handlePlCheckboxChange(this)"> Total Energy Tot IMP Wh &#64;</label>
+                                            <label><input type="checkbox" checked value="Total Energy Tot EXP Wh &#64;" onchange="window.handlePlCheckboxChange(this)"> Total Energy Tot EXP Wh &#64;</label>
+                                            <label><input type="checkbox" value="Total Energy Tot IMP VA &#64;" onchange="window.handlePlCheckboxChange(this)"> Total Energy Tot IMP VA &#64;</label>
+                                            <label><input type="checkbox" value="Total Energy Tot EXP VA &#64;" onchange="window.handlePlCheckboxChange(this)"> Total Energy Tot EXP VA &#64;</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="filter-group">
+                                    <button class="btn-apply" onclick="fetchPowerLoadProfile()"><i class="fa fa-search"></i> Apply</button>
+                                    <button class="btn-export"><i class="fa fa-download"></i> Export Excel</button>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container-pl">
+                                <div class="chart-title">
+                                    <i class="fa fa-line-chart"></i> <span id="pl-chart-title">Profile Reading Chart</span>
+                                </div>
+                                <div class="grid-lines">
+                                    <div class="grid-line-h"></div><div class="grid-line-h"></div><div class="grid-line-h"></div>
+                                    <div class="grid-line-h"></div><div class="grid-line-h"></div><div class="grid-line-h"></div>
+                                    <div class="grid-line-h"></div><div class="grid-line-h"></div><div class="grid-line-h"></div>
+                                    <div class="grid-line-h"></div><div class="grid-line-h"></div>
+                                </div>
+                                <div class="x-axis-label">Time</div>
+                            </div>
+
+                            <div class="table-responsive detail-table-container" style="max-height: 350px; overflow-y: auto;">
+                                <style>
+                                    #pl-table-main { table-layout: auto; }
+                                    #pl-table-main th, #pl-table-main td { white-space: nowrap; min-width: 150px; }
+                                    #pl-table-main th:first-child, #pl-table-main td:first-child { min-width: 210px; white-space: nowrap; }
+                                </style>
+                                <table class="table" id="pl-table-main">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Record Status</th>
+                                            <th>DateTime</th>
+                                            <th>Total Energy Tot IMP Wh &#64;</th>
+                                            <th>Total Energy Tot EXP Wh &#64;</th>
+                                            <th>Total Energy Tot IMP VA &#64;</th>
+                                            <th>Total Energy Tot EXP VA &#64;</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="7" style="text-align:center; padding: 40px; color: var(--text-secondary);">No Power Load Profile data.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Finalized Readings -->
+                        <div id="dtab-fn-readings" class="tab-content detail-tab-content">
+                            <div class="toolbar" style="flex-wrap: wrap; gap: 10px; border-bottom: none;">
+                                <div class="filter-group">
+                                    <div class="premium-select">
+                                        <label>Year</label>
+                                        <select id="fn-year-select">
+                                            <option value="2026">2026</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2023">2023</option>
+                                            <option value="2022">2022</option>
+                                            <option value="2021">2021</option>
+                                        </select>
+                                    </div>
+                                    <div class="premium-select">
+                                        <label>Month</label>
+                                        <select id="fn-month-select">
+                                            <option value="1">January</option>
+                                            <option value="2">February</option>
+                                            <option value="3" selected>March</option>
+                                            <option value="4">April</option>
+                                            <option value="5">May</option>
+                                            <option value="6">June</option>
+                                            <option value="7">July</option>
+                                            <option value="8">August</option>
+                                            <option value="9">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn-apply" onclick="fetchFinalizedReadings()">
+                                        <i class="fa fa-refresh"></i> Apply
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="energy-grid" style="padding: 20px; margin-top: 10px;">
+                                <div class="energy-summary-card">
+                                    <div class="icon"><i class="fa fa-arrow-down"></i></div>
+                                    <div class="val" id="fn-import-val">0.000 kWh</div>
+                                    <div class="unit">Total Import kWh</div>
+                                </div>
+                                <div class="energy-summary-card bess">
+                                    <div class="icon" style="background:var(--success-color);"><i class="fa fa-arrow-up"></i></div>
+                                    <div class="val" id="fn-export-val">0.000 kWh</div>
+                                    <div class="unit">Total Export kWh</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Energy Reports Page -->
+        <div id="page-energy-reports" class="page-block @(currentPage == "energy-reports" ? "active" : "")">
+            <div class="page-header-flex" style="justify-content: flex-end;">
+                <div class="filter-group">
+                    <div class="premium-select">
+                        <label>Year</label>
+                        <select id="energy-year-select">
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                        </select>
+                    </div>
+                    <div class="premium-select">
+                        <label>Month</label>
+                        <select id="energy-month-select">
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3" selected>March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="monthly-analysis">Monthly Energy Analysis</button>
+                <button class="tab-btn" data-tab="status-history">Meter Status History</button>
+            </div>
+
+            <!-- TAB 1: Monthly Analysis -->
+            <div id="tab-monthly-analysis" class="tab-content active">
+                <div class="tm-card">
+                    <div class="tm-card-header">
+                        <div class="tm-card-title">Monthly Overview</div>
+                        <button class="btn-export" id="export-energy-csv"><i class="fa fa-download"></i> Export CSV</button>
+                    </div>
+                    <div class="tm-card-body">
+                        <div class="energy-grid">
+                            <div class="energy-summary-card">
+                                <div class="icon"><i class="fa fa-bolt"></i></div>
+                                <div class="val" id="energy-total-to-lmv">0.00 kWh</div>
+                                <div class="unit">Total Energy to LMV</div>
+                            </div>
+                            <div class="energy-summary-card bess">
+                                <div class="icon"><i class="fa fa-battery-half"></i></div>
+                                <div class="val" id="energy-bess-to-lmv">0.00 kWh</div>
+                                <div class="unit">BESS to LMV</div>
+                            </div>
+                            <div class="energy-summary-card rts">
+                                <div class="icon"><i class="fa fa-plug"></i></div>
+                                <div class="val" id="energy-rts-to-lmv">0.00 kWh</div>
+                                <div class="unit">RTS to LMV</div>
+                            </div>
+                            <div class="energy-summary-card inq">
+                                <div class="icon"><i class="fa fa-check-square-o"></i></div>
+                                <div class="val" id="energy-inqualified">0</div>
+                                <div class="unit">Inqualified Intervals</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tm-card">
+                    <div class="tm-card-header">
+                        <div class="tm-card-title">Period Breakdown</div>
+                    </div>
+                    <div class="tm-card-body">
+                        <div class="table-responsive" style="overflow-x: auto;">
+                            <style>
+                                #energy-breakdown-table th,
+                                #energy-breakdown-table td { white-space: nowrap; }
+                            </style>
+                            <table class="table" id="energy-breakdown-table">
+                                <thead>
+                                    <tr>
+                                        <th>Start Time</th>
+                                        <th>End Time</th>
+                                        <th>Scenario</th>
+                                        <th>Total_to_LMV (kWh)</th>
+                                        <th>Main (kWh)</th>
+                                        <th>K Factor</th>
+                                        <th>BESS_to_LMV (kWh)</th>
+                                        <th>RTS_to_LMV (kWh)</th>
+                                        <th style="text-align: center;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="energy-breakdown-body">
+                                    <tr><td colspan="9" style="text-align:center; padding: 40px; color: var(--text-secondary);">Select year/month to see report data.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-status-history" class="tab-content">
+                <div class="tm-card" style="border: none; box-shadow: var(--shadow-md);">
+                    <div class="tm-card-header" style="background: #001f8f; padding: 12px 25px; display: flex; align-items: center; justify-content: space-between; height: 50px;">
+                        <div class="tm-card-title" style="font-size: 16px; margin: 0; padding: 0; line-height: 1;">Meter Fault History</div>
+                    </div>
+                    <div style="background: #f0f4ff; padding: 10px 25px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px; font-size: 12px; color: #4b5563;">
+                        <i class="fa fa-info-circle" style="color: #3b82f6;"></i>
+                        <span>This section shows only periods where meters experienced faults or errors.</span>
+                    </div>
+                    <div class="tm-card-body" style="padding: 0;">
+                        <div class="table-responsive" style="max-height: calc(100vh - 400px);">
+                            <table class="table" style="margin-bottom: 0;">
+                                <thead style="vertical-align: middle;">
+                                    <tr>
+                                        <th style="vertical-align: middle; text-align: center;">Meter Serial</th>
+                                        <th style="vertical-align: middle; text-align: center;">Meter Name</th>
+                                        <th style="vertical-align: middle; text-align: center;">Scenario</th>
+                                        <th style="vertical-align: middle; text-align: center;">Fault Start</th>
+                                        <th style="vertical-align: middle; text-align: center;">Fault End</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="status-history-body" style="vertical-align: middle;">
+                                    <tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-secondary);">No history data for the selected period.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meter Management Page -->
+        <div id="page-meter-management" class="page-block @(currentPage == "meter-management" ? "active" : "")">
+            <div class="page-header-flex" style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px;">
+                <button class="btn btn-primary" onclick="showMeterForm()" id="add-meter-btn" style="background: var(--primary-color); border: none; font-size: 14px; font-weight: 600; padding: 8px 16px;"><i class="fa fa-plus"></i> Add Meter</button>
+            </div>
+
+            <!-- Add/Edit Meter Form -->
+            <div class="tm-card" id="meter-form-card" style="display: none; margin-bottom: 24px;">
+                <div class="tm-card-header">
+                    <div class="tm-card-title" id="meter-form-title">Add New Meter</div>
+                </div>
+                <div class="tm-card-body" style="background: #f8fafc;">
+                    <form id="meter-config-form" onsubmit="saveMeterConfig(event)">
+                        <input type="hidden" id="meter-action-mode" value="add">
+                        <input type="hidden" id="meter-edit-id" value="">
+                        <input type="hidden" id="meter-owner-id" value="1">
+                        
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Serial Number *</label>
+                                <input type="text" id="meter-serial" class="form-control" required pattern="[0-9]+" style="font-size: 14px; padding: 10px;" placeholder="e.g. 251308613">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Meter Name</label>
+                                <input type="text" id="meter-name" class="form-control" style="font-size: 14px; padding: 10px;" placeholder="e.g. BESS_01">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Outstation</label>
+                                <input type="text" id="meter-outstation" class="form-control" pattern="[0-9]*" style="font-size: 14px; padding: 10px;" placeholder="e.g. 12">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Username *</label>
+                                <input type="text" id="meter-username" class="form-control" required style="font-size: 14px; padding: 10px;" placeholder="e.g. EDMI">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Password *</label>
+                                <input type="password" id="meter-password" class="form-control" required style="font-size: 14px; padding: 10px;" placeholder="Password">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Type *</label>
+                                <input type="text" id="meter-type" class="form-control" required style="font-size: 14px; padding: 10px;" placeholder="e.g. EDMI">
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Model *</label>
+                                <input type="text" id="meter-model" class="form-control" required style="font-size: 14px; padding: 10px;" placeholder="e.g. Mk6E">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Role</label>
+                                <select id="meter-role" class="form-control" style="font-size: 14px; padding: 10px; height: auto;" onchange="handleRoleChange()">
+                                    <option value="">None</option>
+                                    <!-- Populated by JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Source ID</label>
+                                <select id="meter-source" class="form-control" style="font-size: 14px; padding: 10px; height: auto;" disabled>
+                                    <option value="">None</option>
+                                    <!-- Populated by JS -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr; margin-bottom: 24px;">
+                            <div>
+                                <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">Survey Types (comma separated)</label>
+                                <input type="text" id="meter-survey" class="form-control" style="font-size: 14px; padding: 10px;" placeholder="e.g. LS02, LS03">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                            <button type="button" class="btn btn-default" onclick="cancelMeterForm()" style="font-size: 14px; font-weight: 600;">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="meter-submit-btn" style="background: var(--primary-color); border: none; font-size: 14px; font-weight: 600;">Add Meter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Meters List Table -->
+            <div class="tm-card" id="meter-list-card">
+                <div class="tm-card-header">
+                    <div class="tm-card-title">Meter List</div>
+                </div>
+                <div class="tm-card-body">
+                    <div class="table-responsive" style="max-height: calc(100vh - 300px); border:none;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Serial Number</th>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Status</th>
+                                    <th style="text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="meter-management-body">
+                                <tr><td colspan="5" style="text-align:center; padding: 40px;"><div class="loader-ring" style="border-top-color:var(--primary-color);"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Page -->
+        <div id="page-alerts" class="page-block @(currentPage == "alerts" ? "active" : "")">
+             <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 20px;">Alerts</h2>
+             <div class="tm-card">
+                <div class="tm-card-header"><div class="tm-card-title">Active Alerts</div></div>
+                <div class="tm-card-body">
+                    <div style="text-align: center; padding: 60px; color: var(--text-secondary);">
+                        <i class="fa fa-bell-o" style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <p>No active alerts detected at this time.</p>
+                    </div>
+                </div>
+             </div>
+        </div>
+        <!-- Fault Info Modal -->
+        <div class="modal fade" id="fault-info-modal" tabindex="-1" role="dialog" aria-labelledby="fault-info-title" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); overflow: hidden;">
+                    <div class="modal-header" style="background: #001f8f; color: #fff; padding: 15px 20px; border: none; display: flex; align-items: center; gap: 12px;">
+                        <i class="fa fa-bar-chart" style="font-size: 18px; background: rgba(255,255,255,0.2); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px;"></i>
+                        <h5 class="modal-title" id="fault-info-title" style="font-weight: 700; margin: 0; font-size: 18px;">Meter Status - [Timestamp]</h5>
+                    </div>
+                    <div class="modal-body" style="padding: 0;">
+                        <!-- Summary Section -->
+                        <div id="fault-modal-summary" style="padding: 15px 25px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; flex-wrap: wrap; gap: 20px; font-size: 12px; font-weight: 600; color: #64748b;">
+                            <div>PERIOD ID: <span id="modal-summary-id" style="color: #1e293b; margin-left: 5px;">--</span></div>
+                            <div style="border-left: 1px solid #cbd5e1; height: 16px;"></div>
+                            <div>TIME RANGE: <span id="modal-summary-range" style="color: #1e293b; margin-left: 5px;">--</span></div>
+                            <div style="border-left: 1px solid #cbd5e1; height: 16px;"></div>
+                            <div style="display: flex; align-items: center; gap: 8px;">SCENARIO: <span id="modal-summary-scenario" class="scenario-pill warning" style="margin-left: 5px;">--</span></div>
+                        </div>
+
+                        <div id="fault-modal-content">
+                            <!-- Fault info table populated here -->
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid #e2e8f0; padding: 12px 20px; display: flex; justify-content: flex-end;">
+                        <button type="button" class="btn btn-primary" id="close-fault-modal" data-dismiss="modal" style="background: #001f8f; border: none; padding: 8px 24px; font-weight: 700; border-radius: 8px; font-size: 14px; min-width: 100px; display: inline-flex; align-items: center; justify-content: center; line-height: 1;">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            window.showFaultInfo = async function(start, end) {
+                const modalContent = document.getElementById('fault-modal-content');
+                const titleEl = document.getElementById('fault-info-title');
+                const summaryId = document.getElementById('modal-summary-id');
+                const summaryRange = document.getElementById('modal-summary-range');
+                const summaryScenario = document.getElementById('modal-summary-scenario');
+                const closeBtn = document.getElementById('close-fault-modal');
+
+                if (!modalContent) return;
+
+                // Set title and summary placeholders
+                if (titleEl) titleEl.textContent = `Meter Status - ${new Date(start).toLocaleString()}`;
+                if (summaryRange) summaryRange.textContent = `${new Date(start).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(end).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+                
+                modalContent.innerHTML = '<div style="text-align:center; padding:40px;"><div class="loader-ring" style="border-top-color:var(--primary-color); width:30px; height:30px;"></div><p style="margin-top:10px; color:var(--text-secondary);">Fetching faulty meter data...</p></div>';
+                
+                // Close button handler 
+                if (closeBtn) {
+                    closeBtn.onclick = () => {
+                        if (window.$ && $.fn.modal) {
+                            $('#fault-info-modal').modal('hide');
+                        } else {
+                            const modal = document.getElementById('fault-info-modal');
+                            if (modal) {
+                                modal.style.display = 'none';
+                                modal.classList.remove('in', 'show');
+                            }
+                        }
+                    };
+                }
+
+                // Show modal (using jQuery/Bootstrap)
+                if (window.$ && $.fn.modal) {
+                    $('#fault-info-modal').modal('show');
+                } else {
+                    const modal = document.getElementById('fault-info-modal');
+                    if (modal) {
+                        modal.style.display = 'block';
+                        modal.classList.add('in', 'show');
+                        modal.style.opacity = '1';
+                    }
+                }
+
+                try {
+                    const res = await fetch(`${CONFIG.baseUrl}/faults/by-window?window_start_ts=${encodeURIComponent(start)}&window_end_ts=${encodeURIComponent(end)}`);
+                    if (!res.ok) {
+                        if (res.status === 404) {
+                            modalContent.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-secondary);"><i class="fa fa-info-circle" style="font-size:30px; margin-bottom:10px;"></i><p>No fault record found for this specific window.</p></div>';
+                        } else {
+                            throw new Error('Failed to fetch fault data');
+                        }
+                        return;
+                    }
+                    
+                    const data = await res.json();
+                    
+                    // Update summary info
+                    if (summaryId) summaryId.textContent = data.id || 'N/A';
+                    if (summaryScenario) {
+                        summaryScenario.textContent = data.scenario_code || 'N/A';
+                        summaryScenario.className = `scenario-pill ${data.scenario_code === 'ALL_OK' ? 'normal' : 'warning'}`;
+                    }
+                    
+                    if (!data.faults || data.faults.length === 0) {
+                        modalContent.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-secondary);"><i class="fa fa-check-circle" style="font-size:30px; margin-bottom:10px; color:var(--success-color);"></i><p>No faulty meters recorded for this period.</p></div>';
+                        return;
+                    }
+
+                    modalContent.innerHTML = `
+                        <div class="table-responsive" style="max-height: 400px;">
+                            <table class="table" style="margin-bottom:0;">
+                                <thead style="background: #fdfdfd;">
+                                    <tr>
+                                        <th style="border-top:none; color:#64748b; font-size:11px; text-align: center;">METER SERIAL</th>
+                                        <th style="border-top:none; color:#64748b; font-size:11px; text-align: center;">METER NAME</th>
+                                        <th style="border-top:none; color:#64748b; font-size:11px; text-align: center;">FAULT START</th>
+                                        <th style="border-top:none; color:#64748b; font-size:11px; text-align: center;">FAULT END</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.faults.map(f => `
+                                        <tr>
+                                            <td style="font-weight:400; padding:12px 16px; color:#64748b; text-align: center;">${f.meter_serial}</td>
+                                            <td style="padding:12px 16px; font-weight:700; color:#001f8f; text-align: center;">${f.meter_name || 'N/A'}</td>
+                                            <td style="padding:12px 16px; text-align: center;">${new Date(f.fault_start_ts).toLocaleString([], {year:'2-digit', month:'numeric', day:'numeric', hour:'numeric', minute:'2-digit'})}</td>
+                                            <td style="padding:12px 16px; color:#64748b; text-align: center;">${f.fault_end_ts ? new Date(f.fault_end_ts).toLocaleString([], {year:'2-digit', month:'numeric', day:'numeric', hour:'numeric', minute:'2-digit'}) : '--'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                } catch (e) {
+                    console.error('Fault Modal Error:', e);
+                    modalContent.innerHTML = `<div style="text-align:center; padding:40px; color:var(--danger-color);"><i class="fa fa-exclamation-triangle" style="font-size:30px; margin-bottom:10px;"></i><p>Error loading fault info: ${e.message}</p></div>`;
+                }
+            }
+            // Configuration & State
+            const CONFIG = {
+                baseUrl: 'http://192.168.4.117:8001/api',
+                pollingInterval: 30000 
+            };
+
+            const STATE = {
+                meters: [],
+                isPolling: false,
+                currentEnergyPage: 'analysis',
+                lastUpdateData: null,
+                historyData: [],
+                selectedMeterFilter: null,
+                roles: [],
+                sources: [],
+                currentMeterId: null
+            };
+
+            // DOM Elements
+            const elements = {
+                meterTableBody: document.getElementById('meter-list-body'),
+                meterManagementBody: document.getElementById('meter-management-body'),
+                statTotal: document.getElementById('stat-total-meters'),
+                statConnected: document.getElementById('stat-connected-meters'),
+                statDisconnected: document.getElementById('stat-disconnected-meters'),
+                statReading: document.getElementById('stat-reading-meters')
+            };
+
+            // --- API Service ---
+            async function fetchAllMeters() {
+                try {
+                    // Try to load from cache first for immediate UI
+                    const cached = localStorage.getItem('tariff_meters_cache');
+                    if (cached) {
+                        STATE.meters = JSON.parse(cached);
+                        renderMeterList();
+                        renderMeterManagement();
+                        updateStats();
+                    }
+
+                    const response = await fetch(`${CONFIG.baseUrl}/get_all_meters_info`);
+                    if (!response.ok) throw new Error('Failed to fetch meters');
+                    const freshMeters = await response.json();
+                    
+                    // Merge fresh info with existing connected states if any
+                    freshMeters.forEach(m => {
+                        const existing = STATE.meters.find(em => em.meter_id == m.meter_id);
+                        if (existing) {
+                            m._isConnected = existing._isConnected;
+                            m._statusText = existing._statusText;
+                        }
+                    });
+
+                    STATE.meters = freshMeters;
+                    localStorage.setItem('tariff_meters_cache', JSON.stringify(STATE.meters));
+                    
+                    renderMeterList();
+                    renderMeterManagement();
+                    updateStats();
+                } catch (error) {
+                    console.error('API Error (Meters):', error);
+                }
+            }
+
+            async function pollStatus() {
+                if (STATE.isPolling) return;
+                STATE.isPolling = true;
+
+                try {
+                    const response = await fetch(`${CONFIG.baseUrl}/meter_loop_status`);
+                    if (!response.ok) throw new Error('Failed to fetch status');
+                    const statusData = await response.json();
+                    
+                    updateStatusUI(statusData);
+                } catch (error) {
+                    console.error('API Error (Status):', error);
+                } finally {
+                    STATE.isPolling = false;
+                }
+            }
+
+            // --- UI Rendering ---
+            function renderMeterList() {
+                if (!elements.meterTableBody) return;
+                elements.meterTableBody.innerHTML = STATE.meters.map(meter => {
+                    const isConnected = meter._isConnected;
+                    const rawStatus = (meter._statusText || '').toLowerCase();
+                    const isFailed = rawStatus.includes('failed') || rawStatus === 'disconnected' || rawStatus === 'idle';
+                    
+                    const statusText = isConnected ? 'Connected' : (rawStatus.includes('failed') ? 'Failed' : meter._statusText || 'Disconnected');
+                    const typeLabel = (meter.type || 'N/A').toUpperCase().includes('DMI') ? 'EDMI' : (meter.type || '--');
+                    const safeName = (meter.meter_name || 'N/A').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                    return `
+                        <tr class="meter-row">
+                            <td>${meter.serial_number}</td>
+                            <td class="tm-link">
+                                <a href="javascript:void(0)" onclick="openMeterDetail(${meter.meter_id}, '${safeName}')" style="color:var(--primary-color); font-weight:600; text-decoration:none;">
+                                    ${meter.meter_name || 'N/A'}
+                                </a>
+                            </td>
+                            <td>${meter.outstation || '--'}</td>
+                            <td>${typeLabel}</td>
+                            <td>${meter.model || '--'}</td>
+                            <td id="status-cell-${meter.meter_id}">
+                                <span class="status-pill ${isConnected ? 'connected' : (isFailed ? 'failed' : '')}">${statusText}</span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('') || '<tr><td colspan="6" style="text-align:center;">No meters found.</td></tr>';
+            }
+
+            function renderMeterManagement() {
+                if (!elements.meterManagementBody) return;
+                if (!STATE.meters || STATE.meters.length === 0) {
+                    elements.meterManagementBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 40px;"><p style="color:var(--text-secondary);"><i class="fa fa-info-circle"></i> No meters found.</p></td></tr>';
+                    return;
+                }
+
+                elements.meterManagementBody.innerHTML = STATE.meters.map(meter => {
+                    const isConnected = meter._isConnected;
+                    const rawStatus = (meter._statusText || '').toLowerCase();
+                    const isFailed = rawStatus.includes('failed') || rawStatus.includes('timeout') || rawStatus === 'disconnected' || rawStatus === 'idle';
+                    
+                    const statusText = isConnected ? 'Connected' : (isFailed ? 'Failed' : meter._statusText || 'Disconnected');
+                    
+                    return `
+                        <tr>
+                            <td style="font-weight: 600;">${meter.serial_number}</td>
+                            <td>${meter.meter_name || '--'}</td>
+                            <td>${meter.username}</td>
+                            <td id="mgt-status-${meter.meter_id}">
+                                <span class="status-pill ${isConnected ? 'connected' : (isFailed ? 'failed' : '')}">${statusText}</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <button class="btn-action" style="color:var(--primary-color);" onclick="showMeterForm(${meter.meter_id})" title="Edit Meter"><i class="fa fa-pencil"></i></button>
+                                <button class="btn-action delete" style="color:var(--danger-color);" onclick="deleteMeter(${meter.meter_id}, '${meter.serial_number}')" title="Delete Meter"><i class="fa fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            window.openMeterDetail = function(meterId, meterName) {
+                const dashboardView = document.getElementById('tariff-dashboard-view');
+                const detailView = document.getElementById('tariff-meter-detail');
+
+                if (dashboardView && detailView) {
+                    const m = STATE.meters.find(x => x.meter_id == meterId) || {};
+
+                    dashboardView.style.display = 'none';
+                    detailView.style.display = 'block';
+                    STATE.currentMeterId = meterId;
+                    
+                    // Populate Meter Header
+                    document.getElementById('mheader-name').textContent = meterName || m.meter_name || '--';
+                    document.getElementById('mheader-sn').textContent = m.serial_number || '--';
+                    document.getElementById('mheader-type').textContent = `M-${meterId}`;
+                    
+                    const isConnected = m._isConnected;
+                    const rawStatus = (m._statusText || '').toLowerCase();
+                    const isFailed = rawStatus.includes('failed') || rawStatus === 'disconnected' || rawStatus === 'idle';
+                    
+                    const stEl = document.getElementById('mheader-status');
+                    if (stEl) {
+                        stEl.textContent = isConnected ? 'Connected' : (isFailed ? 'Failed' : m._statusText || 'Disconnected');
+                        stEl.className = 'status-pill ' + (isConnected ? 'connected' : (isFailed ? 'failed' : ''));
+                    }
+
+                    // Populate Info Grid
+                    document.getElementById('minfo-imei').textContent = m.serial_number || '--';
+                    const typeLabel = (m.type || 'N/A').toUpperCase().includes('DMI') ? 'EDMI ' + (m.model||'') : (m.model || m.type || 'Mk6E');
+                    document.getElementById('minfo-type').textContent = typeLabel;
+                    
+                    const lastUpd = localStorage.getItem('tariff_last_status') ? new Date().toLocaleString([], {year:'numeric', month:'numeric', day:'numeric', hour:'numeric', minute:'2-digit'}) : 'N/A';
+                    document.getElementById('minfo-updated').textContent = lastUpd;
+
+                    // Fetch CT/VT Ratios
+                    document.getElementById('minfo-ct-pri').textContent = '...';
+                    document.getElementById('minfo-ct-sec').textContent = '...';
+                    document.getElementById('minfo-vt-pri').textContent = '...';
+                    document.getElementById('minfo-vt-sec').textContent = '...';
+
+                    setTimeout(async () => {
+                        try {
+                            const endIso = new Date().toISOString();
+                            const startIso = new Date(Date.now() - 365*24*3600*1000).toISOString(); // look back 1 year
+                            const payload = {
+                                meter_id: meterId,
+                                columns: ['ct_ratio_primary', 'ct_ratio_secondary', 'vt_ratio_primary', 'vt_ratio_secondary'],
+                                time_range: { start_utc: startIso, end_utc: endIso },
+                                order: 'desc',
+                                limit: 1
+                            };
+                            const res = await fetch(`${CONFIG.baseUrl}/query_data_by_time_range`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            if (res.ok) {
+                                const resData = await res.json();
+                                if (resData.data && resData.data.length > 0) {
+                                    const row = resData.data[0];
+                                    document.getElementById('minfo-ct-pri').textContent = row['ct_ratio_primary'] !== undefined && row['ct_ratio_primary'] !== null ? row['ct_ratio_primary'] : '--';
+                                    document.getElementById('minfo-ct-sec').textContent = row['ct_ratio_secondary'] !== undefined && row['ct_ratio_secondary'] !== null ? row['ct_ratio_secondary'] : '--';
+                                    document.getElementById('minfo-vt-pri').textContent = row['vt_ratio_primary'] !== undefined && row['vt_ratio_primary'] !== null ? row['vt_ratio_primary'] : '--';
+                                    document.getElementById('minfo-vt-sec').textContent = row['vt_ratio_secondary'] !== undefined && row['vt_ratio_secondary'] !== null ? row['vt_ratio_secondary'] : '--';
+                                } else {
+                                    document.getElementById('minfo-ct-pri').textContent = 'N/A';
+                                    document.getElementById('minfo-ct-sec').textContent = 'N/A';
+                                    document.getElementById('minfo-vt-pri').textContent = 'N/A';
+                                    document.getElementById('minfo-vt-sec').textContent = 'N/A';
+                                }
+                            }
+                        } catch(e) { console.error('CT/VT Fetch Error', e); }
+                    }, 50);
+
+                    // Init Date pickers
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    if (!document.getElementById('op-from').value) {
+                        document.getElementById('op-from').value = todayStr;
+                        document.getElementById('op-to').value = todayStr;
+                        document.getElementById('pl-from').value = todayStr;
+                        document.getElementById('pl-to').value = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+                    }
+
+                    // Populate Survey Dropdown dynamically
+                    const surveySel = document.getElementById('pl-survey');
+                    if (surveySel) {
+                        if (m.survey_type && Array.isArray(m.survey_type) && m.survey_type.length > 0) {
+                            surveySel.innerHTML = m.survey_type.map(s => `<option value="${s}">${s}</option>`).join('');
+                        } else {
+                            surveySel.innerHTML = '<option value="LS02">LS02</option><option value="LS01">LS01</option>';
+                        }
+                    }
+
+                    setTimeout(() => { 
+                        updateOpMultiSelect(); 
+                        updatePlMultiSelect(); 
+                        fetchOperationMetrics();
+                    }, 10);
+                }
+            };
+            
+            window.switchDetailTab = function(tabId, btnScope) {
+                document.querySelectorAll('.detail-tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.detail-tab-content').forEach(c => c.classList.remove('active'));
+                
+                btnScope.classList.add('active');
+                document.getElementById('dtab-' + tabId).classList.add('active');
+
+                if (tabId === 'fn-readings') fetchFinalizedReadings();
+            };
+
+            window.toggleSurveyView = function() {
+                const val = document.getElementById('pl-interval').value;
+                const isSurvey = val === 'survey';
+                
+                document.querySelectorAll('.pl-time-picker').forEach(el => el.style.display = isSurvey ? 'block' : 'none');
+                document.getElementById('pl-mode-label').textContent = isSurvey ? 'Survey' : 'Interval';
+                
+                document.getElementById('pl-table-main').style.display = isSurvey ? 'none' : 'table';
+                document.getElementById('pl-table-survey').style.display = isSurvey ? 'table' : 'none';
+                
+                document.getElementById('pl-chart-title').innerHTML = isSurvey ? 'Load survey (LS02) 30m sampling interval' : 'Operating Parameters Chart';
+            };
+
+            window.togglePlMultiSelect = function(e) {
+                if (e) e.stopPropagation();
+                const drop = document.getElementById('pl-col-dropdown');
+                if (drop) drop.classList.toggle('show');
+            };
+
+            window.updatePlMultiSelect = function() {
+                const list = document.querySelectorAll('#pl-col-dropdown input[type="checkbox"]:checked');
+                const textEl = document.getElementById('pl-col-text');
+                if (!textEl) return;
+                
+                if (list.length === 0) {
+                    textEl.textContent = 'None selected';
+                } else if (list.length === 1) {
+                    textEl.textContent = list[0].value;
+                } else {
+                    textEl.textContent = list[0].value + ', ' + (list[1] ? list[1].value.substring(0,8) + '...' : '...');
+                }
+            };
+            
+            document.addEventListener('click', function(e) {
+                const wrapper = document.getElementById('pl-col-wrapper');
+                const drop = document.getElementById('pl-col-dropdown');
+                if (wrapper && drop && !wrapper.contains(e.target)) {
+                    drop.classList.remove('show');
+                }
+                const wrapperOp = document.getElementById('op-col-wrapper');
+                const dropOp = document.getElementById('op-col-dropdown');
+                if (wrapperOp && dropOp && !wrapperOp.contains(e.target)) {
+                    dropOp.classList.remove('show');
+                }
+            });
+
+            window.handleOpCheckboxChange = function(cb) {
+                const checkedBoxes = document.querySelectorAll('#op-col-dropdown input[type="checkbox"]:checked');
+                if (checkedBoxes.length > 10) {
+                    alert('You can select up to 10 parameters at a time.');
+                    cb.checked = false;
+                    return;
+                }
+                updateOpMultiSelect();
+            };
+
+            window.toggleOpMultiSelect = function(e) {
+                if (e) e.stopPropagation();
+                const drop = document.getElementById('op-col-dropdown');
+                if (drop) drop.classList.toggle('show');
+            };
+
+            window.updateOpMultiSelect = function() {
+                const list = document.querySelectorAll('#op-col-dropdown input[type="checkbox"]');
+                const textEl = document.getElementById('op-col-text');
+                const thElements = document.querySelectorAll('#op-table-main th');
+                
+                let checkedCount = 0;
+                let firstChecked = null;
+                let secondChecked = null;
+
+                list.forEach((chk, i) => {
+                    const isChecked = chk.checked;
+                    if (isChecked) {
+                        checkedCount++;
+                        if (!firstChecked) firstChecked = chk;
+                        else if (!secondChecked) secondChecked = chk;
+                    }
+                    if (thElements[i + 1]) {
+                        thElements[i + 1].style.display = isChecked ? 'table-cell' : 'none';
+                    }
+                    const rows = document.querySelectorAll('#op-table-main tbody tr');
+                    rows.forEach(row => {
+                        const td = row.cells[i + 1];
+                        if (td && td.colSpan === 1) {
+                            td.style.display = isChecked ? 'table-cell' : 'none';
+                        }
+                    });
+                });
+                
+                const emptyRowTd = document.querySelector('#op-table-main tbody tr:first-child td');
+                if (emptyRowTd && emptyRowTd.parentElement.cells.length === 1) {
+                    emptyRowTd.colSpan = checkedCount + 1;
+                }
+                
+                if (!textEl) return;
+                if (checkedCount === 0) {
+                    textEl.textContent = 'None selected';
+                } else if (checkedCount === 1) {
+                    textEl.textContent = firstChecked.parentElement.textContent.trim();
+                } else if (checkedCount === 52) {
+                    textEl.textContent = '52 columns selected';
+                } else {
+                    textEl.textContent = firstChecked.parentElement.textContent.trim() + ', ' + (secondChecked ? secondChecked.parentElement.textContent.trim().substring(0,8) + '...' : '...');
+                }
+            };
+
+            window.toggleOpSurveyView = function() {
+                const val = document.getElementById('op-interval').value;
+                const isSurvey = val === 'survey';
+                
+                document.getElementById('op-time-from').style.display = isSurvey ? 'block' : 'none';
+                document.getElementById('op-time-to').style.display = isSurvey ? 'block' : 'none';
+                
+                document.getElementById('op-table-main').style.display = isSurvey ? 'none' : 'table';
+                document.getElementById('op-table-survey').style.display = isSurvey ? 'table' : 'none';
+                
+                document.getElementById('op-chart-title').innerHTML = isSurvey ? 'Load survey (LS02) N/A sampling interval' : 'Operating Parameters Chart';
+            };
+
+            document.getElementById('back-to-meter-list').addEventListener('click', () => {
+                document.getElementById('tariff-dashboard-view').style.display = 'block';
+                document.getElementById('tariff-meter-detail').style.display = 'none';
+            });
+
+            function updateStatusUI(data) {
+                if (!data.meter_status) return;
+
+                const now = new Date();
+                let connectedCount = 0;
+                let readingCount = 0;
+                
+                // Track current connected states in STATE.meters for sorting
+                data.meter_status.forEach(status => {
+                    const rawStatus = (status.status || '').toLowerCase();
+                    const isConnected = rawStatus === 'read_ok' || rawStatus === 'prelogin_ok' || rawStatus === 'connected' || rawStatus === 'functional' || rawStatus === 'reading';
+                    const isFailed = rawStatus.includes('failed') || rawStatus.includes('timeout') || rawStatus === 'disconnected' || rawStatus === 'idle';
+                    
+                    const meter = STATE.meters.find(m => m.meter_id == status.meter_id);
+                    if (meter) {
+                        meter._isConnected = isConnected;
+                        meter._statusText = isConnected ? 'Connected' : (isFailed ? 'Failed' : status.status);
+                    }
+                    if (isConnected) connectedCount++;
+                    if (rawStatus === 'reading') readingCount++;
+                });
+
+                // Persist state
+                localStorage.setItem('tariff_meters_cache', JSON.stringify(STATE.meters));
+                localStorage.setItem('tariff_last_status', JSON.stringify(data));
+
+                // Keep default order (sort by ID)
+                STATE.meters.sort((a, b) => a.meter_id - b.meter_id);
+                
+                // Update Overview Numbers
+                if (elements.statTotal) elements.statTotal.textContent = STATE.meters.length;
+                if (elements.statConnected) elements.statConnected.textContent = connectedCount;
+                if (elements.statDisconnected) elements.statDisconnected.textContent = STATE.meters.length - connectedCount;
+                if (elements.statReading) elements.statReading.textContent = readingCount;
+                
+                // Re-render lists with new order
+                renderMeterList();
+                renderMeterManagement();
+            }
+
+            // --- Energy Reports Logic ---
+            const energyElements = {
+                year: document.getElementById('energy-year-select'),
+                month: document.getElementById('energy-month-select'),
+                table: document.getElementById('energy-breakdown-body'),
+                historyTable: document.getElementById('status-history-body'),
+                total: document.getElementById('energy-total-to-lmv'),
+                bess: document.getElementById('energy-bess-to-lmv'),
+                rts: document.getElementById('energy-rts-to-lmv'),
+                inq: document.getElementById('energy-inqualified')
+            };
+
+            async function fetchEnergyReport() {
+                const y = energyElements.year.value;
+                const m = energyElements.month.value;
+                if (energyElements.table) {
+                    energyElements.table.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:40px;"><div class="loader-ring" style="border-top-color:var(--primary-color)"></div></td></tr>';
+                }
+
+                try {
+                    const sRes = await fetch(`${CONFIG.baseUrl}/energy/monthly-summary?year=${y}&month=${m}`);
+                    const summary = await sRes.json();
+                    if (summary.items && summary.items.length > 0) {
+                        const item = summary.items[0];
+                        const bessKwh = item.bess_to_lmv_energy_kwh || 0;
+                        const rtsKwh = item.rfs_to_lmv_energy_kwh || 0;
+                        const totalKwh = bessKwh + rtsKwh;
+
+                        energyElements.total.textContent = totalKwh.toLocaleString(undefined, {minimumFractionDigits: 2}) + ' kWh';
+                        energyElements.bess.textContent = bessKwh.toLocaleString(undefined, {minimumFractionDigits: 2}) + ' kWh';
+                        energyElements.rts.textContent = rtsKwh.toLocaleString(undefined, {minimumFractionDigits: 2}) + ' kWh';
+                        energyElements.inq.textContent = item.number_of_inqualified_intervals || 0;
+                    }
+
+                    const bRes = await fetch(`${CONFIG.baseUrl}/energy/monthly-breakdown?year=${y}&month=${m}`);
+                    const breakdown = await bRes.json();
+                    renderEnergyTable(breakdown.items);
+                } catch (e) {
+                    console.error('Energy Report Error:', e);
+                    if (energyElements.table) {
+                        energyElements.table.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:var(--danger-color);">Error loading data.</td></tr>';
+                    }
+                }
+            }
+
+            async function fetchStatusHistory() {
+                const y = energyElements.year.value;
+                const m = energyElements.month.value;
+                if (!energyElements.historyTable) return;
+                
+                energyElements.historyTable.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px;"><div class="loader-ring" style="border-top-color:var(--primary-color)"></div><p style="margin-top:10px; color:var(--text-secondary);">Loading status history...</p></td></tr>';
+
+                try {
+                    const response = await fetch(`${CONFIG.baseUrl}/faults/by-month?year=${y}&month=${m}`);
+                    const data = await response.json();
+                    STATE.historyData = data || [];
+                    renderHistoryTable();
+                } catch (e) {
+                    console.error('Status History Error:', e);
+                    energyElements.historyTable.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--danger-color);">Error loading history: ${e.message}</td></tr>`;
+                }
+            }
+
+            function renderEnergyTable(items) {
+                if (!items || items.length === 0) {
+                    energyElements.table.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px;">No data available.</td></tr>';
+                    return;
+                }
+                energyElements.table.innerHTML = items.map(item => {
+                    const isFault = item.scenario_code !== 'ALL_OK';
+                    const actionBtn = isFault ? `
+                        <button class="btn-action view-fault-btn" 
+                                data-start="${item.period_start}" 
+                                data-end="${item.period_end}"
+                                title="View faulty meters">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    ` : '';
+                    
+                    const rowStyle = isFault ? 'style="background-color: #fee2e2;"' : '';
+                    const mainVal = item.grid_energy_kwh || 0;
+                    const bessVal = item.bess_to_lmv_kwh || 0;
+                    const rtsVal = item.rts_to_lmv_kwh || 0;
+                    const totalLmv = bessVal + rtsVal;
+
+                    return `
+                    <tr ${rowStyle}>
+                        <td style="vertical-align: middle;">${new Date(item.period_start).toLocaleString()}</td>
+                        <td style="vertical-align: middle;">${new Date(item.period_end).toLocaleString()}</td>
+                        <td style="vertical-align: middle;"><span class="scenario-pill ${item.scenario_code === 'ALL_OK' ? 'normal' : 'warning'}">${item.scenario_code}</span></td>
+                        <td style="vertical-align: middle;">${totalLmv.toFixed(2)}</td>
+                        <td style="vertical-align: middle;">${mainVal.toFixed(2)}</td>
+                        <td style="vertical-align: middle;">${(item.k_factor || 0).toFixed(2)}</td>
+                        <td style="vertical-align: middle;">${bessVal.toFixed(2)}</td>
+                        <td style="vertical-align: middle;">${rtsVal.toFixed(2)}</td>
+                        <td style="text-align:center; vertical-align: middle;">
+                            ${actionBtn}
+                        </td>
+                    </tr>
+                `; }).join('');
+
+                // Add event listeners to buttons
+                energyElements.table.querySelectorAll('.view-fault-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const start = btn.getAttribute('data-start');
+                        const end = btn.getAttribute('data-end');
+                        showFaultInfo(start, end);
+                    });
+                });
+            }
+
+            function renderHistoryTable() {
+                const scenarioWindows = STATE.historyData;
+                if (!scenarioWindows || scenarioWindows.length === 0) {
+                    energyElements.historyTable.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-secondary);">No history available for the selected period.</td></tr>';
+                    return;
+                }
+                
+                // Collect unique meters for filter
+                const metersMap = new Map();
+                let html = '';
+                
+                scenarioWindows.forEach(window => {
+                    if (window.faults && window.faults.length > 0) {
+                        window.faults.forEach(fault => {
+                            // Populate filter map
+                            metersMap.set(fault.meter_serial, fault.meter_name || 'N/A');
+
+                            // Respect filter
+                            if (STATE.selectedMeterFilter && String(fault.meter_serial) !== String(STATE.selectedMeterFilter)) return;
+
+                             html += `
+                                <tr style="vertical-align: middle;">
+                                    <td style="padding:12px 16px; color:#64748b; vertical-align: middle; text-align: center;">${fault.meter_serial}</td>
+                                    <td style="padding:12px 16px; font-weight:700; color:#001f8f; vertical-align: middle; text-align: center;">${fault.meter_name || 'N/A'}</td>
+                                    <td style="padding:12px 16px; vertical-align: middle; text-align: center;"><span class="scenario-pill warning">${window.scenario_code}</span></td>
+                                    <td style="padding:12px 16px; vertical-align: middle; text-align: center;">${new Date(fault.fault_start_ts).toLocaleString([], {year:'2-digit', month:'numeric', day:'numeric', hour:'numeric', minute:'2-digit'})}</td>
+                                    <td style="padding:12px 16px; color:#64748b; vertical-align: middle; text-align: center;">${fault.fault_end_ts ? new Date(fault.fault_end_ts).toLocaleString([], {year:'2-digit', month:'numeric', day:'numeric', hour:'numeric', minute:'2-digit'}) : '--'}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                });
+
+                // Populate filter dropdown using ALL meters from STATE.meters
+                const filterList = document.getElementById('meter-filter-list');
+                if (filterList) {
+                    const currentFilter = STATE.selectedMeterFilter;
+                    let filterHtml = `<li><a href="javascript:void(0)" onclick="filterHistoryByMeter(null)">All Meters ${!currentFilter ? '✓' : ''}</a></li><li role="separator" class="divider"></li>`;
+                    
+                    // Sort meters by name
+                    const sortedMeters = STATE.meters.map(m => [m.serial_number, m.meter_name || 'N/A']).sort((a, b) => a[1].localeCompare(b[1]));
+                    
+                    sortedMeters.forEach(([serial, name]) => {
+                        const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                        filterHtml += `<li><a href="javascript:void(0)" onclick="filterHistoryByMeter('${serial}', '${safeName}')">${name} - ${serial} ${currentFilter === serial ? '✓' : ''}</a></li>`;
+                    });
+                    filterList.innerHTML = filterHtml;
+                }
+
+                if (html === '') {
+                    energyElements.historyTable.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:40px; color:var(--success-color);"><i class="fa fa-check-circle-o" style="font-size:30px; margin-bottom:10px;"></i><p>All meters were healthy for the selected period.</p></td></tr>';
+                } else {
+                    energyElements.historyTable.innerHTML = html;
+                }
+            }
+
+            window.filterHistoryByMeter = function(serial, name) {
+                STATE.selectedMeterFilter = serial;
+                const btn = document.getElementById('filter-by-meter-btn');
+                if (btn) {
+                    btn.innerHTML = serial ? `Filter: ${name || serial} <span class="caret"></span>` : `Filter by Meter <span class="caret"></span>`;
+                }
+                renderHistoryTable();
+            };
+
+            function updateStats() {
+                if (elements.statTotal) elements.statTotal.textContent = STATE.meters.length;
+            }
+
+            // --- Meter Management JS Logic ---
+            window.showMeterForm = function(editMeterId = null) {
+                const formCard = document.getElementById('meter-form-card');
+                const listCard = document.getElementById('meter-list-card');
+                const addBtn = document.getElementById('add-meter-btn');
+                const form = document.getElementById('meter-config-form');
+                const modeInput = document.getElementById('meter-action-mode');
+                const title = document.getElementById('meter-form-title');
+                const submitBtn = document.getElementById('meter-submit-btn');
+
+                form.reset();
+                document.getElementById('meter-serial').readOnly = false;
+                document.getElementById('meter-source').disabled = true;
+
+                if (editMeterId !== null) {
+                    const m = STATE.meters.find(x => x.meter_id === editMeterId);
+                    if (!m) return;
+                    
+                    modeInput.value = 'edit';
+                    document.getElementById('meter-edit-id').value = m.meter_id;
+                    title.textContent = 'Edit Meter';
+                    submitBtn.textContent = 'Update Meter';
+                    
+                    document.getElementById('meter-serial').value = m.serial_number || '';
+                    document.getElementById('meter-serial').readOnly = true;
+                    document.getElementById('meter-name').value = m.meter_name || '';
+                    document.getElementById('meter-outstation').value = m.outstation || '';
+                    document.getElementById('meter-username').value = m.username || '';
+                    document.getElementById('meter-password').value = m.password || '';
+                    document.getElementById('meter-type').value = m.type || '';
+                    document.getElementById('meter-model').value = m.model || '';
+                    document.getElementById('meter-role').value = m.role || '';
+                    
+                    if (m.survey_type && Array.isArray(m.survey_type)) {
+                        document.getElementById('meter-survey').value = m.survey_type.join(', ');
+                    }
+                    
+                    const roleId = Number(m.role || 0);
+                    const selRole = STATE.roles.find(r => r.id === roleId);
+                    if (selRole && selRole.name === 'SOURCE') {
+                        document.getElementById('meter-source').disabled = false;
+                        document.getElementById('meter-source').value = m.source_id || '';
+                    }
+
+                } else {
+                    modeInput.value = 'add';
+                    title.textContent = 'Add New Meter';
+                    submitBtn.textContent = 'Add Meter';
+                }
+
+                formCard.style.display = 'block';
+                listCard.style.display = 'none';
+                if (addBtn) addBtn.style.display = 'none';
+            };
+
+            window.cancelMeterForm = function() {
+                document.getElementById('meter-form-card').style.display = 'none';
+                document.getElementById('meter-list-card').style.display = 'block';
+                const addBtn = document.getElementById('add-meter-btn');
+                if (addBtn) addBtn.style.display = 'inline-block';
+            };
+
+            window.handleRoleChange = function() {
+                const roleSel = document.getElementById('meter-role');
+                const sourceSel = document.getElementById('meter-source');
+                const roleId = Number(roleSel.value || 0);
+                const role = STATE.roles.find(r => r.id === roleId);
+                
+                if (role && role.name === 'SOURCE') {
+                    sourceSel.disabled = false;
+                } else {
+                    sourceSel.disabled = true;
+                    sourceSel.value = '';
+                }
+            };
+
+            window.saveMeterConfig = async function(e) {
+                e.preventDefault();
+                const mode = document.getElementById('meter-action-mode').value;
+                const submitBtn = document.getElementById('meter-submit-btn');
+                
+                const surveyVal = document.getElementById('meter-survey').value;
+                const surveyArr = surveyVal ? surveyVal.split(',').map(s => s.trim()).filter(Boolean) : undefined;
+                
+                const payload = {
+                    serial_number: Number(document.getElementById('meter-serial').value),
+                    username: document.getElementById('meter-username').value,
+                    password: document.getElementById('meter-password').value,
+                    meter_name: document.getElementById('meter-name').value || undefined,
+                    outstation: document.getElementById('meter-outstation').value ? Number(document.getElementById('meter-outstation').value) : undefined,
+                    type: document.getElementById('meter-type').value,
+                    model: document.getElementById('meter-model').value,
+                    survey_type: surveyArr,
+                    owner_id: Number(document.getElementById('meter-owner-id').value) || 1,
+                    role: document.getElementById('meter-role').value ? Number(document.getElementById('meter-role').value) : undefined,
+                    source_id: document.getElementById('meter-source').value ? Number(document.getElementById('meter-source').value) : undefined
+                };
+
+                const url = mode === 'add' ? `${CONFIG.baseUrl}/add_meter` : `${CONFIG.baseUrl}/update_meter`;
+                const method = mode === 'add' ? 'POST' : 'PUT';
+                
+                try {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
+                    
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const resData = await response.json();
+                    
+                    if (!response.ok) {
+                        alert(`Error: ${resData.detail || resData.status || 'Failed to save meter'}`);
+                    } else {
+                        // Success
+                        cancelMeterForm();
+                        // Refetch meters
+                        fetchAllMeters();
+                    }
+                } catch (err) {
+                    alert(`Network error saving meter: ${err.message}`);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = mode === 'add' ? 'Add Meter' : 'Update Meter';
+                }
+            };
+
+            window.deleteMeter = async function(meterId, serial) {
+                if (!confirm(`Are you sure you want to delete meter ${serial}?`)) return;
+                
+                try {
+                    const response = await fetch(`${CONFIG.baseUrl}/delete_meter/${meterId}`, {
+                        method: 'DELETE' // Backend takes DELETE
+                    });
+                    
+                    if (response.ok) {
+                        fetchAllMeters();
+                    } else {
+                        const err = await response.json();
+                        alert(`Failed to delete meter: ${err.detail || err.status}`);
+                    }
+                } catch (e) {
+                    alert(`Network error: ${e.message}`);
+                }
+            };
+
+            async function fetchOptions() {
+                try {
+                    const [resRoles, resSources] = await Promise.all([
+                        fetch(`${CONFIG.baseUrl}/energy/roles`),
+                        fetch(`${CONFIG.baseUrl}/energy/sources`)
+                    ]);
+                    
+                    if (resRoles.ok) {
+                        const r = await resRoles.json();
+                        STATE.roles = r.items || [];
+                        const roleSel = document.getElementById('meter-role');
+                        if (roleSel) {
+                            roleSel.innerHTML = '<option value="">None</option>' + STATE.roles.map(x => `<option value="${x.id}">${x.name}</option>`).join('');
+                        }
+                    }
+                    if (resSources.ok) {
+                        const s = await resSources.json();
+                        STATE.sources = s.items || [];
+                        const srcSel = document.getElementById('meter-source');
+                        if (srcSel) {
+                            srcSel.innerHTML = '<option value="">None</option>' + STATE.sources.map(x => `<option value="${x.id}">${x.name} (ID: ${x.id})</option>`).join('');
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to load roles/sources:', e);
+                }
+            }
+
+            // --- Initialization ---
+            function startPolling() {
+                // Initial fetch
+                fetchAllMeters();
+                pollStatus();
+                fetchOptions();
+                fetchYearlySummary();
+
+                // Background polling
+                setInterval(() => {
+                    if (document.getElementById('meter-form-card').style.display !== 'none') {
+                        // Skip refetching meters if the user is in the middle of editing/adding
+                        pollStatus();
+                    } else {
+                        fetchAllMeters();
+                        pollStatus();
+                    }
+                }, CONFIG.pollingInterval);
+            }
+
+            function init() {
+                // Restore last status if available
+                const lastStatus = localStorage.getItem('tariff_last_status');
+                if (lastStatus) {
+                    try {
+                        const data = JSON.parse(lastStatus);
+                        // We'll update the UI after meters are fetched/restored
+                        setTimeout(() => updateStatusUI(data), 100);
+                    } catch(e) {}
+                }
+
+                startPolling();
+
+                // Tab switching
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const tabId = btn.getAttribute('data-tab');
+                        if (!tabId) return;
+
+                        // Toggle Buttons
+                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+
+                        // Toggle Content
+                        document.querySelectorAll('.tab-content').forEach(content => {
+                            content.classList.remove('active');
+                            if (content.id === `tab-${tabId}`) content.classList.add('active');
+                        });
+
+                        // Fetch data for the selected tab
+                        if (tabId === 'monthly-analysis') fetchEnergyReport();
+                        if (tabId === 'status-history') fetchStatusHistory();
+                    });
+                });
+
+                // Auto-fetch on selector change
+                if (energyElements.year) energyElements.year.addEventListener('change', () => {
+                   fetchEnergyReport();
+                   fetchStatusHistory();
+                });
+                if (energyElements.month) energyElements.month.addEventListener('change', () => {
+                   fetchEnergyReport();
+                   fetchStatusHistory();
+                });
+
+                // Export CSV Listener
+                const exportBtn = document.getElementById('export-energy-csv');
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', () => {
+                        const y = parseInt(energyElements.year.value, 10);
+                        const m = parseInt(energyElements.month.value, 10);
+
+                        // Start date is 1st of month at 00:00:00
+                        const start = new Date(y, m - 1, 1);
+                        // End date is 1st of NEXT month at 00:00:00 (exclusive)
+                        const end = new Date(y, m, 1);
+                        
+                        const formatDt = (date) => {
+                            const pad = n => n.toString().padStart(2, '0');
+                            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+                        };
+                        
+                        const fromTs = encodeURIComponent(formatDt(start));
+                        const toTs = encodeURIComponent(formatDt(end));
+                        
+                        const downloadUrl = `${CONFIG.baseUrl}/energy/interval-raw/csv?from_ts=${fromTs}&to_ts=${toTs}`;
+                        window.open(downloadUrl, '_blank');
+                    });
+                }
+
+                // Initial fetch for energy sub-tabs
+                fetchEnergyReport();
+                fetchStatusHistory();
+            }
+
+            // --- Monthly Energy Chart ---
+            let energyChart = null;
+
+            window.fetchYearlySummary = async function() {
+                const year = document.getElementById('chart-year-select').value;
+                const chartDom = document.getElementById('monthly-energy-chart');
+                if (!chartDom) return;
+
+                if (!energyChart) {
+                    energyChart = echarts.init(chartDom);
+                }
+
+                // Show loading
+                energyChart.showLoading({
+                    text: 'Loading…',
+                    color: 'var(--primary-color)',
+                    textColor: 'var(--text-secondary)',
+                    maskColor: 'rgba(255,255,255,0.6)'
+                });
+
+                try {
+                    const response = await fetch(`${CONFIG.baseUrl}/energy/yearly-summary?year=${year}`);
+                    if (!response.ok) throw new Error('Failed to fetch yearly summary');
+                    const data = await response.json();
+
+                    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                    const bessData = Array(12).fill(0);
+                    const rtsData  = Array(12).fill(0);
+
+                    let totalBess = 0;
+                    let totalRts = 0;
+                    let activeMonths = 0;
+
+                    (data.items || []).forEach(item => {
+                        const idx = item.month - 1;
+                        if (idx >= 0 && idx < 12) {
+                            const b = parseFloat((item.bess_to_lmv_energy_kwh || 0).toFixed(2));
+                            const r = parseFloat((item.rts_to_lmv_energy_kwh  || 0).toFixed(2));
+                            bessData[idx] = b;
+                            rtsData[idx]  = r;
+                            
+                            totalBess += b;
+                            totalRts += r;
+                            if (b > 0 || r > 0 || item.number_of_inqualified_intervals > 0) {
+                                activeMonths++;
+                            }
+                        }
+                    });
+                    
+                    if (activeMonths === 0) activeMonths = 1; // avoid divide by zero for avg
+
+                    const totalEnergy = totalBess + totalRts;
+                    const avgEnergy = totalEnergy / activeMonths;
+
+                    const yrTotalEl = document.getElementById('yearly-total-energy');
+                    const yrBessEl = document.getElementById('yearly-bess-energy');
+                    const yrRtsEl = document.getElementById('yearly-rts-energy');
+                    const yrAvgEl = document.getElementById('yearly-avg-energy');
+
+                    if (yrTotalEl) yrTotalEl.textContent = totalEnergy.toLocaleString(undefined, {minimumFractionDigits: 2}) + ' kWh';
+                    if (yrBessEl) yrBessEl.textContent = totalBess.toLocaleString(undefined, {minimumFractionDigits: 2}) + ' kWh';
+                    if (yrRtsEl) yrRtsEl.textContent = totalRts.toLocaleString(undefined, {minimumFractionDigits: 2}) + ' kWh';
+                    if (yrAvgEl) yrAvgEl.textContent = avgEnergy.toLocaleString(undefined, {minimumFractionDigits: 2}) + ' kWh';
+
+                    const option = {
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: { type: 'shadow' },
+                            formatter: function(params) {
+                                let html = `<b>${params[0].axisValue}</b><br/>`;
+                                params.forEach(p => {
+                                    html += `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:5px;"></span>${p.seriesName}: <b>${p.value.toLocaleString()} kWh</b><br/>`;
+                                });
+                                return html;
+                            }
+                        },
+                        legend: {
+                            data: ['BESS to LMV', 'RTS to LMV'],
+                            top: 0,
+                            right: 0,
+                            textStyle: { fontSize: 11, color: 'var(--text-secondary)' }
+                        },
+                        grid: { top: 28, left: 60, right: 20, bottom: 24 },
+                        xAxis: {
+                            type: 'category',
+                            data: monthNames,
+                            axisLine: { lineStyle: { color: 'var(--border-color)' } },
+                            axisLabel: { fontSize: 11, color: 'var(--text-secondary)' }
+                        },
+                        yAxis: {
+                            type: 'value',
+                            name: 'kWh',
+                            nameTextStyle: { fontSize: 10, color: 'var(--text-secondary)' },
+                            axisLabel: {
+                                fontSize: 10,
+                                color: 'var(--text-secondary)',
+                                formatter: v => v >= 1000 ? (v/1000).toFixed(1)+'k' : v
+                            },
+                            splitLine: { lineStyle: { color: 'var(--border-color)', type: 'dashed' } }
+                        },
+                        series: [
+                            {
+                                name: 'BESS to LMV',
+                                type: 'bar',
+                                stack: 'energy',
+                                barMaxWidth: 40,
+                                itemStyle: { color: '#3b82f6', borderRadius: [0,0,4,4] },
+                                label: {
+                                    show: false
+                                },
+                                data: bessData,
+                                emphasis: { focus: 'series' }
+                            },
+                            {
+                                name: 'RTS to LMV',
+                                type: 'bar',
+                                stack: 'energy',
+                                barMaxWidth: 40,
+                                itemStyle: { color: '#10b981', borderRadius: [4,4,0,0] },
+                                label: {
+                                    show: false
+                                },
+                                data: rtsData,
+                                emphasis: { focus: 'series' }
+                            }
+                        ]
+                    };
+
+                    energyChart.hideLoading();
+                    energyChart.setOption(option, true);
+
+                    // Responsive resize
+                    window.addEventListener('resize', () => energyChart && energyChart.resize());
+
+                } catch (error) {
+                    console.error('API Error (Yearly Summary):', error);
+                    energyChart.hideLoading();
+                }
+            };
+
+            // --- Operation Metrics JS Logic ---
+            window.fetchFinalizedReadings = async function() {
+                if (!STATE.currentMeterId) return;
+
+                const year = document.getElementById('fn-year-select').value;
+                const month = document.getElementById('fn-month-select').value;
+                const importEl = document.getElementById('fn-import-val');
+                const exportEl = document.getElementById('fn-export-val');
+
+                if (importEl) importEl.textContent = '...';
+                if (exportEl) exportEl.textContent = '...';
+
+                try {
+                    const response = await fetch(`${CONFIG.baseUrl}/energy/monthly-sum`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            meter_id: STATE.currentMeterId,
+                            year: parseInt(year),
+                            month: parseInt(month)
+                        })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to fetch finalized readings');
+                    const data = await response.json();
+
+                    if (importEl) importEl.textContent = (data.import || 0).toLocaleString(undefined, { minimumFractionDigits: 3 }) + ' kWh';
+                    if (exportEl) exportEl.textContent = (data.export || 0).toLocaleString(undefined, { minimumFractionDigits: 3 }) + ' kWh';
+                } catch (error) {
+                    console.error('API Error (Finalized Readings):', error);
+                    if (importEl) importEl.textContent = 'Error';
+                    if (exportEl) exportEl.textContent = 'Error';
+                }
+            };
+
+            window.fetchOperationMetrics = async function() {
+                if (!STATE.currentMeterId) return;
+                
+                const btn = document.querySelector('#dtab-op-metrics .btn-apply');
+                const origBtnHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Loading...';
+                btn.disabled = true;
+
+                const fromDate = document.getElementById('op-from').value;
+                const toDate = document.getElementById('op-to').value;
+                const intervalVal = document.getElementById('op-interval').value; // '1m', '5m', '15m', 'survey'
+                const timeFrom = document.getElementById('op-time-from').value || '00:00';
+                const timeTo = document.getElementById('op-time-to').value || '23:59';
+                
+                let startIso, endIso;
+                if (intervalVal === 'survey') {
+                    startIso = new Date(`${fromDate}T${timeFrom}:00`).toISOString();
+                    endIso = new Date(`${toDate}T${timeTo}:59`).toISOString();
+                } else {
+                    startIso = new Date(`${fromDate}T00:00:00`).toISOString();
+                    endIso = new Date(`${toDate}T23:59:59`).toISOString();
+                }
+
+                let intervalSecs = null;
+                if (intervalVal === '1m') intervalSecs = 60;
+                if (intervalVal === '5m') intervalSecs = 300;
+                if (intervalVal === '15m') intervalSecs = 900;
+
+                const checkboxes = Array.from(document.querySelectorAll('#op-col-dropdown input[type="checkbox"]'));
+                const checkedBoxes = document.querySelectorAll('#op-col-dropdown input[type="checkbox"]:checked');
+                
+                if (checkedBoxes.length === 0) {
+                    alert('Please select at least one column.');
+                    btn.innerHTML = origBtnHtml;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Collect only selected columns
+                const selectedColumns = Array.from(checkedBoxes).map(c => c.value);
+
+                const payload = {
+                    meter_id: STATE.currentMeterId,
+                    columns: selectedColumns,
+                    time_range: { start_utc: startIso, end_utc: endIso },
+                    order: 'asc',
+                    limit: 10000,
+                    interval_seconds: intervalSecs
+                };
+
+                try {
+                    const res = await fetch(`${CONFIG.baseUrl}/query_data_by_time_range`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!res.ok) {
+                        const err = await res.json();
+                        throw new Error(err.detail && typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail || err));
+                    }
+
+                    const resData = await res.json();
+                    const dataArr = resData.data || [];
+
+                    renderOpChart(dataArr, selectedColumns);
+                    renderOpTable(dataArr, checkboxes);
+
+                } catch (e) {
+                    console.error('Operation Metrics Fetch Error:', e);
+                    document.querySelector('#op-table-main tbody').innerHTML = `<tr><td colspan="53" style="text-align:center; padding: 20px; color: var(--danger-color);">Error loading data: ${e.message}</td></tr>`;
+                } finally {
+                    btn.innerHTML = origBtnHtml;
+                    btn.disabled = false;
+                }
+            };
+
+            let opEchartInstance = null;
+            function renderOpChart(dataArr, columns) {
+                const chartDom = document.getElementById('op-chart');
+                if (!opEchartInstance) {
+                    opEchartInstance = echarts.init(chartDom);
+                }
+                
+                if (!dataArr || dataArr.length === 0) {
+                    opEchartInstance.clear();
+                    opEchartInstance.setOption({
+                        title: { text: 'No data found for the selected period', left: 'center', top: 'center', textStyle: { color: '#9ca3af', fontSize: 14, fontWeight: 'normal' } }
+                    });
+                    return;
+                }
+
+                const timestamps = dataArr.map(d => new Date(d.time_stamp).toLocaleString());
+                
+                const series = columns.map(col => {
+                    const chk = document.querySelector(`#op-col-dropdown input[value="${col}"]`);
+                    const name = chk ? chk.parentElement.textContent.trim() : col;
+                    return {
+                        name: name,
+                        type: 'line',
+                        data: dataArr.map(d => d[col]),
+                        smooth: true,
+                        showSymbol: false
+                    };
+                });
+
+                const option = {
+                    tooltip: { trigger: 'axis' },
+                    legend: { 
+                        data: series.map(s => s.name),
+                        bottom: 0,
+                        type: 'scroll'
+                    },
+                    grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
+                    xAxis: { type: 'category', boundaryGap: false, data: timestamps },
+                    yAxis: { type: 'value' },
+                    series: series
+                };
+
+                opEchartInstance.setOption(option, true);
+            }
+
+            function renderOpTable(dataArr, allCheckboxes) {
+                const tbody = document.querySelector('#op-table-main tbody');
+                if (!dataArr || dataArr.length === 0) {
+                    const colspanStr = document.querySelector('#op-table-main tbody tr:first-child td').colSpan || 53;
+                    tbody.innerHTML = `<tr><td colspan="${colspanStr}" style="text-align:center; padding: 40px; color: var(--text-secondary);">No Operation Metrics data found for this period.</td></tr>`;
+                    return;
+                }
+
+                // We generate rows with all 52 columns so the alignment matches the multiselect visibility toggle.
+                let html = '';
+                dataArr.forEach(row => {
+                    html += '<tr>';
+                    html += `<td>${new Date(row.time_stamp).toLocaleString()}</td>`;
+                    allCheckboxes.forEach(chk => {
+                        const val = row[chk.value] !== undefined && row[chk.value] !== null ? row[chk.value] : '--';
+                        html += `<td>${val}</td>`;
+                    });
+                    html += '</tr>';
+                });
+
+                tbody.innerHTML = html;
+                window.updateOpMultiSelect(); // Apply column visibility to newly rendered cells
+            }
+
+            // --- Power Load Profile Logic ---
+
+            window.handlePlCheckboxChange = function(cb) {
+                const checkedBoxes = document.querySelectorAll('#pl-col-dropdown input[type="checkbox"]:checked');
+                if (checkedBoxes.length > 10) {
+                    alert('You can select up to 10 parameters at a time.');
+                    cb.checked = false;
+                    return;
+                }
+                updatePlMultiSelect();
+            };
+
+            window.togglePlMultiSelect = function(e) {
+                if (e) e.stopPropagation();
+                const drop = document.getElementById('pl-col-dropdown');
+                drop.classList.toggle('show');
+            };
+
+            window.updatePlMultiSelect = function() {
+                const list = document.querySelectorAll('#pl-col-dropdown input[type="checkbox"]');
+                const checkedBoxes = Array.from(list).filter(c => c.checked);
+                const table = document.getElementById('pl-table-main');
+                const textEl = document.getElementById('pl-col-text');
+                
+                if (checkedBoxes.length === 0) {
+                    textEl.textContent = 'None selected';
+                    if (table) {
+                        const trs = table.querySelectorAll('tr');
+                        trs.forEach(tr => {
+                            const cells = tr.children;
+                            for (let i = 1; i < cells.length; i++) {
+                                cells[i].style.display = 'none';
+                            }
+                        });
+                        const colSpanStr = table.querySelector('tbody tr:first-child td')?.colSpan;
+                        if (colSpanStr) {
+                             table.querySelector('tbody tr:first-child td').colSpan = 1;
+                        }
+                    }
+                    return;
+                }
+                
+                const labels = checkedBoxes.map(c => c.parentElement.textContent.trim());
+                if (labels.length <= 2) {
+                    textEl.textContent = labels.join(', ');
+                } else {
+                    textEl.textContent = `${labels[0]}, ${labels[1]}, ...`;
+                }
+
+                if (table) {
+                    const trs = table.querySelectorAll('tr');
+                    // Ensure the empty state row is handled separately
+                    const isEmptyState = table.querySelector('tbody').textContent.includes('No Power Load Profile');
+                    if (isEmptyState && table.querySelector('tbody tr:first-child td')) {
+                        table.querySelector('tbody tr:first-child td').colSpan = checkedBoxes.length + 1;
+                        return;
+                    }
+                    
+                    trs.forEach(tr => {
+                        const cells = tr.children;
+                        for (let i = 1; i < cells.length; i++) {
+                            const colIndex = i - 1; 
+                            if (colIndex < list.length) {
+                                if (list[colIndex].checked) {
+                                    cells[i].style.display = '';
+                                } else {
+                                    cells[i].style.display = 'none';
+                                }
+                            }
+                        }
+                    });
+                }
+            };
+            
+            document.addEventListener('click', function(e) {
+                const plDrop = document.getElementById('pl-col-dropdown');
+                if (plDrop && plDrop.classList.contains('show') && !e.target.closest('#pl-col-wrapper')) {
+                    plDrop.classList.remove('show');
+                }
+            });
+
+            window.fetchPowerLoadProfile = async function() {
+                if (!STATE.currentMeterId) return;
+                
+                const btn = document.querySelector('#dtab-pl-profile .btn-apply');
+                const origBtnHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Loading...';
+                btn.disabled = true;
+
+                const fromDate = document.getElementById('pl-from').value;
+                const toDate = document.getElementById('pl-to').value;
+                const timeFrom = document.getElementById('pl-time-from').value || '00:00';
+                const timeTo = document.getElementById('pl-time-to').value || '23:59';
+                const survey = document.getElementById('pl-survey').value;
+
+                if (!fromDate || !toDate) {
+                    alert('Please select both From and To dates.');
+                    btn.innerHTML = origBtnHtml;
+                    btn.disabled = false;
+                    return;
+                }
+
+                const startIso = `${fromDate}T${timeFrom}:00`;
+                const endIso = `${toDate}T${timeTo}:59`;
+
+                const checkboxes = Array.from(document.querySelectorAll('#pl-col-dropdown input[type="checkbox"]'));
+                const checkedBoxes = Array.from(document.querySelectorAll('#pl-col-dropdown input[type="checkbox"]:checked'));
+                
+                if (checkedBoxes.length === 0) {
+                    alert('Please select at least one column.');
+                    btn.innerHTML = origBtnHtml;
+                    btn.disabled = false;
+                    return;
+                }
+
+                const payload = {
+                    meter_id: STATE.currentMeterId,
+                    survey: survey,
+                    from_datetime: startIso,
+                    to_datetime: endIso
+                };
+
+                try {
+                    const res = await fetch(`${CONFIG.baseUrl}/read_profile`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!res.ok) {
+                        const err = await res.json();
+                        throw new Error(err.detail && typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail || err));
+                    }
+
+                    const resData = await res.json();
+                    
+                    const dataArr = resData.data || [];
+                    const selectedColumns = checkedBoxes.map(c => c.value);
+
+                    renderPlChart(dataArr, selectedColumns);
+                    renderPlTable(dataArr, checkboxes);
+
+                } catch (e) {
+                    console.error('Power Load Profile Fetch Error:', e);
+                    document.querySelector('#pl-table-main tbody').innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 40px; color: var(--danger-color);">Error loading data: ${e.message}</td></tr>`;
+                } finally {
+                    btn.innerHTML = origBtnHtml;
+                    btn.disabled = false;
+                }
+            };
+            
+            let plEchartInstance = null;
+            function renderPlChart(dataArr, columns) {
+                let chartDom = document.getElementById('pl-chart');
+                if (!chartDom) {
+                    const container = document.querySelector('#dtab-pl-profile .chart-container-pl');
+                    const lines = container.querySelector('.grid-lines');
+                    const xlbl = container.querySelector('.x-axis-label');
+                    if (lines) lines.remove();
+                    if (xlbl) xlbl.remove();
+                    
+                    chartDom = document.createElement('div');
+                    chartDom.id = 'pl-chart';
+                    chartDom.style.width = '100%';
+                    chartDom.style.height = '350px';
+                    chartDom.style.marginTop = '15px';
+                    container.appendChild(chartDom);
+                }
+
+                if (!plEchartInstance) {
+                    plEchartInstance = echarts.init(chartDom);
+                }
+                
+                if (!dataArr || dataArr.length === 0) {
+                    plEchartInstance.clear();
+                    plEchartInstance.setOption({
+                        title: { text: 'No profile data found for the selected period', left: 'center', top: 'center', textStyle: { color: '#9ca3af', fontSize: 14, fontWeight: 'normal' } }
+                    });
+                    return;
+                }
+
+                let timestamps = dataArr.map(d => {
+                    const ts = d.time_stamp || d.DateTime || d.TIMESTAMP;
+                    return ts ? new Date(ts).toLocaleString() : '??';
+                });
+                
+                const series = columns.map(col => {
+                    const chk = document.querySelector(`#pl-col-dropdown input[value="${col}"]`);
+                    const name = chk ? chk.parentElement.textContent.trim() : col;
+                    
+                    // Filter: only numeric values for chart
+                    const firstVal = dataArr[0][col];
+                    const isPlottable = typeof firstVal === 'number' || (!isNaN(parseFloat(firstVal)) && isFinite(firstVal));
+                    if (!isPlottable) return null;
+
+                    return {
+                        name: name,
+                        type: 'line',
+                        data: dataArr.map(d => {
+                            let val = d[col];
+                            if (typeof val === 'string') val = parseFloat(val);
+                            return typeof val === 'number' && !Number.isInteger(val) ? parseFloat(val.toFixed(4)) : val;
+                        }),
+                        smooth: true,
+                        showSymbol: false,
+                    };
+                }).filter(s => s !== null);
+
+                const option = {
+                    tooltip: { trigger: 'axis' },
+                    legend: { 
+                        data: series.map(s => s.name),
+                        bottom: 0,
+                        type: 'scroll'
+                    },
+                    grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
+                    xAxis: { type: 'category', boundaryGap: false, data: timestamps },
+                    yAxis: { type: 'value' },
+                    series: series
+                };
+
+                plEchartInstance.setOption(option, true);
+            }
+
+            function renderPlTable(dataArr, allCheckboxes) {
+                const tbody = document.querySelector('#pl-table-main tbody');
+                if (!dataArr || dataArr.length === 0) {
+                    const colspanStr = document.querySelector('#pl-table-main tbody tr:first-child td')?.colSpan || 7;
+                    tbody.innerHTML = `<tr><td colspan="${colspanStr}" style="text-align:center; padding: 40px; color: var(--text-secondary);">No Power Load Profile data found for this period.</td></tr>`;
+                    return;
+                }
+
+                let html = '';
+                dataArr.forEach(row => {
+                    html += '<tr>';
+                    html += `<td>${new Date(row.time_stamp || row.DateTime).toLocaleString()}</td>`;
+                    allCheckboxes.forEach(chk => {
+                        let val = row[chk.value] !== undefined && row[chk.value] !== null ? row[chk.value] : '--';
+                        if (typeof val === 'number' && !Number.isInteger(val)) {
+                            val = parseFloat(val.toFixed(4));
+                        }
+                        html += `<td>${val}</td>`;
+                    });
+                    html += '</tr>';
+                });
+
+                tbody.innerHTML = html;
+                window.updatePlMultiSelect(); // Apply column visibility to newly rendered cells
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

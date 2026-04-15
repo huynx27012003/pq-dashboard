@@ -1,0 +1,1366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+  <Product Id="*" Name="openXDA" Language="1033" Version="!(bind.FileVersion.openXDA.exe)" Manufacturer="Grid Protection Alliance" UpgradeCode="{EDB9D2AA-F21E-475F-9782-E2C95BF072C0}">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." AllowSameVersionUpgrades="yes"/>
+    <MediaTemplate EmbedCab="yes" />
+    
+    <PropertyRef Id='WIXNETFX4RELEASEINSTALLED'/>
+    <Condition Message='This setup requires Microsoft .NET Framework 4.8 or greater - this will need to be installed before installation can continue.'>
+      <![CDATA[Installed OR (WIXNETFX4RELEASEINSTALLED >= "#528040")]]>
+    </Condition>
+
+    <Property Id="INSTALLFOLDER">
+      <RegistrySearch Id="InstallFolderRegSearch" Root="HKLM" Key="SOFTWARE\Grid Protection Alliance\openXDA" Name="InstallPath" Type="raw" />
+    </Property>
+
+    <Feature Id="AllProducts" Title="All Products" Level="1" Display="expand" ConfigurableDirectory="INSTALLFOLDER" AllowAdvertise="no" Description="All components of the openXDA installation.">
+      <Feature Id="openXDA" Title="openXDA" AllowAdvertise="no" Description="Includes the openXDA database, service, and remote console components.">
+        <!-- openXDA Database-->
+        <Feature Id="DatabaseFeature" Title="openXDA Database" AllowAdvertise="no" Description="Installs the openXDA database schema to a SQL Server database.">
+          <Feature Id="EnableEventDataSqlClrFeature" Title="EnableEventDataSqlClr.sql" AllowAdvertise="no" Description="Installs the SQLCLR interface for querying event data from the openXDA database (requires installation of SAFE assemblies).">
+            <ComponentRef Id="EnableEventDataSqlClr" />
+          </Feature>
+          <Feature Id="EnableHistorianSqlClrFeature" Title="EnableHistorianSqlClr.sql" AllowAdvertise="no" Description="Installs the SQLCLR interface for querying trending data from the openHistorian (requires installation of UNSAFE assemblies)." Level="2">
+            <ComponentRef Id="EnableHistorianSqlClr" />
+          </Feature>
+
+          <ComponentRef Id="DBScript" />
+          <ComponentRef Id="DashScript" />
+          <ComponentRef Id="DefaultSettings" />
+          <ComponentRef Id="DefaultChannelTypes" />
+          <ComponentRef Id="DefaultTrendingAlarms" />
+          <ComponentRef Id="DefaultContours" />
+          <ComponentRef Id="SystemCenter" />
+          <ComponentRef Id="SEBrowser" />
+          <ComponentRef Id="MiMD" />
+        </Feature>
+
+        <!-- openXDA Service -->
+        <Feature Id="ServiceFeature" Title="openXDA Service" AllowAdvertise="no" Description="Installs the openXDA Windows service to perform data analytics.">
+          <ComponentGroupRef Id="ServiceComponents" />
+          <ComponentGroupRef Id="AzureADDependencyComponents" />
+
+          <!-- Web Files -->
+          <?include WebFeatures.wxi ?>
+        </Feature>
+
+        <!-- openXDA Console -->
+        <Feature Id="ConsoleFeature" Title="openXDA Remote Console" AllowAdvertise="no" Description="Installs the openXDA remote console used to monitor and interact with the openXDA service.">
+          <ComponentGroupRef Id="ConsoleComponents" />
+        </Feature>
+      </Feature>
+    </Feature>
+    
+    <UI>
+      <!-- User Interface -->
+      <UIRef Id="WixUI_FeatureTree" />
+      <UIRef Id="WixUI_ErrorProgressText" />
+      <DialogRef Id="DatabaseConnectionDialog" />
+      
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="FILEPATH" Value="[#openXDA.exe.config]" Order="1">1</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="MODE" Value="READ" Order="1">1</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="PROPERTYMAPPINGS" Value="[CONNECTIONSTRINGMAPPING];;[COMPANYNAMEMAPPING];;[COMPANYACRONYMMAPPING]" Order="1">NOT NODEID</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="PROPERTYMAPPINGS" Value="[CONNECTIONSTRINGMAPPING];;[COMPANYNAMEMAPPING];;[COMPANYACRONYMMAPPING];;[NODEIDMAPPING]" Order="1">NODEID</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Event="DoAction" Value="ReadConfigFileAction" Order="2">1</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="XDACONNECTIONSTRING" Value="[DEFAULTCONNECTIONSTRING]" Order="3">NOT XDACONNECTIONSTRING</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="COMPANYNAME" Value="[DEFAULTCOMPANYNAME]" Order="3">NOT COMPANYNAME</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="COMPANYACRONYM" Value="[DEFAULTCOMPANYACRONYM]" Order="3">NOT COMPANYACRONYM</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="CONNECTIONSTRING" Value="[XDACONNECTIONSTRING]" Order="4">1</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="PROPERTYMAPPINGS" Value="[DBCONNECTIONSTRINGMAPPINGS]" Order="4">1</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Event="DoAction" Value="ReadConnectionStringAction" Order="5">1</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="WINDOWSAUTH" Value="1" Order="6">INTEGRATEDSECURITY = "SSPI"</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="WINDOWSAUTH" Order="6">NOT(INTEGRATEDSECURITY = "SSPI")</Publish>
+
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="INSTALLDATABASEFEATURE" Value="1" Order="7"><![CDATA[&DatabaseFeature=3]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="INSTALLDATABASEFEATURE" Order="7"><![CDATA[NOT(&DatabaseFeature=3)]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="INSTALLEVENTSQLCLRFEATURE" Value="1" Order="7"><![CDATA[&EnableEventDataSqlClrFeature=3]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="INSTALLEVENTSQLCLRFEATURE" Order="7"><![CDATA[NOT(&EnableEventDataSqlClrFeature=3)]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="INSTALLHISTORIANSQLCLRFEATURE" Value="1" Order="7"><![CDATA[&EnableHistorianSqlClrFeature=3]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="INSTALLHISTORIANSQLCLRFEATURE" Order="7"><![CDATA[NOT(&EnableHistorianSqlClrFeature=3)]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="INSTALLSERVICEFEATURE" Value="1" Order="7"><![CDATA[&ServiceFeature=3 OR (!ServiceFeature=3 AND &ServiceFeature=-1)]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="INSTALLSERVICEFEATURE" Order="7"><![CDATA[NOT(&ServiceFeature=3 OR (!ServiceFeature=3 AND &ServiceFeature=-1))]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="INSTALLCONSOLEFEATURE" Value="1" Order="7"><![CDATA[&ConsoleFeature=3 OR (!ConsoleFeature=3 AND &ConsoleFeature=-1)]]></Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Property="INSTALLCONSOLEFEATURE" Order="7"><![CDATA[NOT(&ConsoleFeature=3 OR (!ConsoleFeature=3 AND &ConsoleFeature=-1))]]></Publish>
+
+      <Publish Dialog="CustomizeDlg" Control="Next" Event="NewDialog" Value="ServiceAccountDialog" Order="8">INSTALLSERVICEFEATURE</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Event="NewDialog" Value="DatabaseConnectionDialog" Order="8">NOT(INSTALLSERVICEFEATURE) AND INSTALLDATABASEFEATURE</Publish>
+      <Publish Dialog="CustomizeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="8">NOT(INSTALLSERVICEFEATURE) AND NOT(INSTALLDATABASEFEATURE)</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="DatabaseConnectionDialog">INSTALLSERVICEFEATURE OR INSTALLDATABASEFEATURE</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="CustomizeDlg">NOT(INSTALLSERVICEFEATURE OR INSTALLDATABASEFEATURE)</Publish>
+    </UI>
+    
+    <Icon Id="openXDA.ico.exe" SourceFile="$(var.openXDA.TargetPath)" />
+    <Icon Id="openXDAConsole.ico.exe" SourceFile="$(var.openXDAConsole.TargetPath)" />
+
+    <Property Id="INSTALLDATABASEFEATURE" Secure="yes" />
+    <Property Id="INSTALLEVENTSQLCLRFEATURE" Secure="yes" />
+    <Property Id="INSTALLHISTORIANSQLCLRFEATURE" Secure="yes" />
+    <Property Id="INSTALLSERVICEFEATURE" Secure="yes" />
+    <Property Id="INSTALLCONSOLEFEATURE" Secure="yes" />
+
+    <Property Id="SERVICEACCOUNT" Secure="yes" />
+    <Property Id="SERVICENAME" Value="$(var.openXDA.TargetName)" />
+    <Property Id="SERVICEPASSWORD" Hidden="yes" />
+    
+    <Property Id="HTTPSERVICEPORTS" Value="8989" />
+    <Property Id="SERVERNAME" Value="localhost" />
+    <Property Id="SAMEACCOUNT" Value="1" />
+    <Property Id="WINDOWSAUTH" Value="1" />
+    <Property Id="NODEID" Secure="yes" />
+    
+    <Property Id="DEFAULTCOMPANYNAME" Value="Grid Protection Alliance" />
+    <Property Id="DEFAULTCOMPANYACRONYM" Value="GPA" />
+    <Property Id="COMPANYNAME" Secure="yes" />
+    <Property Id="COMPANYACRONYM" Secure="yes" />
+
+
+    <Property Id="INTEGRATEDSECURITY" Value="SSPI" Secure="yes" />
+    <Property Id="DATABASENAME" Value="openXDA" Secure="yes" />
+
+    <Property Id="DEFAULTCONNECTIONSTRING" />
+    
+    <Property Id="DATAPROVIDERSTRING" Value="AssemblyName={System.Data, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089};; ConnectionType=System.Data.SqlClient.SqlConnection;; AdapterType=System.Data.SqlClient.SqlDataAdapter" />
+    <Property Id="DBCONNECTIONSTRING" Secure="yes" />
+    <Property Id="SERVERCONNECTIONSTRING" Secure="yes" />
+    <Property Id="XDACONNECTIONSTRING" Secure="yes" />
+    <Property Id="DEFAULTCONNECTIONSTRING" Secure="yes" />
+    
+    <Property Id="CREATEDBQUERY" Secure="yes" />
+    <Property Id="ALTERDBQUERY" Secure="yes" />
+    <Property Id="CREATEDBLOGINQUERY" Secure="yes" />
+    <Property Id="ALTERDBLOGINQUERY" Secure="yes" />
+    <Property Id="CREATEDBUSERQUERY" Secure="yes" />
+    <Property Id="DBPERMISSIONSQUERY" Secure="yes" />
+    
+    <Property Id="DBCONNECTIONSTRINGMAPPINGS" Value="SERVERNAME=Data Source;DATABASENAME=Initial Catalog;INTEGRATEDSECURITY=Integrated Security;DBUSERNAME=User Id;DBPASSWORD=Password" />
+    <Property Id="CONNECTIONSTRINGMAPPING" Value="XDACONNECTIONSTRING={//systemSettings/add[@name='ConnectionString']/@value}" />
+    <Property Id="COMPANYNAMEMAPPING" Value="COMPANYNAME={//add[@name='CompanyName']/@value}" />
+    <Property Id="NODEIDMAPPING" Value="NODEID={//systemSettings/add[@name='NodeID']/@value}" />
+    <Property Id="COMPANYACRONYMMAPPING" Value="COMPANYACRONYM={//add[@name='CompanyAcronym']/@value}" />
+
+    <!-- JRC: Something to consider:
+    <Property Id="SYSTEMNAME" Value=" " />
+    -->
+
+    <Property Id="REGSERVICEACCOUNT">
+      <RegistrySearch Id="ServiceAccountRegSearch" Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\[SERVICENAME]" Name="ObjectName" Type="raw" />
+    </Property>
+    <SetProperty Action="SetServiceAccountDefault" Id="SERVICEACCOUNT" After="LaunchConditions" Value="NT SERVICE\[SERVICENAME]" Sequence="first"><![CDATA[NOT REGSERVICEACCOUNT AND NOT SERVICEACCOUNT]]></SetProperty>
+    <SetProperty Action="SetServiceAccountRegistry" Id="SERVICEACCOUNT" After="LaunchConditions" Value="[REGSERVICEACCOUNT]" Sequence="first"><![CDATA[REGSERVICEACCOUNT AND NOT SERVICEACCOUNT]]></SetProperty>
+
+    <SetProperty Action="SetDatabase" Id="DATABASENAME" Value="[SERVICENAME]" After="LaunchConditions" Sequence="first"><![CDATA[NOT DATABASENAME]]></SetProperty>
+    <SetProperty Action="SetConnectionStringDefault" Id="DEFAULTCONNECTIONSTRING" Value="Data Source=[SERVERNAME];;Initial Catalog=[DATABASENAME];;User Id=[DBUSERNAME];;Password=[DBPASSWORD]" After="LaunchConditions" Sequence="first"><![CDATA[NOT DEFAULTCONNECTIONSTRING AND NOT(INTEGRATEDSECURITY = "SSPI")]]></SetProperty>
+    <SetProperty Action="SetConnectionStringDefaultSSPI" Id="DEFAULTCONNECTIONSTRING" Value="Data Source=[SERVERNAME];;Initial Catalog=[DATABASENAME];;Integrated Security=[INTEGRATEDSECURITY]" After="LaunchConditions" Sequence="first"><![CDATA[NOT DEFAULTCONNECTIONSTRING AND (INTEGRATEDSECURITY = "SSPI")]]></SetProperty>
+    <SetProperty Action="SetXDAConnectionString" Id="XDACONNECTIONSTRING" After="LaunchConditions" Value="[DEFAULTCONNECTIONSTRING]" Sequence="first"><![CDATA[NOT XDACONNECTIONSTRING]]></SetProperty>
+
+    <SetProperty Action="SetNodeID" Id="NODEID" Value="00000000-0000-0000-0000-000000000000" After="LaunchConditions" Sequence="first"><![CDATA[NOT NODEID]]></SetProperty>
+    <SetProperty Action="SetCompanyName" Id="COMPANYNAME" Value="[DEFAULTCOMPANYNAME]" After="LaunchConditions" Sequence="first"><![CDATA[NOT COMPANYNAME]]></SetProperty>
+    <SetProperty Action="SetCompanyAcronym" Id="COMPANYACRONYM" Value="[DEFAULTCOMPANYACRONYM]" After="LaunchConditions" Sequence="first"><![CDATA[NOT COMPANYACRONYM]]></SetProperty>
+
+    <SetProperty Id="UPDATECONFIGFILEMAPPINGS" Value="[CONNECTIONSTRINGMAPPING];;[COMPANYNAMEMAPPING];;[COMPANYACRONYMMAPPING];;[NODEIDMAPPING]" Before="UpdateConfigFileAction.SetProperty" Sequence="execute" />
+
+    <SetProperty Action="INSTALLDATABASEFEATURE0" Id="INSTALLDATABASEFEATURE" Value="1" After="CostFinalize" Sequence="both"><![CDATA[&DatabaseFeature=3]]></SetProperty>
+    <SetProperty Action="INSTALLDATABASEFEATURE1" Id="INSTALLDATABASEFEATURE" Value="" After="CostFinalize" Sequence="both"><![CDATA[NOT(&DatabaseFeature=3)]]></SetProperty>
+    <SetProperty Action="INSTALLEVENTSQLCLRFEATURE0" Id="INSTALLEVENTSQLCLRFEATURE" Value="1" After="CostFinalize" Sequence="both"><![CDATA[&EnableEventDataSqlClrFeature=3]]></SetProperty>
+    <SetProperty Action="INSTALLEVENTSQLCLRFEATURE1" Id="INSTALLEVENTSQLCLRFEATURE" Value="" After="CostFinalize" Sequence="both"><![CDATA[NOT(&EnableEventDataSqlClrFeature=3)]]></SetProperty>
+    <SetProperty Action="INSTALLHISTORIANSQLCLRFEATURE0" Id="INSTALLHISTORIANSQLCLRFEATURE" Value="1" After="CostFinalize" Sequence="both"><![CDATA[&EnableHistorianSqlClrFeature=3]]></SetProperty>
+    <SetProperty Action="INSTALLHISTORIANSQLCLRFEATURE1" Id="INSTALLHISTORIANSQLCLRFEATURE" Value="" After="CostFinalize" Sequence="both"><![CDATA[NOT(&EnableHistorianSqlClrFeature=3)]]></SetProperty>
+    <SetProperty Action="INSTALLSERVICEFEATURE0" Id="INSTALLSERVICEFEATURE" Value="1" After="CostFinalize" Sequence="both"><![CDATA[&ServiceFeature=3 OR (!ServiceFeature=3 AND &ServiceFeature=-1)]]></SetProperty>
+    <SetProperty Action="INSTALLSERVICEFEATURE1" Id="INSTALLSERVICEFEATURE" Value="" After="CostFinalize" Sequence="both"><![CDATA[NOT(&ServiceFeature=3 OR (!ServiceFeature=3 AND &ServiceFeature=-1))]]></SetProperty>
+    <SetProperty Action="INSTALLCONSOLEFEATURE0" Id="INSTALLCONSOLEFEATURE" Value="1" After="CostFinalize" Sequence="both"><![CDATA[&ConsoleFeature=3 OR (!ConsoleFeature=3 AND &ConsoleFeature=-1)]]></SetProperty>
+    <SetProperty Action="INSTALLCONSOLEFEATURE1" Id="INSTALLCONSOLEFEATURE" Value="" After="CostFinalize" Sequence="both"><![CDATA[NOT(&ConsoleFeature=3 OR (!ConsoleFeature=3 AND &ConsoleFeature=-1))]]></SetProperty>
+    
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)\openXDASetupBanner.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)\openXDASetupDialog.bmp" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\INSTALL_LICENSE.rtf" />
+    
+    <!-- Add/Remove Programs Properties -->
+    <Property Id="ARPPRODUCTICON" Value="openXDA.ico.exe" />
+    
+    <!-- Custom Actions -->
+    <Binary Id="InstallerActions" SourceFile="$(var.SolutionDir)\Dependencies\GSF\GSF.InstallerActions.CA.dll" />
+
+    <CustomAction Id="ReadConfigFileAction" BinaryKey="InstallerActions" DllEntry="XmlFileAction" Execute="immediate" />
+    <CustomAction Id="ReadConnectionStringAction" BinaryKey="InstallerActions" DllEntry="ConnectionStringAction" Execute="immediate" />
+    <CustomAction Id="AuthenticateServiceAccountAction" BinaryKey="InstallerActions" DllEntry="AuthenticateServiceAccountAction" Execute="immediate" />
+    <CustomAction Id="PasswordGenerationAction" BinaryKey="InstallerActions" DllEntry="PasswordGenerationAction" Execute="immediate" />
+    <CustomAction Id="TestDatabaseConnectionAction" BinaryKey="InstallerActions" DllEntry="TestDatabaseConnectionAction" Execute="immediate" />
+
+    <CustomAction Id="UpdateConfigFileAction.SetProperty" Property="UpdateConfigFileAction" Value="FilePath=[#openXDA.exe.config];Mode=WRITE;PropertyMappings=[UPDATECONFIGFILEMAPPINGS];XDACONNECTIONSTRING=[XDACONNECTIONSTRING];COMPANYNAME=[COMPANYNAME];COMPANYACRONYM=[COMPANYACRONYM];SERVICENAME=[SERVICENAME];NODEID=[NODEID]" />
+    <CustomAction Id="UpdateConfigFileAction" BinaryKey="InstallerActions" DllEntry="XmlFileAction" Execute="deferred" Impersonate="no" />
+
+    <CustomAction Id="ConfigureServiceAction.SetProperty" Property="ConfigureServiceAction" Value="SERVICENAME=[SERVICENAME]" />
+    <CustomAction Id="ConfigureServiceAction" BinaryKey="InstallerActions" DllEntry="ConfigureServiceAction" Execute="deferred" Impersonate="no" />
+    <CustomAction Id="ServiceAccountAction.SetProperty" Property="ServiceAccountAction" Value="SERVICENAME=[SERVICENAME];SERVICEACCOUNT=[SERVICEACCOUNT];HTTPSERVICEPORTS=[HTTPSERVICEPORTS]" />
+    <CustomAction Id="ServiceAccountAction" BinaryKey="InstallerActions" DllEntry="ServiceAccountAction" Execute="deferred" Impersonate="no" />
+    
+    <CustomAction Id="CreateDatabase.SetProperty" Property="CreateDatabase" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[SERVERCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=[CREATEDBQUERY]" />
+    <CustomAction Id="CreateDatabase" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="AlterDatabase.SetProperty" Property="AlterDatabase" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[SERVERCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=[ALTERDBQUERY]" />
+    <CustomAction Id="AlterDatabase" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="CreateDBLogin.SetProperty" Property="CreateDBLogin" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[SERVERCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=[CREATEDBLOGINQUERY]" />
+    <CustomAction Id="CreateDBLogin" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="AlterDBLogin.SetProperty" Property="AlterDBLogin" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[SERVERCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=[ALTERDBLOGINQUERY]" />
+    <CustomAction Id="AlterDBLogin" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="CreateDBUser.SetProperty" Property="CreateDBUser" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=[CREATEDBUSERQUERY]" />
+    <CustomAction Id="CreateDBUser" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="GrantDBPermissions.SetProperty" Property="GrantDBPermissions" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=[DBPERMISSIONSQUERY]" />
+    <CustomAction Id="GrantDBPermissions" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+
+    <?include obj\SqlClr.wxi ?>
+    <CustomAction Id="GSF.Core.SqlClr.SetProperty" Property="GSF.Core.SqlClr" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=CREATE ASSEMBLY [\[]GSF.Core.SqlClr[\]] AUTHORIZATION dbo FROM [GSF.Core.SqlClr.dll] WITH PERMISSION_SET = UNSAFE" />
+    <CustomAction Id="GSF.Core.SqlClr" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="GSF.SortedTreeStore.SqlClr.SetProperty" Property="GSF.SortedTreeStore.SqlClr" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=CREATE ASSEMBLY [\[]GSF.SortedTreeStore.SqlClr[\]] AUTHORIZATION dbo FROM [GSF.SortedTreeStore.SqlClr.dll] WITH PERMISSION_SET = UNSAFE" />
+    <CustomAction Id="GSF.SortedTreeStore.SqlClr" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="openHistorian.Core.SqlClr.SetProperty" Property="openHistorian.Core.SqlClr" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=CREATE ASSEMBLY [\[]openHistorian.Core.SqlClr[\]] AUTHORIZATION dbo FROM [openHistorian.Core.SqlClr.dll] WITH PERMISSION_SET = UNSAFE" />
+    <CustomAction Id="openHistorian.Core.SqlClr" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="openHistorian.SqlClr.SetProperty" Property="openHistorian.SqlClr" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=CREATE ASSEMBLY [\[]openHistorian.SqlClr[\]] AUTHORIZATION dbo FROM [openHistorian.SqlClr.dll] WITH PERMISSION_SET = UNSAFE" />
+    <CustomAction Id="openHistorian.SqlClr" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="openHistorian.XDALink.SqlClr.SetProperty" Property="openHistorian.XDALink.SqlClr" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=CREATE ASSEMBLY [\[]openHistorian.XDALink.SqlClr[\]] AUTHORIZATION dbo FROM [openHistorian.XDALink.SqlClr.dll] WITH PERMISSION_SET = UNSAFE" />
+    <CustomAction Id="openHistorian.XDALink.SqlClr" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="openXDA.SqlClr.SetProperty" Property="openXDA.SqlClr" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];DBQUERY=CREATE ASSEMBLY [\[]openXDA.SqlClr[\]] AUTHORIZATION dbo FROM [openXDA.SqlClr.dll]" />
+    <CustomAction Id="openXDA.SqlClr" BinaryKey="InstallerActions" DllEntry="DatabaseQueryAction" Execute="deferred" Impersonate="yes" />
+    
+    <CustomAction Id="openXDA.sql.SetProperty" Property="openXDA.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#openXDA.sql]" />
+    <CustomAction Id="openXDA.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="DashSprocs.sql.SetProperty" Property="DashSprocs.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#DashSprocs.sql]" />
+    <CustomAction Id="DashSprocs.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="EnableEventDataSqlClr.sql.SetProperty" Property="EnableEventDataSqlClr.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#EnableEventDataSqlClr.sql]" />
+    <CustomAction Id="EnableEventDataSqlClr.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="EnableHistorianSqlClr.sql.SetProperty" Property="EnableHistorianSqlClr.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#EnableHistorianSqlClr.sql]" />
+    <CustomAction Id="EnableHistorianSqlClr.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="DefaultSettings.sql.SetProperty" Property="DefaultSettings.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#DefaultSettings.sql]" />
+    <CustomAction Id="DefaultSettings.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="DefaultChannelTypes.sql.SetProperty" Property="DefaultChannelTypes.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#DefaultChannelTypes.sql]" />
+    <CustomAction Id="DefaultChannelTypes.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="DefaultTrendingAlarms.sql.SetProperty" Property="DefaultTrendingAlarms.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#DefaultTrendingAlarms.sql]" />
+    <CustomAction Id="DefaultTrendingAlarms.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="DefaultContours.sql.SetProperty" Property="DefaultContours.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#DefaultContours.sql]" />
+    <CustomAction Id="DefaultContours.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="SystemCenter.sql.SetProperty" Property="SystemCenter.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#SystemCenter.sql]" />
+    <CustomAction Id="SystemCenter.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="SEBrowser.sql.SetProperty" Property="SEBrowser.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#SEBrowser.sql]" />
+    <CustomAction Id="SEBrowser.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="MiMD.sql.SetProperty" Property="MiMD.sql" Value="SERVICENAME=[SERVICENAME];CONNECTIONSTRING=[DBCONNECTIONSTRING];DATAPROVIDERSTRING=[DATAPROVIDERSTRING];SCRIPTPATH=[#MiMD.sql]" />
+    <CustomAction Id="MiMD.sql" BinaryKey="InstallerActions" DllEntry="DatabaseScriptAction" Execute="deferred" Impersonate="yes" />
+
+    <CustomAction Id="UpgradeValidationAction.SetProperty" Property="UpgradeValidationAction" Value="ProcessStartInfo=FileName=[#XDAUpgradeValidation.exe];SERVICENAME=[SERVICENAME]" />
+    <CustomAction Id="UpgradeValidationAction" BinaryKey="InstallerActions" DllEntry="StartProcessAction" Execute="deferred" Impersonate="no" />
+
+    <UI>
+      <ProgressText Action="CreateDatabase">Creating database [DATABASENAME]...</ProgressText>
+      <ProgressText Action="AlterDatabase">Setting database as trustworthy...</ProgressText>
+      <ProgressText Action="CreateDBLogin">Creating login [XDASERVICELOGIN]...</ProgressText>
+      <ProgressText Action="AlterDBLogin">Setting password for login [XDASERVICELOGIN]...</ProgressText>
+      <ProgressText Action="CreateDBUser">Granting privileges to login [XDASERVICELOGIN]...</ProgressText>
+      <ProgressText Action="GrantDBPermissions">Granting privileges to login [XDASERVICELOGIN]...</ProgressText>
+
+      <ProgressText Action="GSF.Core.SqlClr">Creating assemblies to support openSTE...</ProgressText>
+      <ProgressText Action="GSF.SortedTreeStore.SqlClr">Creating assemblies to support openSTE...</ProgressText>
+      <ProgressText Action="openHistorian.Core.SqlClr">Creating assemblies to support openSTE...</ProgressText>
+      <ProgressText Action="openHistorian.SqlClr">Creating assemblies to support openSTE...</ProgressText>
+      <ProgressText Action="openHistorian.XDALink.SqlClr">Creating assemblies to support openSTE...</ProgressText>
+      <ProgressText Action="openXDA.SqlClr">Creating assembly to query event data...</ProgressText>
+
+      <ProgressText Action="openXDA.sql">Setting up initial schema...</ProgressText>
+      <ProgressText Action="DashSprocs.sql">Creating procedures to support PQ Dashboard...</ProgressText>
+      <ProgressText Action="EnableEventDataSqlClr.sql">Enabling SqlClr interface to event data...</ProgressText>
+      <ProgressText Action="EnableHistorianSqlClr.sql">Enabling SqlClr interface to the openHistorian...</ProgressText>
+      <ProgressText Action="DefaultSettings.sql">Adding default settings...</ProgressText>
+      <ProgressText Action="DefaultChannelTypes.sql">Defining default channel types...</ProgressText>
+      <ProgressText Action="DefaultTrendingAlarms.sql">Defining default trending alarms...</ProgressText>
+      <ProgressText Action="DefaultContours.sql">Adding default contour color scales...</ProgressText>
+      <ProgressText Action="SystemCenter.sql">Adding tables to support System Center...</ProgressText>
+      <ProgressText Action="SEBrowser.sql">Adding tables to support SEBrowser...</ProgressText>
+      <ProgressText Action="MiMD.sql">Adding tables to support MiMD...</ProgressText>
+
+      <ProgressText Action="UpgradeValidationAction">Executing upgrade validation process...</ProgressText>
+    </UI>
+
+    <InstallExecuteSequence>
+      <Custom Action="UpdateConfigFileAction.SetProperty" After="InstallFiles">INSTALLSERVICEFEATURE</Custom>
+      <Custom Action="UpdateConfigFileAction" After="UpdateConfigFileAction.SetProperty">INSTALLSERVICEFEATURE</Custom>
+
+      <Custom Action="ConfigureServiceAction.SetProperty" After="InstallServices"><![CDATA[&ServiceFeature=3]]></Custom>
+      <Custom Action="ConfigureServiceAction" After="ConfigureServiceAction.SetProperty"><![CDATA[&ServiceFeature=3]]></Custom>
+      <Custom Action="ServiceAccountAction.SetProperty" After="ConfigureServiceAction">INSTALLSERVICEFEATURE</Custom>
+      <Custom Action="ServiceAccountAction" After="ServiceAccountAction.SetProperty">INSTALLSERVICEFEATURE</Custom>
+      
+      <Custom Action="CreateDatabase.SetProperty" After="InstallFiles">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="CreateDatabase" After="CreateDatabase.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="AlterDatabase.SetProperty" After="CreateDatabase">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="AlterDatabase" After="AlterDatabase.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="CreateDBLogin.SetProperty" After="AlterDatabase">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="CreateDBLogin" After="CreateDBLogin.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="AlterDBLogin.SetProperty" After="CreateDBLogin">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="AlterDBLogin" After="AlterDBLogin.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="CreateDBUser.SetProperty" After="AlterDBLogin">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="CreateDBUser" After="CreateDBUser.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="GrantDBPermissions.SetProperty" After="CreateDBUser">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="GrantDBPermissions" After="GrantDBPermissions.SetProperty">INSTALLDATABASEFEATURE</Custom>
+
+      <Custom Action="openXDA.SqlClr.SetProperty" After="GrantDBPermissions">INSTALLEVENTSQLCLRFEATURE</Custom>
+      <Custom Action="openXDA.SqlClr" After="openXDA.SqlClr.SetProperty">INSTALLEVENTSQLCLRFEATURE</Custom>
+      <Custom Action="GSF.Core.SqlClr.SetProperty" After="openXDA.SqlClr">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="GSF.Core.SqlClr" After="GSF.Core.SqlClr.SetProperty">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="GSF.SortedTreeStore.SqlClr.SetProperty" After="GSF.Core.SqlClr">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="GSF.SortedTreeStore.SqlClr" After="GSF.SortedTreeStore.SqlClr.SetProperty">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="openHistorian.Core.SqlClr.SetProperty" After="GSF.SortedTreeStore.SqlClr">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="openHistorian.Core.SqlClr" After="openHistorian.Core.SqlClr.SetProperty">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="openHistorian.SqlClr.SetProperty" After="openHistorian.Core.SqlClr">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="openHistorian.SqlClr" After="openHistorian.SqlClr.SetProperty">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="openHistorian.XDALink.SqlClr.SetProperty" After="openHistorian.SqlClr">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="openHistorian.XDALink.SqlClr" After="openHistorian.XDALink.SqlClr.SetProperty">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      
+      <Custom Action="openXDA.sql.SetProperty" After="openHistorian.XDALink.SqlClr">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="openXDA.sql" After="openXDA.sql.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="DashSprocs.sql.SetProperty" After="openXDA.sql">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="DashSprocs.sql" After="DashSprocs.sql.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="EnableEventDataSqlClr.sql.SetProperty" After="DashSprocs.sql">INSTALLEVENTSQLCLRFEATURE</Custom>
+      <Custom Action="EnableEventDataSqlClr.sql" After="EnableEventDataSqlClr.sql.SetProperty">INSTALLEVENTSQLCLRFEATURE</Custom>
+      <Custom Action="EnableHistorianSqlClr.sql.SetProperty" After="EnableEventDataSqlClr.sql">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="EnableHistorianSqlClr.sql" After="EnableHistorianSqlClr.sql.SetProperty">INSTALLHISTORIANSQLCLRFEATURE</Custom>
+      <Custom Action="DefaultSettings.sql.SetProperty" After="EnableHistorianSqlClr.sql">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="DefaultSettings.sql" After="DefaultSettings.sql.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="DefaultChannelTypes.sql.SetProperty" After="DefaultSettings.sql">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="DefaultChannelTypes.sql" After="DefaultChannelTypes.sql.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="DefaultTrendingAlarms.sql.SetProperty" After="DefaultChannelTypes.sql">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="DefaultTrendingAlarms.sql" After="DefaultTrendingAlarms.sql.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="DefaultContours.sql.SetProperty" After="DefaultTrendingAlarms.sql">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="DefaultContours.sql" After="DefaultContours.sql.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="SystemCenter.sql.SetProperty" After="DefaultContours.sql">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="SystemCenter.sql" After="SystemCenter.sql.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="SEBrowser.sql.SetProperty" After="SystemCenter.sql">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="SEBrowser.sql" After="SEBrowser.sql.SetProperty">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="MiMD.sql.SetProperty" After="SEBrowser.sql">INSTALLDATABASEFEATURE</Custom>
+      <Custom Action="MiMD.sql" After="MiMD.sql.SetProperty">INSTALLDATABASEFEATURE</Custom>
+
+      <Custom Action="UpgradeValidationAction.SetProperty" After="InstallFiles">INSTALLSERVICEFEATURE</Custom>
+      <Custom Action="UpgradeValidationAction" After="UpgradeValidationAction.SetProperty">INSTALLSERVICEFEATURE</Custom>
+    </InstallExecuteSequence>
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <?if $(var.Platform) = x64 ?>
+        <Directory Id="ProgramFiles64Folder">
+          <!-- C:\Program Files\openXDA -->
+          <Directory Id="INSTALLFOLDER" Name="openXDA">
+            <Component Id="InstallFolderPermissions" Guid="{414759B2-2C29-4C37-978E-D1C8DC4DF4E1}">
+              <CreateFolder>
+                <util:PermissionEx User="[SERVICENAME] Admins" CreateFile="yes" CreateChild="yes" GenericRead="yes" GenericWrite="yes" GenericExecute="yes" Delete="yes" DeleteChild="yes" />
+              </CreateFolder>
+            </Component>
+
+            <Directory Id="ARCGISFOLDER" Name="ArcGISRuntime100.4">
+              <Directory Id="ARCGISCLIENTFOLDER" Name="client64" />
+            </Directory>
+
+            <Directory Id="DEBUGFOLDER" Name="Debug" />
+            <Directory Id="WATCHFOLDER" Name="Watch" />
+            <?include WebFolders.wxi ?>
+          </Directory>
+        </Directory>
+      <?else ?>
+        <Directory Id="ProgramFilesFolder">
+          <!-- C:\Program Files (x86)\openXDA -->
+          <Directory Id="INSTALLFOLDER" Name="openXDA">
+            <Component Id="InstallFolderPermissions" Guid="{414759B2-2C29-4C37-978E-D1C8DC4DF4E1}">
+              <CreateFolder>
+                <util:PermissionEx User="[SERVICENAME] Admins" CreateFile="yes" CreateChild="yes" GenericRead="yes" GenericWrite="yes" GenericExecute="yes" Delete="yes" DeleteChild="yes" />
+              </CreateFolder>
+            </Component>
+            
+            <Directory Id="ARCGISFOLDER" Name="ArcGISRuntime100.4">
+              <Directory Id="ARCGISCLIENTFOLDER" Name="client32" />
+            </Directory>
+
+            <Directory Id="DEBUGFOLDER" Name="Debug" />
+            <Directory Id="WATCHFOLDER" Name="Watch" />
+            <?include WebFolders.wxi ?>
+          </Directory>
+        </Directory>
+      <?endif ?>
+
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="openXDA" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <?include WebFiles.wxi ?>
+
+  </Fragment>
+
+  <Fragment>
+    <!-- Database Components -->
+    <ComponentGroup Id="DatabaseComponents" Directory="INSTALLFOLDER">
+      <!-- Database Scripts -->
+      <Component Id="DBScript">
+        <File Id="openXDA.sql" Name="openXDA.sql" Source="$(var.SolutionDir)\Data\01 - openXDA.sql" />
+      </Component>
+      <Component Id="DashScript">
+        <File Id="DashSprocs.sql" Name="DashSprocs.sql" Source="$(var.SolutionDir)\Data\02 - DashSprocs.sql" />
+      </Component>
+      <Component Id="EnableEventDataSqlClr">
+        <File Id="EnableEventDataSqlClr.sql" Name="EnableEventDataSqlClr.sql" Source="$(var.SolutionDir)\Data\03 - EnableEventDataSqlClr.sql" />
+      </Component>
+      <Component Id="EnableHistorianSqlClr">
+        <File Id="EnableHistorianSqlClr.sql" Name="EnableHistorianSqlClr.sql" Source="$(var.SolutionDir)\Data\04 - EnableHistorianSqlClr.sql" />
+      </Component>
+      <Component Id="DefaultSettings">
+        <File Id="DefaultSettings.sql" Name="DefaultSettings.sql" Source="$(var.SolutionDir)\Data\05 - DefaultSettings.sql" />
+      </Component>
+      <Component Id="DefaultChannelTypes">
+        <File Id="DefaultChannelTypes.sql" Name="DefaultChannelTypes.sql" Source="$(var.SolutionDir)\Data\06 - DefaultChannelTypes.sql" />
+      </Component>
+      <Component Id="DefaultTrendingAlarms">
+        <File Id="DefaultTrendingAlarms.sql" Name="DefaultTrendingAlarms.sql" Source="$(var.SolutionDir)\Data\07 - DefaultTrendingAlarms.sql" />
+      </Component>
+      <Component Id="DefaultContours">
+        <File Id="DefaultContours.sql" Name="DefaultContours.sql" Source="$(var.SolutionDir)\Data\08 - DefaultContours.sql" />
+      </Component>
+      <Component Id="SystemCenter">
+        <File Id="SystemCenter.sql" Name="SystemCenter.sql" Source="$(var.SolutionDir)\Data\09 - SystemCenter.sql" />
+      </Component>
+      <Component Id="SEBrowser">
+        <File Id="SEBrowser.sql" Name="SEBrowser.sql" Source="$(var.SolutionDir)\Data\11 - SEBrowser.sql" />
+      </Component>
+      <Component Id="MiMD">
+        <File Id="MiMD.sql" Name="MiMD.sql" Source="$(var.SolutionDir)\Data\10 - MiMD.sql" />
+      </Component>
+    </ComponentGroup>
+    
+    <!-- openXDA Service Components -->
+    <ComponentGroup Id="ServiceComponents" Directory="INSTALLFOLDER">
+      <!-- Service Applications -->
+      <Component Id="openXDA">
+        <File Id="openXDA.exe" Name="$(var.openXDA.TargetFileName)" Source="$(var.openXDA.TargetPath)" />
+        <ServiceInstall Id="openXDAService" Name="openXDA" Account="[SERVICEACCOUNT]" Password="[SERVICEPASSWORD]" Type="ownProcess" Start="auto" ErrorControl="normal" Description="Engine for detecting and locating faults by analyzing power quality data files." />
+        <ServiceControl Id="openXDAServiceControl" Name="openXDA" Start="install" Stop="both" Remove="uninstall" />
+      </Component>
+      <Component Id="openXDAConfig" Permanent="yes">
+        <File Id="openXDA.exe.config" Name="$(var.openXDA.TargetFileName).config" Source="$(var.openXDA.TargetPath).config" />
+      </Component>
+      <Component Id="DeviceDefinitionsMigrator">
+        <File Id="DeviceDefinitionsMigrator.exe" Name="$(var.DeviceDefinitionsMigrator.TargetFileName)" Source="$(var.DeviceDefinitionsMigrator.TargetPath)" />
+      </Component>
+      <Component Id="ldconfig.bat">
+        <File Id="ldconfig.bat" Name="ldconfig.bat" Source="$(var.DeviceDefinitionsMigrator.ProjectDir)\ldconfig.bat" />
+      </Component>
+      <Component Id="ldconfig.ps1">
+        <File Id="ldconfig.ps1" Name="ldconfig.ps1" Source="$(var.DeviceDefinitionsMigrator.ProjectDir)\ldconfig.ps1" />
+      </Component>
+      <Component Id="XDAUpgradeValidation">
+        <File Id="XDAUpgradeValidation.exe" Name="$(var.XDAUpgradeValidation.TargetFileName)" Source="$(var.XDAUpgradeValidation.TargetPath)" />
+      </Component>
+      
+      <!-- XDA Libraries -->
+      <ComponentRef Id="FaultAlgorithms" />
+      <ComponentRef Id="FaultData" />
+      <ComponentRef Id="Reports" />
+      <ComponentRef Id="openXDA.Adapters" />
+      <ComponentRef Id="openXDA.ArcGIS" />
+      <ComponentRef Id="openXDA.Configuration" />
+      <ComponentRef Id="openHistorian.XDALink" />
+      <ComponentRef Id="openXDA.Model" />
+	  <ComponentRef Id="openXDA.APIMiddleware" />
+	  <ComponentRef Id="openXDA.APIAuthentication" />
+      <ComponentRef Id="openXDA.Nodes" />
+      <ComponentRef Id="openXDA.NotificationDataSources" />
+      <ComponentRef Id="openXDA.XMLConfig" />
+      <ComponentRef Id="openXDA.PQI" />
+      <ComponentRef Id="openXDA.DataPusher" />
+      <ComponentRef Id="openXDA.Reports" />
+
+      <ComponentRef Id="PQMark.DataAggregator" />
+
+      <!-- DotNetZip Dependencies -->
+      <ComponentRef Id="Ionic.Zlib" />
+      
+      <!-- ESRI.ArcGIS Dependencies -->
+      <ComponentRef Id="runtimecore" />
+      <ComponentRef Id="RuntimeCoreNet" />
+      <ComponentRef Id="Esri.ArcGISRuntime" />
+
+      <!-- log4net Dependencies -->
+      <ComponentRef Id="log4net" />
+
+      <!-- GSF Dependencies -->
+      <ComponentRef Id="AjaxMin"/>
+      <ComponentRef Id="Antlr3.Runtime" />
+      <ComponentRef Id="ExpressionEvaluator" />
+      <ComponentRef Id="GSF.COMTRADE" />
+      <ComponentRef Id="GSF.Communication" />
+      <ComponentRef Id="GSF.Core" />
+      <ComponentRef Id="GSF.EMAX" />
+      <ComponentRef Id="GSF.Geo" />
+      <ComponentRef Id="GSF.PhasorProtocols" />
+      <ComponentRef Id="GSF.PQDIF" />
+      <ComponentRef Id="GSF.Security" />
+      <ComponentRef Id="GSF.ServiceProcess" />
+      <ComponentRef Id="GSF.SELEventParser" />
+      <ComponentRef Id="GSF.TimeSeries" />
+      <ComponentRef Id="GSF.Web" />
+      <ComponentRef Id="TagDefinitions" />
+      <ComponentRef Id="GrafanaAdapters"/>
+
+      <!-- openHistorian Dependencies -->
+      <ComponentRef Id="crypto" />
+      <ComponentRef Id="GSF.SortedTreeStore" />
+      <ComponentRef Id="openHistorian.Core" />
+
+      <!-- eDNA Dependencies -->
+      <ComponentRef Id="EzDnaApi" />
+      <ComponentRef Id="EzDnaApi64" />
+      <ComponentRef Id="EzDNAApiNet" />
+      <ComponentRef Id="EzDNAApiNet64" />
+      <ComponentRef Id="EzDNAApiNetSecure" />
+      <ComponentRef Id="EzDNAApiNetSecure64" />
+      <ComponentRef Id="EZDnaServApi" />
+      <ComponentRef Id="EZDnaServApi64" />
+      <ComponentRef Id="EzDNAServApiNet" />
+      <ComponentRef Id="EzDNAServApiNet64" />
+
+      <!-- Local NuGet Dependencies -->
+      <ComponentRef Id="MathNet.Numerics" />
+      <ComponentRef Id="HtmlAgilityPack" />
+
+      <!-- Self Hosting SignalR, WebAPI and Razor Engine Components (provided via GSF.Web) -->
+      <ComponentRef Id="Microsoft.AspNet.SignalR.Core" />
+      <ComponentRef Id="System.Web.Cors" />
+      <ComponentRef Id="System.Web.Http" />
+      <ComponentRef Id="System.Web.Http.Cors" />
+      <ComponentRef Id="System.Web.Http.Owin" />
+      <ComponentRef Id="Microsoft.Owin" />
+      <ComponentRef Id="Microsoft.Owin.Cors" />
+      <ComponentRef Id="Microsoft.Owin.Diagnostics" />
+      <ComponentRef Id="Microsoft.Owin.Host.HttpListener" />
+      <ComponentRef Id="Microsoft.Owin.Hosting" />
+      <ComponentRef Id="Microsoft.Owin.Security" />
+      <ComponentRef Id="Newtonsoft.Json" />
+      <ComponentRef Id="NUglify" />
+      <ComponentRef Id="Owin" />
+      <ComponentRef Id="RazorEngine" />
+      <ComponentRef Id="System.Web.Razor" />
+      <ComponentRef Id="System.Net.Http.Formatting" />
+      <ComponentRef Id="System.Web.Helpers" />
+      <ComponentRef Id="System.Web.Mvc" />
+      <ComponentRef Id="System.Web.WebPages.Deployment" />
+      <ComponentRef Id="System.Web.WebPages" />
+      <ComponentRef Id="System.Web.WebPages.Razor" />
+      <ComponentRef Id="System.Security.AccessControl"/>
+      <ComponentRef Id="System.Security.Permissions"/>
+      <ComponentRef Id="System.Security.Principal.Windows"/>
+
+      <!-- HIDS Dependencies -->
+      <ComponentRef Id="HIDS" />
+      <ComponentRef Id="openXDA.HIDS" />
+      <ComponentRef Id="System.Threading.Tasks.Extensions" />
+      <ComponentRef Id="Microsoft.Bcl.AsyncInterfaces" />
+      <ComponentRef Id="System.Linq.Async" />
+      <ComponentRef Id="InfluxDB.Client" />
+      <ComponentRef Id="InfluxDB.Client.Core" />
+      <ComponentRef Id="RestSharp" />
+      <ComponentRef Id="System.Runtime.CompilerServices.Unsafe" />
+      <ComponentRef Id="NodaTime" />
+      <ComponentRef Id="NodaTime.Serialization.JsonNet" />
+      <ComponentRef Id="CSVHelper" />
+      <ComponentRef Id="System.Buffers"/>
+      <ComponentRef Id="System.Collections.Immutable"/>
+      <ComponentRef Id="System.Configuration.ConfigurationManager"/>
+      <ComponentRef Id="System.Memory"/>
+      <ComponentRef Id="System.Numerics.Vectors"/>
+      <ComponentRef Id="System.Reactive"/>
+      <ComponentRef Id="System.ValueTuple"/>
+
+      <!-- SPCTools Dependencies -->
+      <ComponentRef Id="SPCTools" />
+      <ComponentRef Id="JsonSubTypes" />
+      <ComponentRef Id="Microsoft.Extensions.Primitives"/>
+      <ComponentRef Id="Microsoft.Extensions.ObjectPool"/>
+      <ComponentRef Id="Microsoft.Net.Http.Headers"/>
+
+      <ComponentRef Id="InstallFolderPermissions"/>
+
+      <Component Id="Registry" Guid="{F74C123C-C923-4B04-813B-05E81397C764}">
+        <RegistryKey Id="REG_GridProtectionAlliance" Root="HKLM" Key="SOFTWARE\Grid Protection Alliance" ForceCreateOnInstall="yes">
+          <RegistryKey Id="REG_GridProtectionAlliance.openXDA" Key="openXDA" ForceCreateOnInstall="yes">
+            <RegistryValue Id="REG_GridProtectionAlliance.openXDA.InstallPath" Name="InstallPath" Value="[INSTALLFOLDER]" Type="string" />
+            <RegistryValue Id="REG_GridProtectionAlliance.openXDA.Revision" Name="Revision" Value="[ProductVersion]" Type="string" />
+            <RegistryValue Id="REG_GridProtectionAlliance.openXDA.TargetBitSize" Name="TargetBitSize" Value="64bit" Type="string" />
+          </RegistryKey>
+        </RegistryKey>
+      </Component>
+
+      <!-- Cleanup -->
+      <Component Id="Cleanup" Guid="{C8EBB158-C708-4C94-87C1-F5DBC77D7BDE}">
+        <CreateFolder />
+        <RemoveFolder Id="RemoveDebugFolder" Directory="DEBUGFOLDER" On="uninstall" />
+        <RemoveFolder Id="RemoveWatchFolder" Directory="WATCHFOLDER" On="uninstall" />
+        <RemoveFolder Id="RemoveApplicationProgramsFolder" Directory="ApplicationProgramsFolder" On="uninstall" />
+        <RemoveFolder Id="RemoveInstallFolder" Directory="INSTALLFOLDER" On="uninstall" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- openXDA Console Components -->
+    <ComponentGroup Id="ConsoleComponents" Directory="INSTALLFOLDER">
+      <!-- Remote Console Applications -->
+      <Component Id="openXDAConsole">
+        <File Id="openXDAConsole.exe" Name="$(var.openXDAConsole.TargetFileName)" Source="$(var.openXDAConsole.TargetPath)" />
+        <Shortcut Id="openXDAConsoleStartMenuShortcut" Name="openXDA Console" Icon="openXDAConsole.ico.exe" Description="Console application to monitor the openXDA service." WorkingDirectory="INSTALLFOLDER" Directory="ApplicationProgramsFolder" Advertise="yes" />
+      </Component>
+      <Component Id="openXDAConsoleConfig">
+        <File Id="openXDAConsole.exe.config" Name="$(var.openXDAConsole.TargetFileName).config" Source="$(var.openXDAConsole.TargetPath).config" />
+      </Component>
+
+      <!-- GSF Dependencies -->
+      <ComponentRef Id="GSF.Communication" />
+      <ComponentRef Id="GSF.Core" />
+      <ComponentRef Id="GSF.Security" />
+      <ComponentRef Id="GSF.ServiceProcess" />
+    </ComponentGroup>
+
+    <!-- openXDA Library Components -->
+    <ComponentGroup Id="LibraryComponents" Directory="INSTALLFOLDER">
+      <!-- XDA Libraries -->
+      <Component Id="FaultAlgorithms">
+        <File Id="FaultAlgorithms.dll" Name="$(var.FaultAlgorithms.TargetFileName)" Source="$(var.FaultAlgorithms.TargetPath)" />
+      </Component>
+      <Component Id="FaultData">
+        <File Id="FaultData.dll" Name="$(var.FaultData.TargetFileName)" Source="$(var.FaultData.TargetPath)" />
+      </Component>
+      <Component Id="Reports">
+        <File Id="Reports.dll" Name="Reports.dll" Source="$(var.SolutionDir)\Dependencies\NuGet\Report.NET.0.09.06\lib\net46\Reports.dll" />
+      </Component>
+
+      <Component Id="openXDA.Adapters">
+        <File Id="openXDA.Adapters.dll" Name="$(var.openXDA.Adapters.TargetFileName)" Source="$(var.openXDA.Adapters.TargetPath)" />
+      </Component>
+      <Component Id="openXDA.ArcGIS">
+        <File Id="openXDA.ArcGIS.dll" Name="$(var.openXDA.ArcGIS.TargetFileName)" Source="$(var.openXDA.ArcGIS.TargetPath)" />
+      </Component>
+      <Component Id="openXDA.Configuration">
+        <File Id="openXDA.Configuration.dll" Name="$(var.openXDA.Configuration.TargetFileName)" Source="$(var.openXDA.Configuration.TargetPath)" />
+      </Component>
+      <Component Id="openXDA.Model">
+        <File Id="openXDA.Model.dll" Name="$(var.openXDA.Model.TargetFileName)" Source="$(var.openXDA.Model.TargetPath)" />
+      </Component>
+	  <Component Id="openXDA.APIMiddleware">
+		<File Id="openXDA.APIMiddleware.dll" Name="$(var.openXDA.APIMiddleware.TargetFileName)" Source="$(var.openXDA.APIMiddleware.TargetPath)" />
+	  </Component>
+	  <Component Id="openXDA.APIAuthentication">
+		<File Id="openXDA.APIAuthentication.dll" Name="$(var.openXDA.APIAuthentication.TargetFileName)" Source="$(var.openXDA.APIAuthentication.TargetPath)" />
+	  </Component>
+      <Component Id="openXDA.Nodes">
+        <File Id="openXDA.Nodes.dll" Name="$(var.openXDA.Nodes.TargetFileName)" Source="$(var.openXDA.Nodes.TargetPath)" />
+      </Component>
+      <Component Id="openXDA.NotificationDataSources">
+        <File Id="openXDA.NotificationDataSources.dll" Name="$(var.openXDA.NotificationDataSources.TargetFileName)" Source="$(var.openXDA.NotificationDataSources.TargetPath)" />
+      </Component>
+      <Component Id="openXDA.XMLConfig">
+        <File Id="openXDA.XMLConfig.dll" Name="$(var.openXDA.XMLConfig.TargetFileName)" Source="$(var.openXDA.XMLConfig.TargetPath)" />
+      </Component>
+      <Component Id="openXDA.PQI">
+        <File Id="openXDA.PQI.dll" Name="$(var.openXDA.PQI.TargetFileName)" Source="$(var.openXDA.PQI.TargetPath)" />
+      </Component>
+      <Component Id="openXDA.DataPusher">
+        <File Id="openXDA.DataPusher.dll" Name="$(var.openXDA.DataPusher.TargetFileName)" Source="$(var.openXDA.DataPusher.TargetPath)" />
+      </Component>
+      <Component Id="openXDA.Reports">
+        <File Id="openXDA.Reports.dll" Name="$(var.openXDA.Reports.TargetFileName)" Source="$(var.openXDA.Reports.TargetPath)" />
+      </Component>
+      <Component Id="PQMark.DataAggregator">
+        <File Id="PQMark.DataAggregator.dll" Name="$(var.PQMark.DataAggregator.TargetFileName)" Source="$(var.PQMark.DataAggregator.TargetPath)" />
+      </Component>
+      <Component Id="openHistorian.XDALink">
+        <File Id="openHistorian.XDALink.dll" Name="$(var.openHistorian.XDALink.TargetFileName)" Source="$(var.openHistorian.XDALink.TargetPath)" />
+      </Component>
+      
+      <!-- DotNetZip Dependencies -->
+      <Component Id="Ionic.Zlib">
+        <File Id="Ionic.Zlib.dll" Name="Ionic.Zlib.dll" Source="$(var.SolutionDir)\Dependencies\DotNetZip\Ionic.Zlib.dll" />
+      </Component>
+      
+      <!-- ESRI.ArcGIS Dependencies -->
+      <Component Id="Esri.ArcGISRuntime">
+        <File Id="Esri.ArcGISRuntime.dll" Name="Esri.ArcGISRuntime.dll" Source="$(var.SolutionDir)\Dependencies\NuGet\Esri.ArcGISRuntime.WPF.100.4.0\lib\net461\Esri.ArcGISRuntime.dll" />
+      </Component>
+      
+      <!-- log4net Dependencies -->
+      <Component Id="log4net">
+        <File Id="log4net.dll" Name="log4net.dll" Source="$(var.SolutionDir)\Dependencies\NuGet\log4net.3.1.0\lib\net462\log4net.dll" />
+      </Component>
+
+      <!-- GSF Dependencies -->
+      <Component Id="AjaxMin">
+        <File Id="AjaxMin.dll" Name="AjaxMin.dll" Source="$(var.SolutionDir)\Dependencies\GSF\AjaxMin.dll" />
+      </Component>
+      <Component Id="Antlr3.Runtime">
+        <File Id="Antlr3.Runtime.dll" Name="Antlr3.Runtime.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Antlr3.Runtime.dll" />
+      </Component>
+      <Component Id="ExpressionEvaluator">
+        <File Id="ExpressionEvaluator.dll" Name="ExpressionEvaluator.dll" Source="$(var.SolutionDir)\Dependencies\GSF\ExpressionEvaluator.dll" />
+      </Component>
+      <Component Id="GSF.COMTRADE">
+        <File Id="GSF.COMTRADE.dll" Name="GSF.COMTRADE.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.COMTRADE.dll" />
+      </Component>
+      <Component Id="GSF.Communication">
+        <File Id="GSF.Communication.dll" Name="GSF.Communication.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.Communication.dll" />
+      </Component>
+      <Component Id="GSF.Core">
+        <File Id="GSF.Core.dll" Name="GSF.Core.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.Core.dll" />
+      </Component>
+      <Component Id="GSF.EMAX">
+        <File Id="GSF.EMAX.dll" Name="GSF.EMAX.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.EMAX.dll" />
+      </Component>
+      <Component Id="GSF.Geo">
+        <File Id="GSF.Geo.dll" Name="GSF.Geo.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.Geo.dll" />
+      </Component>
+      <Component Id="GSF.PhasorProtocols">
+        <File Id="GSF.PhasorProtocols.dll" Name="GSF.PhasorProtocols.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.PhasorProtocols.dll" />
+      </Component>
+      <Component Id="GSF.PQDIF">
+        <File Id="GSF.PQDIF.dll" Name="GSF.PQDIF.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.PQDIF.dll" />
+      </Component>
+      <Component Id="GSF.Security">
+        <File Id="GSF.Security.dll" Name="GSF.Security.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.Security.dll" />
+      </Component>
+      <Component Id="GSF.ServiceProcess">
+        <File Id="GSF.ServiceProcess.dll" Name="GSF.ServiceProcess.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.ServiceProcess.dll" />
+      </Component>
+      <Component Id="GSF.SELEventParser">
+        <File Id="GSF.SELEventParser.dll" Name="GSF.SELEventParser.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.SELEventParser.dll" />
+      </Component>
+      <Component Id="GSF.TimeSeries">
+        <File Id="GSF.TimeSeries.dll" Name="GSF.TimeSeries.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.TimeSeries.dll" />
+      </Component>
+      <Component Id="GSF.Web">
+        <File Id="GSF.Web.dll" Name="GSF.Web.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GSF.Web.dll" />
+      </Component>
+      <Component Id="TagDefinitions">
+        <File Id="TagDefinitions.xml" Name="TagDefinitions.xml" Source="$(var.SolutionDir)\Dependencies\GSF\TagDefinitions.xml" />
+      </Component>
+      <Component Id="GrafanaAdapters">
+        <File Id="GrafanaAdapters.dll" Name="GrafanaAdapters.dll" Source="$(var.SolutionDir)\Dependencies\GSF\GrafanaAdapters.dll" />
+      </Component>
+
+      <!-- openHistorian Dependencies -->
+      <Component Id="crypto">
+        <File Id="crypto.dll" Name="crypto.dll" Source="$(var.SolutionDir)\Dependencies\openHistorian\crypto.dll" />
+      </Component>
+      <Component Id="GSF.SortedTreeStore">
+        <File Id="GSF.SortedTreeStore.dll" Name="GSF.SortedTreeStore.dll" Source="$(var.SolutionDir)\Dependencies\openHistorian\GSF.SortedTreeStore.dll" />
+      </Component>
+      <Component Id="openHistorian.Core">
+        <File Id="openHistorian.Core.dll" Name="openHistorian.Core.dll" Source="$(var.SolutionDir)\Dependencies\openHistorian\openHistorian.Core.dll" />
+      </Component>
+
+      <!-- eDNA Dependencies -->
+      <Component Id="EzDnaApi">
+        <File Id="EzDnaApi.dll" Name="EzDnaApi.dll" Source="$(var.SolutionDir)\Dependencies\eDNA\EzDnaApi.dll" />
+      </Component>
+      <Component Id="EzDnaApi64">
+        <File Id="EzDnaApi64.dll" Name="EzDnaApi64.dll" Source="$(var.SolutionDir)\Dependencies\eDNA\EzDnaApi64.dll" />
+      </Component>
+      <Component Id="EzDNAApiNet">
+        <File Id="EzDNAApiNet.dll" Name="EzDNAApiNet.dll" Source="$(var.SolutionDir)\Dependencies\eDNA\EzDNAApiNet.dll" />
+      </Component>
+      <Component Id="EzDNAApiNet64">
+        <File Id="EzDNAApiNet64.dll" Name="EzDNAApiNet64.dll" Source="$(var.SolutionDir)\Dependencies\eDNA\EzDNAApiNet64.dll" />
+      </Component>
+      <Component Id="EzDNAApiNetSecure">
+        <File Id="EzDNAApiNetSecure.dll" Name="EzDNAApiNetSecure.dll" Source="$(var.SolutionDir)\Dependencies\eDNA\EzDNAApiNetSecure.dll" />
+      </Component>
+      <Component Id="EzDNAApiNetSecure64">
+        <File Id="EzDNAApiNetSecure64.dll" Name="EzDNAApiNetSecure64.dll" Source="$(var.SolutionDir)\Dependencies\eDNA\EzDNAApiNetSecure64.dll" />
+      </Component>
+      <Component Id="EZDnaServApi">
+        <File Id="EZDnaServApi.dll" Name="EZDnaServApi.dll" Source="$(var.SolutionDir)\Dependencies\eDNA\EZDnaServApi.dll" />
+      </Component>
+      <Component Id="EZDnaServApi64">
+        <File Id="EZDnaServApi64.dll" Name="EZDnaServApi64.dll" Source="$(var.SolutionDir)\Dependencies\eDNA\EZDnaServApi64.dll" />
+      </Component>
+      <Component Id="EzDNAServApiNet">
+        <File Id="EzDNAServApiNet.dll" Name="EzDNAServApiNet.dll" Source="$(var.SolutionDir)\Dependencies\eDNA\EzDNAServApiNet.dll" />
+      </Component>
+      <Component Id="EzDNAServApiNet64">
+        <File Id="EzDNAServApiNet64.dll" Name="EzDNAServApiNet64.dll" Source="$(var.SolutionDir)\Dependencies\eDNA\EzDNAServApiNet64.dll" />
+      </Component>
+
+      <!-- Local NuGet Depedencies -->
+      <Component Id="MathNet.Numerics">
+        <File Id="MathNet.Numerics.dll" Name="MathNet.Numerics.dll" Source="$(var.openXDA.TargetDir)MathNet.Numerics.dll" />
+      </Component>
+      <Component Id="HtmlAgilityPack">
+        <File Id="HtmlAgilityPack.dll" Name="HtmlAgilityPack.dll" Source="$(var.openXDA.TargetDir)HtmlAgilityPack.dll" />
+      </Component>
+      <Component Id="System.Security.AccessControl">
+        <File Id="System.Security.AccessControl.dll" Name="System.Security.AccessControl.dll" Source="$(var.openXDA.TargetDir)System.Security.AccessControl.dll" />
+      </Component>
+      <Component Id="System.Security.Permissions">
+        <File Id="System.Security.Permissions.dll" Name="System.Security.Permissions.dll" Source="$(var.openXDA.TargetDir)System.Security.Permissions.dll" />
+      </Component>
+      <Component Id="System.Security.Principal.Windows">
+        <File Id="System.Security.Principal.Windows.dll" Name="System.Security.Principal.Windows.dll" Source="$(var.openXDA.TargetDir)System.Security.Principal.Windows.dll" />
+      </Component>
+
+
+      <!-- HIDS Dependencies -->
+      <Component Id="HIDS">
+        <File Id="HIDS.dll" Name="HIDS.dll"  Source="$(var.openXDA.TargetDir)HIDS.dll" />
+      </Component>
+      <Component Id="openXDA.HIDS">
+        <File Id="openXDA.HIDS.dll" Name="$(var.openXDA.HIDS.TargetFileName)" Source="$(var.openXDA.HIDS.TargetPath)" />
+      </Component>
+      <Component Id="System.Threading.Tasks.Extensions">
+        <File Id="System.Threading.Tasks.Extensions.dll" Name="System.Threading.Tasks.Extensions.dll"  Source="$(var.openXDA.TargetDir)System.Threading.Tasks.Extensions.dll" />
+      </Component>
+      <Component Id="Microsoft.Bcl.AsyncInterfaces">
+        <File Id="Microsoft.Bcl.AsyncInterfaces.dll" Name="Microsoft.Bcl.AsyncInterfaces.dll" Source="$(var.openXDA.TargetDir)Microsoft.Bcl.AsyncInterfaces.dll" />
+      </Component>
+      <Component Id="System.Linq.Async">
+        <File Id="System.Linq.Async.dll" Name="System.Linq.Async.dll" Source="$(var.openXDA.TargetDir)System.Linq.Async.dll" />
+      </Component>
+      <Component Id="InfluxDB.Client">
+        <File Id="InfluxDB.Client.dll" Name="InfluxDB.Client.dll" Source="$(var.openXDA.TargetDir)InfluxDB.Client.dll" />
+      </Component>
+      <Component Id="InfluxDB.Client.Core">
+        <File Id="InfluxDB.Client.Core.dll" Name="InfluxDB.Client.Core.dll" Source="$(var.openXDA.TargetDir)InfluxDB.Client.Core.dll" />
+      </Component>
+      <Component Id="RestSharp">
+        <File Id="RestSharp.dll" Name="RestSharp.dll" Source="$(var.openXDA.TargetDir)RestSharp.dll" />
+      </Component>
+      <Component Id="System.Runtime.CompilerServices.Unsafe">
+        <File Id="System.Runtime.CompilerServices.Unsafe.dll" Name="System.Runtime.CompilerServices.Unsafe.dll" Source="$(var.openXDA.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" />
+      </Component>
+      <Component Id="NodaTime">
+        <File Id="NodaTime.dll" Name="NodaTime.dll" Source="$(var.openXDA.TargetDir)NodaTime.dll" />
+      </Component>
+      <Component Id="NodaTime.Serialization.JsonNet">
+        <File Id="NodaTime.Serialization.JsonNet.dll" Name="NodaTime.Serialization.JsonNet.dll" Source="$(var.openXDA.TargetDir)NodaTime.Serialization.JsonNet.dll" />
+      </Component>
+      <Component Id="CSVHelper">
+        <File Id="CsvHelper.dll" Name="CsvHelper.dll" Source="$(var.openXDA.TargetDir)CsvHelper.dll" />
+      </Component>
+      <Component Id="System.Buffers">
+        <File Id="System.Buffers.dll" Name="System.Buffers.dll" Source="$(var.openXDA.TargetDir)System.Buffers.dll" />
+      </Component>
+      <Component Id="System.Collections.Immutable">
+        <File Id="System.Collections.Immutable.dll" Name="System.Collections.Immutable.dll" Source="$(var.openXDA.TargetDir)System.Collections.Immutable.dll" />
+      </Component>
+      <Component Id="System.Configuration.ConfigurationManager">
+        <File Id="System.Configuration.ConfigurationManager.dll" Name="System.Configuration.ConfigurationManager.dll" Source="$(var.openXDA.TargetDir)System.Configuration.ConfigurationManager.dll" />
+      </Component>
+      <Component Id="System.Memory">
+        <File Id="System.Memory.dll" Name="System.Memory.dll" Source="$(var.openXDA.TargetDir)System.Memory.dll" />
+      </Component>
+      <Component Id="System.Numerics.Vectors">
+        <File Id="System.Numerics.Vectors.dll" Name="System.Numerics.Vectors.dll" Source="$(var.openXDA.TargetDir)System.Numerics.Vectors.dll" />
+      </Component>
+      <Component Id="System.Reactive">
+        <File Id="System.Reactive.dll" Name="System.Reactive.dll" Source="$(var.openXDA.TargetDir)System.Reactive.dll" />
+      </Component>
+      <Component Id="System.ValueTuple">
+        <File Id="System.ValueTuple.dll" Name="System.ValueTuple.dll" Source="$(var.openXDA.TargetDir)System.ValueTuple.dll" />
+      </Component>
+
+      <!--SPC Tools Dependencies -->
+      <Component Id="SPCTools">
+        <File Id="SPCtools.dll" Name="$(var.SPCTools.TargetFileName)" Source="$(var.SPCTools.TargetPath)" />
+      </Component>
+      <Component Id="Microsoft.Extensions.Primitives">
+        <File Id="Microsoft.Extensions.Primitives.dll" Name="Microsoft.Extensions.Primitives.dll" Source="$(var.openXDA.TargetDir)Microsoft.Extensions.Primitives.dll" />
+      </Component>
+      <Component Id="Microsoft.Extensions.ObjectPool">
+        <File Id="Microsoft.Extensions.ObjectPool.dll" Name="Microsoft.Extensions.ObjectPool.dll" Source="$(var.openXDA.TargetDir)Microsoft.Extensions.ObjectPool.dll" />
+      </Component>
+      <Component Id="Microsoft.Net.Http.Headers">
+        <File Id="Microsoft.Net.Http.Headers.dll" Name="Microsoft.Net.Http.Headers.dll" Source="$(var.openXDA.TargetDir)Microsoft.Net.Http.Headers.dll" />
+      </Component>
+
+      <!-- Self Hosting SignalR, WebAPI and Razor Engine Components (these are managed as NuGet dependencies to GSF.Web) -->
+      <Component Id="Microsoft.AspNet.SignalR.Core">
+        <File Id="Microsoft.AspNet.SignalR.Core.dll" Name="Microsoft.AspNet.SignalR.Core.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.AspNet.SignalR.Core.dll" />
+      </Component>
+      <Component Id="System.Net.Http.Formatting">
+        <File Id="System.Net.Http.Formatting.dll" Name="System.Net.Http.Formatting.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Net.Http.Formatting.dll" />
+      </Component>
+      <Component Id="System.Web.Http.Cors">
+        <File Id="System.Web.Http.Cors.dll" Name="System.Web.Http.Cors.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Web.Http.Cors.dll" />
+      </Component>
+      <Component Id="System.Web.Mvc">
+        <File Id="System.Web.Mvc.dll" Name="System.Web.Mvc.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Web.Mvc.dll" />
+      </Component>
+      <Component Id="System.Web.Http">
+        <File Id="System.Web.Http.dll" Name="System.Web.Http.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Web.Http.dll" />
+      </Component>
+      <Component Id="System.Web.Http.Owin">
+        <File Id="System.Web.Http.Owin.dll" Name="System.Web.Http.Owin.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Web.Http.Owin.dll" />
+      </Component>
+      <Component Id="Microsoft.Owin">
+        <File Id="Microsoft.Owin.dll" Name="Microsoft.Owin.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Owin.dll" />
+      </Component>
+      <Component Id="Microsoft.Owin.Cors">
+        <File Id="Microsoft.Owin.Cors.dll" Name="Microsoft.Owin.Cors.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Owin.Cors.dll" />
+      </Component>
+      <Component Id="Microsoft.Owin.Diagnostics">
+        <File Id="Microsoft.Owin.Diagnostics.dll" Name="Microsoft.Owin.Diagnostics.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Owin.Diagnostics.dll" />
+      </Component>
+      <Component Id="Microsoft.Owin.Host.HttpListener">
+        <File Id="Microsoft.Owin.Host.HttpListener.dll" Name="Microsoft.Owin.Host.HttpListener.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Owin.Host.HttpListener.dll" />
+      </Component>
+      <Component Id="Microsoft.Owin.Hosting">
+        <File Id="Microsoft.Owin.Hosting.dll" Name="Microsoft.Owin.Hosting.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Owin.Hosting.dll" />
+      </Component>
+      <Component Id="Microsoft.Owin.Security">
+        <File Id="Microsoft.Owin.Security.dll" Name="Microsoft.Owin.Security.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Owin.Security.dll" />
+      </Component>
+      <Component Id="Newtonsoft.Json">
+        <File Id="Newtonsoft.Json.dll" Name="Newtonsoft.Json.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Newtonsoft.Json.dll" />
+      </Component>
+      <Component Id="NUglify">
+        <File Id="NUglify.dll" Name="NUglify.dll" Source="$(var.SolutionDir)\Dependencies\GSF\NUglify.dll" />
+      </Component>
+      <Component Id="JsonSubTypes">
+        <File Id="JsonSubTypes.dll" Name="JsonSubTypes.dll" Source="$(var.SolutionDir)\Dependencies\NuGet\JsonSubTypes.1.8.0\lib\net47\JsonSubTypes.dll" />
+      </Component>
+
+      <Component Id="Owin">
+        <File Id="Owin.dll" Name="Owin.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Owin.dll" />
+      </Component>
+      <Component Id="RazorEngine">
+        <File Id="RazorEngine.dll" Name="RazorEngine.dll" Source="$(var.SolutionDir)\Dependencies\GSF\RazorEngine.dll" />
+      </Component>
+      <Component Id="System.Web.Razor">
+        <File Id="System.Web.Razor.dll" Name="System.Web.Razor.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Web.Razor.dll" />
+      </Component>
+      <Component Id="System.Web.Cors">
+        <File Id="System.Web.Cors.dll" Name="System.Web.Cors.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Web.Cors.dll" />
+      </Component>
+      <Component Id="System.Web.Helpers">
+        <File Id="System.Web.Helpers.dll" Name="System.Web.Helpers.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Web.Helpers.dll" />
+      </Component>
+      <Component Id="System.Web.WebPages">
+        <File Id="System.Web.WebPages.dll" Name="System.Web.WebPages.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Web.WebPages.dll" />
+      </Component>
+      <Component Id="System.Web.WebPages.Deployment">
+        <File Id="System.Web.WebPages.Deployment.dll" Name="System.Web.WebPages.Deployment.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Web.WebPages.Deployment.dll" />
+      </Component>
+      <Component Id="System.Web.WebPages.Razor">
+        <File Id="System.Web.WebPages.Razor.dll" Name="System.Web.WebPages.Razor.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Web.WebPages.Razor.dll" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Azure AD Dependencies -->
+    <ComponentGroup Id="AzureADDependencyComponents" Directory="INSTALLFOLDER">
+      <Component Id="Azure.Core">
+        <File Id="Azure.Core.dll" Name="Azure.Core.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Azure.Core.dll">
+          <netfx:NativeImage Id="ngen_Azure.Core.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.AspNetCore.Cryptography.Internal">
+        <File Id="Microsoft.AspNetCore.Cryptography.Internal.dll" Name="Microsoft.AspNetCore.Cryptography.Internal.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.AspNetCore.Cryptography.Internal.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.AspNetCore.Cryptography.Internal.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.AspNetCore.DataProtection.Abstractions">
+        <File Id="Microsoft.AspNetCore.DataProtection.Abstractions.dll" Name="Microsoft.AspNetCore.DataProtection.Abstractions.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.AspNetCore.DataProtection.Abstractions.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.AspNetCore.DataProtection.Abstractions.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.AspNetCore.DataProtection">
+        <File Id="Microsoft.AspNetCore.DataProtection.dll" Name="Microsoft.AspNetCore.DataProtection.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.AspNetCore.DataProtection.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.AspNetCore.DataProtection.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Extensions.Caching.Abstractions">
+        <File Id="Microsoft.Extensions.Caching.Abstractions.dll" Name="Microsoft.Extensions.Caching.Abstractions.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Extensions.Caching.Abstractions.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Extensions.Caching.Abstractions.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Extensions.Caching.Memory">
+        <File Id="Microsoft.Extensions.Caching.Memory.dll" Name="Microsoft.Extensions.Caching.Memory.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Extensions.Caching.Memory.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Extensions.Caching.Memory.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Extensions.Configuration.Abstractions">
+        <File Id="Microsoft.Extensions.Configuration.Abstractions.dll" Name="Microsoft.Extensions.Configuration.Abstractions.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Extensions.Configuration.Abstractions.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Extensions.Configuration.Abstractions.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Extensions.DependencyInjection.Abstractions">
+        <File Id="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Name="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Extensions.DependencyInjection.Abstractions.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Extensions.DependencyInjection.Abstractions.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Extensions.DependencyInjection">
+        <File Id="Microsoft.Extensions.DependencyInjection.dll" Name="Microsoft.Extensions.DependencyInjection.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Extensions.DependencyInjection.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Extensions.DependencyInjection.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Extensions.FileProviders.Abstractions">
+        <File Id="Microsoft.Extensions.FileProviders.Abstractions.dll" Name="Microsoft.Extensions.FileProviders.Abstractions.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Extensions.FileProviders.Abstractions.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Extensions.FileProviders.Abstractions.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Extensions.Hosting.Abstractions">
+        <File Id="Microsoft.Extensions.Hosting.Abstractions.dll" Name="Microsoft.Extensions.Hosting.Abstractions.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Extensions.Hosting.Abstractions.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Extensions.Hosting.Abstractions.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Extensions.Logging.Abstractions">
+        <File Id="Microsoft.Extensions.Logging.Abstractions.dll" Name="Microsoft.Extensions.Logging.Abstractions.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Extensions.Logging.Abstractions.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Extensions.Logging.Abstractions.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Extensions.Logging">
+        <File Id="Microsoft.Extensions.Logging.dll" Name="Microsoft.Extensions.Logging.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Extensions.Logging.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Extensions.Logging.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Extensions.Options">
+        <File Id="Microsoft.Extensions.Options.dll" Name="Microsoft.Extensions.Options.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Extensions.Options.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Extensions.Options.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Graph.Core">
+        <File Id="Microsoft.Graph.Core.dll" Name="Microsoft.Graph.Core.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Graph.Core.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Graph.Core.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Graph">
+        <File Id="Microsoft.Graph.dll" Name="Microsoft.Graph.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Graph.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Graph.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Identity.Client.Broker">
+        <File Id="Microsoft.Identity.Client.Broker.dll" Name="Microsoft.Identity.Client.Broker.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Identity.Client.Broker.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Identity.Client.Broker.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Identity.Client.Desktop">
+        <File Id="Microsoft.Identity.Client.Desktop.dll" Name="Microsoft.Identity.Client.Desktop.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Identity.Client.Desktop.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Identity.Client.Desktop.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Identity.Client">
+        <File Id="Microsoft.Identity.Client.dll" Name="Microsoft.Identity.Client.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Identity.Client.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Identity.Client.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Identity.Client.NativeInterop">
+        <File Id="Microsoft.Identity.Client.NativeInterop.dll" Name="Microsoft.Identity.Client.NativeInterop.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Identity.Client.NativeInterop.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Identity.Client.NativeInterop.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Identity.Web.TokenCache">
+        <File Id="Microsoft.Identity.Web.TokenCache.dll" Name="Microsoft.Identity.Web.TokenCache.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Identity.Web.TokenCache.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Identity.Web.TokenCache.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.IdentityModel.Abstractions">
+        <File Id="Microsoft.IdentityModel.Abstractions.dll" Name="Microsoft.IdentityModel.Abstractions.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.IdentityModel.Abstractions.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.IdentityModel.Abstractions.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.IdentityModel.JsonWebTokens">
+        <File Id="Microsoft.IdentityModel.JsonWebTokens.dll" Name="Microsoft.IdentityModel.JsonWebTokens.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.IdentityModel.JsonWebTokens.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.IdentityModel.JsonWebTokens.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.IdentityModel.Logging">
+        <File Id="Microsoft.IdentityModel.Logging.dll" Name="Microsoft.IdentityModel.Logging.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.IdentityModel.Logging.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.IdentityModel.Logging.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.IdentityModel.Protocols">
+        <File Id="Microsoft.IdentityModel.Protocols.dll" Name="Microsoft.IdentityModel.Protocols.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.IdentityModel.Protocols.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.IdentityModel.Protocols.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.IdentityModel.Protocols.OpenIdConnect">
+        <File Id="Microsoft.IdentityModel.Protocols.OpenIdConnect.dll" Name="Microsoft.IdentityModel.Protocols.OpenIdConnect.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.IdentityModel.Protocols.OpenIdConnect.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.IdentityModel.Tokens">
+        <File Id="Microsoft.IdentityModel.Tokens.dll" Name="Microsoft.IdentityModel.Tokens.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.IdentityModel.Tokens.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.IdentityModel.Tokens.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Web.WebView2.Core">
+        <File Id="Microsoft.Web.WebView2.Core.dll" Name="Microsoft.Web.WebView2.Core.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Web.WebView2.Core.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Web.WebView2.Core.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Web.WebView2.WinForms">
+        <File Id="Microsoft.Web.WebView2.WinForms.dll" Name="Microsoft.Web.WebView2.WinForms.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Web.WebView2.WinForms.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Web.WebView2.WinForms.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Web.WebView2.Wpf">
+        <File Id="Microsoft.Web.WebView2.Wpf.dll" Name="Microsoft.Web.WebView2.Wpf.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Web.WebView2.Wpf.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Web.WebView2.Wpf.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="Microsoft.Win32.Registry">
+        <File Id="Microsoft.Win32.Registry.dll" Name="Microsoft.Win32.Registry.dll" Source="$(var.SolutionDir)\Dependencies\GSF\Microsoft.Win32.Registry.dll">
+          <netfx:NativeImage Id="ngen_Microsoft.Win32.Registry.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="System.Diagnostics.DiagnosticSource">
+        <File Id="System.Diagnostics.DiagnosticSource.dll" Name="System.Diagnostics.DiagnosticSource.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Diagnostics.DiagnosticSource.dll">
+          <netfx:NativeImage Id="ngen_System.Diagnostics.DiagnosticSource.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="System.Drawing.Common">
+        <File Id="System.Drawing.Common.dll" Name="System.Drawing.Common.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Drawing.Common.dll">
+          <netfx:NativeImage Id="ngen_System.Drawing.Common.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="System.IdentityModel.Tokens.Jwt">
+        <File Id="System.IdentityModel.Tokens.Jwt.dll" Name="System.IdentityModel.Tokens.Jwt.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.IdentityModel.Tokens.Jwt.dll">
+          <netfx:NativeImage Id="ngen_System.IdentityModel.Tokens.Jwt.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="System.Memory.Data">
+        <File Id="System.Memory.Data.dll" Name="System.Memory.Data.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Memory.Data.dll">
+          <netfx:NativeImage Id="ngen_System.Memory.Data.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="System.Net.Http.Json">
+        <File Id="System.Net.Http.Json.dll" Name="System.Net.Http.Json.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Net.Http.Json.dll">
+          <netfx:NativeImage Id="ngen_System.Net.Http.Json.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="System.Net.Http.WinHttpHandler">
+        <File Id="System.Net.Http.WinHttpHandler.dll" Name="System.Net.Http.WinHttpHandler.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Net.Http.WinHttpHandler.dll">
+          <netfx:NativeImage Id="ngen_System.Net.Http.WinHttpHandler.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="System.Security.Cryptography.Xml">
+        <File Id="System.Security.Cryptography.Xml.dll" Name="System.Security.Cryptography.Xml.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Security.Cryptography.Xml.dll">
+          <netfx:NativeImage Id="ngen_System.Security.Cryptography.Xml.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="System.Text.Encodings.Web">
+        <File Id="System.Text.Encodings.Web.dll" Name="System.Text.Encodings.Web.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Text.Encodings.Web.dll">
+          <netfx:NativeImage Id="ngen_System.Text.Encodings.Web.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+      <Component Id="System.Text.Json">
+        <File Id="System.Text.Json.dll" Name="System.Text.Json.dll" Source="$(var.SolutionDir)\Dependencies\GSF\System.Text.Json.dll">
+          <netfx:NativeImage Id="ngen_System.Text.Json.dll"  Platform="64bit" Priority="0" AppBaseDirectory="INSTALLFOLDER" />
+        </File>
+      </Component>
+    </ComponentGroup>
+    
+    <!-- ESRI.ArcGIS Runtime Components-->
+    <ComponentGroup Id="ESRIArcGISRuntimeComponents" Directory="ARCGISCLIENTFOLDER">
+      <?if $(var.Platform) = x64 ?>
+      <Component Id="runtimecore">
+        <File Id="runtimecore.dll" Name="runtimecore.dll" Source="$(var.SolutionDir)\Dependencies\NuGet\Esri.ArcGISRuntime.WPF.100.4.0\lib\net461\arcgisruntime100.4\client64\runtimecore.dll" />
+      </Component>
+      <Component Id="RuntimeCoreNet">
+        <File Id="RuntimeCoreNet.dll" Name="RuntimeCoreNet.dll" Source="$(var.SolutionDir)\Dependencies\NuGet\Esri.ArcGISRuntime.WPF.100.4.0\lib\net461\arcgisruntime100.4\client64\RuntimeCoreNet.dll" />
+      </Component>
+      <?else ?>
+      <Component Id="runtimecore">
+        <File Id="runtimecore.dll" Name="runtimecore.dll" Source="$(var.SolutionDir)\Dependencies\NuGet\Esri.ArcGISRuntime.WPF.100.4.0\lib\net461\arcgisruntime100.4\client32\runtimecore.dll" />
+      </Component>
+      <Component Id="RuntimeCoreNet">
+        <File Id="RuntimeCoreNet.dll" Name="RuntimeCoreNet.dll" Source="$(var.SolutionDir)\Dependencies\NuGet\Esri.ArcGISRuntime.WPF.100.4.0\lib\net461\arcgisruntime100.4\client32\RuntimeCoreNet.dll" />
+      </Component>
+      <?endif ?>
+    </ComponentGroup>
+  </Fragment>
+
+  <!-- Custom Dialogs -->
+  <Fragment>
+    <UI>
+      <!-- ServiceAccount Dialog -->
+      <Dialog Id="ServiceAccountDialog" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}Service Account</Text>
+        </Control>
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>Enter the [ProductName] service account.</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="ServiceAccountLabel" Type="Text" X="45" Y="73" Width="100" Height="15" TabSkip="no" Text="Service &amp;Account:" />
+        <Control Id="ServiceAccountEdit" Type="Edit" X="45" Y="85" Width="220" Height="18" Property="SERVICEACCOUNT" Text="{80}" />
+        <Control Id="ServicePasswordLabel" Type="Text" X="45" Y="113" Width="100" Height="15" TabSkip="no" Text="Service &amp;Password:" />
+        <Control Id="ServicePasswordEdit" Type="Edit" X="45" Y="125" Width="220" Height="18" Property="SERVICEPASSWORD" Text="{80}" Password="yes" />
+        <Control Id="ServicePasswordInfo" Type="Text" X="45" Y="153" Width="280" Height="30" Transparent="yes" NoPrefix="yes">
+          <Text>NOTE: If the service account is LocalSystem or begins with NT AUTHORITY or NT SERVICE you may leave the password field blank.</Text>
+        </Control>
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
+          <Publish Event="NewDialog" Value="CustomizeDlg">1</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
+          <Publish Event="DoAction" Value="AuthenticateServiceAccountAction">1</Publish>
+          <Publish Event="NewDialog" Value="ServiceAccountErrorDialog">NOT SERVICEAUTHENTICATED</Publish>
+          <Publish Event="NewDialog" Value="CompanyInfoDialog">SERVICEAUTHENTICATED</Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+      </Dialog>
+
+      <!-- ServiceAccountError Dialog -->
+      <Dialog Id="ServiceAccountErrorDialog" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}Service Account</Text>
+        </Control>
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>Setup encountered an error authenticating the service account.</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="InfoLabel" Type="Text" X="45" Y="73" Width="280" Height="60" TabSkip="no">
+          <Text>The service account entered could not be authorized. The username or password may have been entered incorrectly. To correct this, please click the "Back" button to go back to the previous step. To ignore this error and proceed with the installation, click the "Next" button.</Text>
+        </Control>
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Back">
+          <Publish Event="NewDialog" Value="ServiceAccountDialog">1</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
+          <Publish Event="NewDialog" Value="CompanyInfoDialog">1</Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+      </Dialog>
+      
+      <!-- CompanyInfo Dialog -->
+      <Dialog Id="CompanyInfoDialog" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}Company Information</Text>
+        </Control>
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>Enter information for the company using [ProductName].</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="CompanyNameLabel" Type="Text" X="45" Y="73" Width="100" Height="15" TabSkip="no" Text="Company &amp;Name:" />
+        <Control Id="CompanyNameEdit" Type="Edit" X="45" Y="85" Width="220" Height="18" Property="COMPANYNAME" Text="{80}" />
+        <Control Id="CompanyAcronymLabel" Type="Text" X="45" Y="113" Width="100" Height="15" TabSkip="no" Text="Company &amp;Acronym:" />
+        <Control Id="CompanyAcronymEdit" Type="Edit" X="45" Y="125" Width="220" Height="18" Property="COMPANYACRONYM" Text="{80}" />
+        <!-- JRC: Something to consider:
+        <Control Id="SystemNameLabel" Type="Text" X="45" Y="153" Width="250" Height="15" TabSkip="no" Text="&amp;System Name: (e.g., a location name, dev or prod)" />
+        <Control Id="SystemNameEdit" Type="Edit" X="45" Y="165" Width="220" Height="18" Property="SYSTEMNAME" Text="{80}" />
+         -->
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
+          <Publish Event="NewDialog" Value="ServiceAccountDialog">1</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
+          <Publish Event="NewDialog" Value="DatabaseConnectionDialog">1</Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+      </Dialog>
+      
+      <!-- Database Connection Dialog -->
+      <Dialog Id="DatabaseConnectionDialog" Width="370" Height="270" Title="[ProductName] Setup">
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>{\WixUI_Font_Title}Database Connection</Text>
+        </Control>
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+          <Text>Configure your database connection.</Text>
+        </Control>
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="ServerNameLabel" Type="Text" X="95" Y="53" Width="100" Height="13" TabSkip="no" Text="&amp;Server name:" />
+        <Control Id="ServerNameEdit" Type="Edit" X="95" Y="65" Width="170" Height="18" Property="SERVERNAME" Text="{80}" />
+        <Control Id="DatabaseNameLabel" Type="Text" X="95" Y="88" Width="100" Height="13" TabSkip="no" Text="&amp;Database name:" />
+        <Control Id="DatabaseNameEdit" Type="Edit" X="95" Y="100" Width="170" Height="18" Property="DATABASENAME" Text="{80}" />
+        <Control Id="WindowsAuthenticationCheckBox" Type="CheckBox" X="85" Y="125" Width="200" Height="17" Property="WINDOWSAUTH" CheckBoxValue="1" Text="Use Windows Authentication" />
+        <Control Id="UsernameLabel" Type="Text" X="95" Y="143" Width="100" Height="13" TabSkip="no" Text="&amp;Username:">
+          <Condition Action="enable">NOT WINDOWSAUTH</Condition>
+          <Condition Action="disable">WINDOWSAUTH</Condition>
+        </Control>
+        <Control Id="UsernameEdit" Type="Edit" X="95" Y="155" Width="170" Height="18" Property="DBUSERNAME" Text="{80}">
+          <Condition Action="enable">NOT WINDOWSAUTH</Condition>
+          <Condition Action="disable">WINDOWSAUTH</Condition>
+        </Control>
+        <Control Id="PasswordLabel" Type="Text" X="95" Y="178" Width="100" Height="13" TabSkip="no" Text="&amp;Password:">
+          <Condition Action="enable">NOT WINDOWSAUTH</Condition>
+          <Condition Action="disable">WINDOWSAUTH</Condition>
+        </Control>
+        <Control Id="PasswordEdit" Type="Edit" X="95" Y="190" Width="170" Height="18" Property="DBPASSWORD" Text="{80}" Password="yes">
+          <Condition Action="enable">NOT WINDOWSAUTH</Condition>
+          <Condition Action="disable">WINDOWSAUTH</Condition>
+        </Control>
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
+          <Publish Event="NewDialog" Value="CompanyInfoDialog">INSTALLSERVICEFEATURE</Publish>
+          <Publish Event="NewDialog" Value="CustomizeDlg">NOT INSTALLSERVICEFEATURE</Publish>
+        </Control>
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
+          <!-- Set up the queries to create the database. -->
+          <Publish Property="GENPASSWORDLENGTH" Value="20">1</Publish>
+          <Publish Event="DoAction" Value="PasswordGenerationAction">NOT XDASERVICEPASSWORD</Publish>
+          <Publish Property="XDASERVICELOGIN" Value="XDAService">1</Publish>
+          <Publish Property="XDASERVICEPASSWORD" Value="[GENERATEDPASSWORD]">NOT XDASERVICEPASSWORD</Publish>
+          <Publish Property="CREATEDBQUERY" Value="CREATE DATABASE [\[][DATABASENAME][\]]">1</Publish>
+          <Publish Property="ALTERDBQUERY" Value="ALTER DATABASE [\[][DATABASENAME][\]] SET TRUSTWORTHY ON">1</Publish>
+          <Publish Property="CREATEDBLOGINQUERY" Value="IF NOT EXISTS (SELECT * FROM master.dbo.syslogins WHERE loginname = '[XDASERVICELOGIN]') CREATE LOGIN [\[][XDASERVICELOGIN][\]] WITH PASSWORD = '[XDASERVICEPASSWORD]', CHECK_EXPIRATION = OFF, CHECK_POLICY = OFF">1</Publish>
+          <Publish Property="ALTERDBLOGINQUERY" Value="ALTER LOGIN [\[][XDASERVICELOGIN][\]] WITH PASSWORD = '[XDASERVICEPASSWORD]'">1</Publish>
+          <Publish Property="CREATEDBUSERQUERY" Value="CREATE USER [\[][XDASERVICELOGIN][\]] FOR LOGIN [\[][XDASERVICELOGIN][\]]">1</Publish>
+          <Publish Property="DBPERMISSIONSQUERY" Value="EXEC sp_addrolemember N'db_owner', N'[XDASERVICELOGIN]'">1</Publish>
+          
+          <!-- Set up the authentication part of the connection string based on user input. -->
+          <Publish Property="AUTHSTRING" Value="Integrated Security=SSPI">WINDOWSAUTH</Publish>
+          <Publish Property="AUTHSTRING" Value="User Id=[DBUSERNAME];;Password=[DBPASSWORD]">NOT WINDOWSAUTH</Publish>
+          <Publish Property="XDAAUTHSTRING" Value="Integrated Security=SSPI">NOT INSTALLDATABASEFEATURE AND WINDOWSAUTH</Publish>
+          <Publish Property="XDAAUTHSTRING" Value="User Id=[DBUSERNAME];;Password=[DBPASSWORD]">NOT INSTALLDATABASEFEATURE AND NOT WINDOWSAUTH</Publish>
+          <Publish Property="XDAAUTHSTRING" Value="User Id=[XDASERVICELOGIN];;Password=[XDASERVICEPASSWORD]">INSTALLDATABASEFEATURE</Publish>
+          
+          <!-- Set up connection strings for connecting to server and database. -->
+          <Publish Property="SERVERCONNECTIONSTRING" Value="Data Source=[SERVERNAME];;[AUTHSTRING];;Pooling=false">1</Publish>
+          <Publish Property="DBCONNECTIONSTRING" Value="Data Source=[SERVERNAME];;Initial Catalog=[DATABASENAME];;[AUTHSTRING];;Pooling=false">1</Publish>
+          <Publish Property="XDACONNECTIONSTRING" Value="Data Source=[SERVERNAME];;Initial Catalog=[DATABASENAME];;[XDAAUTHSTRING]">1</Publish>
+          
+          <!-- Determine whether we can connect to the database server. -->
+          <Publish Property="CONNECTIONSTRING" Value="[SERVERCONNECTIONSTRING];;Connection Timeout=5">1</Publish>
+          <Publish Event="DoAction" Value="TestDatabaseConnectionAction">1</Publish>
+          <Publish Property="DBSERVERCONNECTS">NOT DATABASECONNECTED</Publish>
+          <Publish Property="DBSERVERCONNECTS" Value="1">DATABASECONNECTED</Publish>
+          <Publish Property="ERRORMESSAGE" Value="Unable to connect to the database. Please verify the connection configuration and try again.">NOT DBSERVERCONNECTS</Publish>
+          <Publish Event="SpawnDialog" Value="ModalErrorDialog">NOT DBSERVERCONNECTS</Publish>
+          
+          <!-- Determine whether the database already exists on the server. -->
+          <Publish Property="CONNECTIONSTRING" Value="[DBCONNECTIONSTRING];;Connection Timeout=5">DBSERVERCONNECTS</Publish>
+          <Publish Event="DoAction" Value="TestDatabaseConnectionAction">DBSERVERCONNECTS</Publish>
+          <Publish Property="DBEXISTS">NOT DATABASECONNECTED</Publish>
+          <Publish Property="DBEXISTS" Value="1">DATABASECONNECTED</Publish>
+          <Publish Property="ERRORMESSAGE" Value="Database [DATABASENAME] already exists on the server. Enter a different database name or drop the existing database, then try again. If you do not wish to install the database, return to the Custom Setup screen and modify your feature selections.">INSTALLDATABASEFEATURE AND DBSERVERCONNECTS AND DBEXISTS</Publish>
+          <Publish Property="ERRORMESSAGE" Value="Database [DATABASENAME] does not exist on the server. Enter the name of an existing database, then try again. If you wish to install the database, return to the Custom Setup screen and modify your feature selections.">NOT INSTALLDATABASEFEATURE AND DBSERVERCONNECTS AND NOT DBEXISTS</Publish>
+          <Publish Event="SpawnDialog" Value="ModalErrorDialog">DBSERVERCONNECTS AND ((INSTALLDATABASEFEATURE AND DBEXISTS) OR (NOT INSTALLDATABASEFEATURE AND NOT DBEXISTS))</Publish>
+
+          <!-- Move to the next dialog if the validation checks out. -->
+          <Publish Event="NewDialog" Value="VerifyReadyDlg">DBSERVERCONNECTS AND ((INSTALLDATABASEFEATURE AND NOT DBEXISTS) OR (NOT INSTALLDATABASEFEATURE AND DBEXISTS))</Publish>
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+      </Dialog>
+
+      <!-- Modal dialog to display error messages. -->
+      <Dialog Id="ModalErrorDialog" Width="250" Height="100" Title="Database Connection Error">
+        <Control Id="ErrorMessageLabel" Type="Text" X="10" Y="10" Width="230" Height="50" TabSkip="no" Text="[ERRORMESSAGE]" />
+        <Control Id="OKButton" Type="PushButton" X="82" Y="70" Width="56" Height="17" Default="yes" Cancel="yes" Text="&amp;OK">
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+      </Dialog>
+    </UI>
+  </Fragment>
+</Wix>

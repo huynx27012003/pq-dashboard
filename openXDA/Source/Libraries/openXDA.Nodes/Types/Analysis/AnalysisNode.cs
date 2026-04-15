@@ -1,0 +1,686 @@
+﻿//******************************************************************************************************
+//  AnalysisNode.cs - Gbtc
+//
+//  Copyright © 2021, Grid Protection Alliance.  All Rights Reserved.
+//
+//  Licensed to the Grid Protection Alliance (GPA) under one or more contributor license agreements. See
+//  the NOTICE file distributed with this work for additional information regarding copyright ownership.
+//  The GPA licenses this file to you under the MIT License (MIT), the "License"; you may not use this
+//  file except in compliance with the License. You may obtain a copy of the License at:
+//
+//      http://opensource.org/licenses/MIT
+//
+//  Unless agreed to in writing, the subject software distributed under the License is distributed on an
+//  "AS-IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. Refer to the
+//  License for the specific language governing permissions and limitations.
+//
+//  Code Modification History:
+//  ----------------------------------------------------------------------------------------------------
+//  01/07/2021 - Stephen C. Wills
+//       Generated original version of source code.
+//
+//******************************************************************************************************
+
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.Controllers;
+using FaultData;
+using FaultData.Configuration;
+using FaultData.DataAnalysis;
+using FaultData.DataOperations;
+using FaultData.DataReaders;
+using FaultData.DataSets;
+using GSF.Configuration;
+using GSF.Data;
+using GSF.Data.Model;
+using GSF.Threading;
+using log4net;
+using openXDA.Configuration;
+using openXDA.Model;
+using IDataReader = FaultData.DataReaders.IDataReader;
+
+namespace openXDA.Nodes.Types.Analysis
+{
+    public class AnalysisNode : NodeBase, IDisposable
+    {
+        #region [ Members ]
+
+        // Nested Types
+        private class NodeSettings
+        {
+            public NodeSettings(Action<object> configure) =>
+                configure(this);
+
+            [Category]
+            [SettingName(SystemSection.CategoryName)]
+            public SystemSection SystemSettings { get; } = new SystemSection();
+
+            [Category]
+            [SettingName(TaskProcessorSection.CategoryName)]
+            public TaskProcessorSection TaskProcessorSettings { get; } = new TaskProcessorSection();
+
+            [Category]
+            [SettingName(COMTRADESection.CategoryName)]
+            public COMTRADESection COMTRADESettings { get; } = new COMTRADESection();
+        }
+
+        private class AnalysisWebController : ApiController
+        {
+            private AnalysisNode Node { get; }
+
+            public AnalysisWebController(AnalysisNode node) =>
+                Node = node;
+
+            [HttpPost]
+            public void PollTaskQueue() =>
+                Node.PollingOperation.RunOnceAsync();
+        }
+
+        #endregion
+
+        #region [ Constructors ]
+
+        public AnalysisNode(Host host, Node definition, NodeType type)
+            : base(host, definition, type)
+        {
+            Action pollingFunction = GetPollingFunction();
+            void LogException(Exception ex) => Log.Error(ex.Message, ex);
+            PollingOperation = new ShortSynchronizedOperation(pollingFunction, LogException);
+
+            Action<object> configurator = GetConfigurator();
+            UpdateTaskProcessorSettings(configurator);
+            PollingOperation.RunOnceAsync();
+        }
+
+        #endregion
+
+        #region [ Properties ]
+
+        private ISynchronizedOperation PollingOperation { get; }
+        private string MeterFilterQuery { get; set; }
+        private int ProcessingThreadCount { get; set; }
+        private bool IsDisposed { get; set; }
+
+        #endregion
+
+        #region [ Methods ]
+
+        public override IHttpController CreateWebController() =>
+            new AnalysisWebController(this);
+
+        public void Dispose() =>
+            IsDisposed = true;
+
+        protected override void OnReconfigure(Action<object> configurator) =>
+            UpdateTaskProcessorSettings(configurator);
+
+        private Action GetPollingFunction()
+        {
+            AnalysisTaskProcessor taskProcessor = new AnalysisTaskProcessor(Definition.ID, CreateDbConnection);
+
+            // Reset Tasks tha failed Processing on this Node
+            using (AdoDataConnection connection = CreateDbConnection())
+            {
+                string query = "UPDATE AnalysisTask SET NodeID = NULL WHERE NodeID  = {0}";
+                connection.ExecuteNonQuery(query, Definition.ID);
+            }
+            // This is used to track the processing thread
+            // count so resource usage can be throttled
+            int threadCount = 0;
+            int GetThreadCount() => Interlocked.CompareExchange(ref threadCount, 0, 0);
+
+            return () =>
+            {
+                if (IsDisposed)
+                    return;
+
+                int maxThreadCount = ProcessingThreadCount;
+
+                // If there are no threads available to process,
+                // active threads will poll again when they are finished
+                if (GetThreadCount() >= maxThreadCount)
+                    return;
+
+                AnalysisTask task = taskProcessor.Poll(MeterFilterQuery);
+
+                // It's not necessary to keep
+                // polling if the queue is empty
+                if (task is null)
+                    return;
+
+                // Add another processing thread for the polled task
+                Interlocked.Increment(ref threadCount);
+
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        ThreadContext.Properties["Meter"] = task.Meter.AssetKey;
+                        Process(task);
+                        taskProcessor.Dequeue(task);
+                        _ = NotifyEventEmailNodeWhenIdle();
+                    }
+                    finally
+                    {
+                        Interlocked.Decrement(ref threadCount);
+
+                        // Ensure there are no more tasks in the queue
+                        PollingOperation.RunOnceAsync();
+                    }
+                });
+
+                // Keep polling until the queue is empty
+                PollingOperation.RunOnceAsync();
+            };
+        }
+
+        private void Process(AnalysisTask task)
+        {
+            FileGroup fileGroup = task.FileGroup;
+            try
+            {
+                Meter meter = task.Meter;
+                MeterDataSet meterDataset = Process(fileGroup, meter);
+                SaveMeterConfiguration(fileGroup, meter);
+                if (!(meterDataset is null))
+                    DailyStatisticOperation.UpdateSuccessFileProcessingStatistic(meterDataset);
+            }
+            catch (Exception ex)
+            {
+                DataFile dataFile = task.FileGroup.DataFiles.First();
+                string filePath = Path.ChangeExtension(dataFile.FilePath, "*");
+                string message = $"An error occurred while processing file group \"{filePath}\": {ex.Message}";
+
+                try
+                {
+                    fileGroup.ProcessingStatus = (int)FileGroupProcessingStatus.Failed;
+                    UpdateFileGroup(fileGroup);
+
+                    DailyStatisticOperation.UpdateFailureFileProcessingStatistic(task.Meter.AssetKey, task.FileGroup, message);
+                }
+                catch (Exception e) {
+                    Exception w = new Exception(message, e);
+                    Log.Error(w.Message, w);
+                }
+
+                Exception wrapper = new Exception(message, ex);
+                Log.Error(wrapper.Message, wrapper);
+            }
+        }
+
+        private MeterDataSet Process(FileGroup fileGroup, Meter meter)
+        {
+            DateTime startTime = DateTime.UtcNow;
+            Action<object> configurator = GetConfigurator();
+            TimeZoneConverter timeZoneConverter = new TimeZoneConverter(configurator);
+            fileGroup.ProcessingStartTime = timeZoneConverter.ToXDATimeZone(startTime);
+            fileGroup.ProcessingVersion++;
+            fileGroup.ProcessingStatus = (int)FileGroupProcessingStatus.Processing;
+            UpdateFileGroup(fileGroup);
+
+            DataFile dataFile = fileGroup.DataFiles.First();
+            string fileGroupPath = Path.ChangeExtension(dataFile.FilePath, "*");
+            Log.Info($"Reading data from file group \"{fileGroupPath}\"...");
+
+            DataReaderFactory readerFactory = new DataReaderFactory(CreateDbConnection);
+            IDataReader reader = readerFactory.CreateDataReader(fileGroup);
+            configurator(reader);
+
+            MeterDataSet meterDataSet = reader.Parse(fileGroup);
+            FileGroupProcessingStatus processingStatus;
+
+            if (!(meterDataSet is null))
+            {
+                DataFile primaryFile = reader.GetPrimaryDataFile(fileGroup);
+                meterDataSet.CreateDbConnection = CreateDbConnection;
+                meterDataSet.FilePath = primaryFile.FilePath;
+                meterDataSet.FileGroup = fileGroup;
+                meterDataSet.Configure = configurator;
+                meterDataSet.Meter.AssetKey = meter.AssetKey;
+
+                NodeSettings settings = new NodeSettings(configurator);
+
+                // Apply sqrt(2) multiplier for SEL (and similar) meters, unless already adjusted by data reader
+                if (reader is COMTRADEReader && RequiresRoot2Adjustment(meter, settings.COMTRADESettings.Root2AdjustmentQuery))
+                    ApplyRoot2Adjustment(meterDataSet);
+
+                // Shift date/time values to the configured time zone and set the start and end time values on the file group
+                TimeZoneInfo defaultMeterTimeZone = settings.SystemSettings.DefaultMeterTimeZoneInfo;
+                TimeZoneInfo meterTimeZone = meter.GetTimeZoneInfo(defaultMeterTimeZone);
+                Func<DateTime, DateTime> toXDATime = timeZoneConverter.GetMeterTimeZoneConverter(meterTimeZone);
+                ShiftTime(meterDataSet, toXDATime);
+                SetDataTimeRange(meterDataSet);
+                UpdateFileGroup(fileGroup);
+
+                Log.Info($"Processing file group \"{fileGroupPath}\"...");
+                processingStatus = Process(meterDataSet);
+                Log.Info($"Finished processing file group \"{fileGroupPath}\".");
+            }
+            else processingStatus = FileGroupProcessingStatus.Success;
+
+            DateTime endTime = DateTime.UtcNow;
+            fileGroup.ProcessingEndTime = timeZoneConverter.ToXDATimeZone(endTime);
+            fileGroup.ProcessingStatus = (int)processingStatus;
+            UpdateFileGroup(fileGroup);
+
+            return meterDataSet;
+        }
+
+        private FileGroupProcessingStatus Process(MeterDataSet meterDataSet)
+        {
+            FileGroup fileGroup = meterDataSet.FileGroup;
+            List<DataOperation> dataOperationDefinitions;
+
+            using (AdoDataConnection connection = CreateDbConnection())
+            {
+                TableOperations<DataOperation> dataOperationTable = new TableOperations<DataOperation>(connection);
+                new TableOperations<DataOperationFailure>(connection).DeleteRecordWhere("FileGroupID={0}", fileGroup.ID);
+
+                // Load the data operations from the database
+                dataOperationDefinitions = dataOperationTable
+                    .QueryRecords("LoadOrder")
+                    .ToList();
+            }
+
+            PluginFactory<IDataOperation> dataOperationFactory = new PluginFactory<IDataOperation>();
+            FileGroupProcessingStatus status = FileGroupProcessingStatus.Failed;
+            List<DataOperationFailure> dataOperationFailures = new List<DataOperationFailure>();
+            int index = 0;
+
+            foreach (DataOperation dataOperationDefinition in dataOperationDefinitions)
+            {
+                try
+                {
+                    if (IsDisposed)
+                        throw new Exception("Data operation pipeline is disposed");
+
+                    Log.Debug($"Executing data operation '{dataOperationDefinition.UnqualifiedTypeName}'...");
+
+                    // Call the execute method on the data operation to perform in-memory data transformations
+                    string assemblyName = dataOperationDefinition.AssemblyName;
+                    string typeName = dataOperationDefinition.TypeName;
+                    IDataOperation dataOperation = dataOperationFactory.Create(assemblyName, typeName);
+
+                    using (dataOperation as IDisposable)
+                    {
+                        meterDataSet.Configure(dataOperation);
+                        dataOperation.Execute(meterDataSet);
+                    }
+
+                    Log.Debug($"Finished executing data operation '{dataOperationDefinition.UnqualifiedTypeName}'.");
+                    if (index == 0) status = FileGroupProcessingStatus.Success;
+                    else if (status == FileGroupProcessingStatus.Failed) status = FileGroupProcessingStatus.PartialSuccess;
+                }
+                catch (Exception ex)
+                {
+                    // Log the error and skip to the next data operation
+                    string message = $"An error occurred while executing data operation of type '{dataOperationDefinition.TypeName}' on data from meter '{meterDataSet.Meter.AssetKey}': {ex.Message}";
+                    Exception wrapper = new Exception(message, ex);
+                    if (status == FileGroupProcessingStatus.Success) status = FileGroupProcessingStatus.PartialSuccess;
+                    Log.Error(wrapper.Message, wrapper);
+                    dataOperationFailures.Add(new DataOperationFailure
+                    {
+                        DataOperationID = dataOperationDefinition.ID,
+                        FileGroupID = meterDataSet.FileGroup.ID,
+                        Log = message,
+                        StackTrace = ex.StackTrace,
+                        TimeOfFailure = DateTime.UtcNow
+                    });
+                    if (IsDisposed)
+                    {
+                        TryLogDataOperationFailures(dataOperationFailures);
+                        return FileGroupProcessingStatus.Failed;
+                    }
+                }
+
+                index++;
+            }
+
+            TryLogDataOperationFailures(dataOperationFailures);
+            _ = NotifyEventEmailNode(fileGroup.ID, fileGroup.ProcessingVersion);
+            _ = NotifyEPRICapBankAnalysisNode(fileGroup.ID, fileGroup.ProcessingVersion);
+            _ = NotifyRabbitMQNode(fileGroup.ID, fileGroup.ProcessingVersion);
+
+            return status;
+        }
+
+        private void TryLogDataOperationFailures(IEnumerable<DataOperationFailure> failures)
+        {
+            try
+            {
+                using (AdoDataConnection connection = CreateDbConnection())
+                {
+                    TableOperations<DataOperationFailure> failureTable = new TableOperations<DataOperationFailure>(connection);
+                    foreach (DataOperationFailure failure in failures)
+                        failureTable.AddNewRecord(failure);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Unable to log data operation failures: " + ex.Message, ex);
+            }
+        }
+
+        private void SaveMeterConfiguration(FileGroup fileGroup, Meter meter)
+        {
+            MeterSettingsSheet meterSettingsSheet = new MeterSettingsSheet(meter);
+
+            using (AdoDataConnection connection = CreateDbConnection())
+            {
+                const string ConfigKey = "openXDA";
+                TableOperations<MeterConfiguration> meterConfigurationTable = new TableOperations<MeterConfiguration>(connection);
+                meterSettingsSheet.UpdateConfiguration(meterConfigurationTable, ConfigKey);
+
+                RecordRestriction queryRestriction =
+                    new RecordRestriction("MeterID = {0}", meter.ID) &
+                    new RecordRestriction("ConfigKey = {0}", ConfigKey) &
+                    new RecordRestriction("DiffID IS NULL");
+
+                MeterConfiguration currentConfiguration = meterConfigurationTable.QueryRecord("ID DESC", queryRestriction);
+                connection.ExecuteNonQuery("DELETE FROM FileGroupMeterConfiguration WHERE FileGroupID = {0} AND MeterConfigurationID IN (SELECT ID FROM MeterConfiguration WHERE ConfigKey = {1})", fileGroup.ID, ConfigKey);
+                connection.ExecuteNonQuery("INSERT INTO FileGroupMeterConfiguration VALUES({0}, {1})", fileGroup.ID, currentConfiguration.ID);
+            }
+        }
+
+        private bool RequiresRoot2Adjustment(Meter meter, string meterQuery)
+        {
+            string scalarQuery =
+                $"SELECT CASE " +
+                $"    WHEN {{0}} IN ({meterQuery}) " +
+                $"    THEN 1 " +
+                $"    ELSE 0 " +
+                $"END";
+
+            using (AdoDataConnection connection = CreateDbConnection())
+            {
+                return connection.ExecuteScalar<int>(scalarQuery, meter.ID) != 0;
+            }
+        }
+
+        private void ShiftTime(MeterDataSet meterDataSet, Func<DateTime, DateTime> toXDATime)
+        {
+            DataPoint ToXDATime(DataPoint point)
+            {
+                DateTime xdaTime = toXDATime(point.Time);
+                return point.NewTime(xdaTime);
+            }
+
+            foreach (DataSeries dataSeries in meterDataSet.DataSeries)
+            {
+                dataSeries.DataPoints = dataSeries.DataPoints
+                    .Select(ToXDATime)
+                    .ToList();
+            }
+
+            foreach (DataSeries dataSeries in meterDataSet.Digitals)
+            {
+                dataSeries.DataPoints = dataSeries.DataPoints
+                    .Select(ToXDATime)
+                    .ToList();
+            }
+
+            for (int i = 0; i < meterDataSet.ReportedDisturbances.Count; i++)
+            {
+                ReportedDisturbance disturbance = meterDataSet.ReportedDisturbances[i];
+                DateTime time = toXDATime(disturbance.Time);
+                meterDataSet.ReportedDisturbances[i] = disturbance.ShiftTimestampTo(time);
+            }
+        }
+
+        private void UpdateFileGroup(FileGroup fileGroup)
+        {
+            using (AdoDataConnection connection = CreateDbConnection())
+            {
+                TableOperations<FileGroup> fileGroupTable = new TableOperations<FileGroup>(connection);
+                fileGroupTable.UpdateRecord(fileGroup);
+            }
+        }
+
+        private void UpdateTaskProcessorSettings(Action<object> configurator)
+        {
+            NodeSettings settings = new NodeSettings(configurator);
+            MeterFilterQuery = settings.TaskProcessorSettings.MeterFilterQuery;
+            ProcessingThreadCount = settings.TaskProcessorSettings.ProcessingThreadCount;
+        }
+
+        private async Task NotifyEventEmailNode(int fileGroupID, int processingVersion)
+        {
+            Type nodeType = typeof(Email.EventEmailNode);
+            string typeName = nodeType.FullName;
+            int? result = QueryNodeID(typeName);
+
+            if (result is null)
+                return;
+
+            void ConfigureRequest(HttpRequestMessage request)
+            {
+                int nodeID = result.GetValueOrDefault();
+                string action = "TriggerForFileGroup";
+                NameValueCollection queryParameters = new NameValueCollection();
+                queryParameters.Add("fileGroupID", fileGroupID.ToString());
+                queryParameters.Add("processingVersion", processingVersion.ToString());
+
+                string url = Host.BuildURL(nodeID, action, queryParameters);
+                request.Method = HttpMethod.Post;
+                request.RequestUri = new Uri(url);
+            }
+
+            using (HttpResponseMessage response = await Host.SendWebRequestAsync(ConfigureRequest))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    string body = await response.Content.ReadAsStringAsync();
+
+                    string logMessage = new StringBuilder()
+                        .AppendLine("Event email notification failed.")
+                        .AppendLine($"Status: {response.StatusCode}")
+                        .AppendLine("Body:")
+                        .Append(body)
+                        .ToString();
+
+                    Log.Debug(logMessage);
+                }
+            }
+        }
+
+        private async Task NotifyEventEmailNodeWhenIdle()
+        {
+            bool IsAnalysisRunning()
+            {
+                using (AdoDataConnection connection = CreateDbConnection())
+                {
+                    const string Query = "SELECT COUNT(*) FROM AnalysisTask";
+                    int analysisTaskCount = connection.ExecuteScalar<int>(Query);
+                    return analysisTaskCount > 0;
+                }
+            }
+
+            if (IsAnalysisRunning())
+                return;
+
+            Type nodeType = typeof(Email.EventEmailNode);
+            string typeName = nodeType.FullName;
+            int? result = QueryNodeID(typeName);
+
+            if (result is null)
+                return;
+
+            void ConfigureRequest(HttpRequestMessage request)
+            {
+                int nodeID = result.GetValueOrDefault();
+                string action = "SkipMaxDelayTimers";
+
+                string url = Host.BuildURL(nodeID, action);
+                request.Method = HttpMethod.Post;
+                request.RequestUri = new Uri(url);
+            }
+
+            using (HttpResponseMessage response = await Host.SendWebRequestAsync(ConfigureRequest))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    string body = await response.Content.ReadAsStringAsync();
+
+                    string logMessage = new StringBuilder()
+                        .AppendLine("Event email notification failed.")
+                        .AppendLine($"Status: {response.StatusCode}")
+                        .AppendLine("Body:")
+                        .Append(body)
+                        .ToString();
+
+                    Log.Debug(logMessage);
+                }
+            }
+        }
+
+        private async Task NotifyEPRICapBankAnalysisNode(int fileGroupID, int processingVersion)
+        {
+            Type nodeType = typeof(EPRICapBankAnalysis.EPRICapBankAnalysisNode);
+            string typeName = nodeType.FullName;
+            int? result = QueryNodeID(typeName);
+
+            if (result is null)
+                return;
+
+            void ConfigureRequest(HttpRequestMessage request)
+            {
+                int nodeID = result.GetValueOrDefault();
+                string action = "Analyze";
+                NameValueCollection queryParameters = new NameValueCollection();
+                queryParameters.Add("fileGroupID", fileGroupID.ToString());
+                queryParameters.Add("processingVersion", processingVersion.ToString());
+
+                string url = Host.BuildURL(nodeID, action, queryParameters);
+                request.Method = HttpMethod.Post;
+                request.RequestUri = new Uri(url);
+            }
+
+            using (HttpResponseMessage response = await Host.SendWebRequestAsync(ConfigureRequest))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    string body = await response.Content.ReadAsStringAsync();
+
+                    string logMessage = new StringBuilder()
+                        .AppendLine("EPRI Cap Bank Analysis notification failed.")
+                        .AppendLine($"Status: {response.StatusCode}")
+                        .AppendLine("Body:")
+                        .Append(body)
+                        .ToString();
+
+                    Log.Debug(logMessage);
+                }
+            }
+        }
+
+        private async Task NotifyRabbitMQNode(int fileGroupID, int processingVersion)
+        {
+            Type nodeType = typeof(RabbitMQ.RabbitMQNode);
+            string typeName = nodeType.FullName;
+            int? result = QueryNodeID(typeName);
+
+            if (result is null)
+                return;
+
+            void ConfigureRequest(HttpRequestMessage request)
+            {
+                int nodeID = result.GetValueOrDefault();
+                string action = "Notify";
+                NameValueCollection queryParameters = new NameValueCollection();
+                queryParameters.Add("fileGroupID", fileGroupID.ToString());
+                queryParameters.Add("processingVersion", processingVersion.ToString());
+
+                string url = Host.BuildURL(nodeID, action, queryParameters);
+                request.Method = HttpMethod.Post;
+                request.RequestUri = new Uri(url);
+            }
+
+            using (HttpResponseMessage response = await Host.SendWebRequestAsync(ConfigureRequest))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    string body = await response.Content.ReadAsStringAsync();
+
+                    string logMessage = new StringBuilder()
+                        .AppendLine("RabbitMQ notification failed.")
+                        .AppendLine($"Status: {response.StatusCode}")
+                        .AppendLine("Body:")
+                        .Append(body)
+                        .ToString();
+
+                    Log.Debug(logMessage);
+                }
+            }
+        }
+
+        private int? QueryNodeID(string nodeTypeName)
+        {
+            using (AdoDataConnection connection = CreateDbConnection())
+            {
+                const string QueryFormat =
+                    "SELECT Node.ID " +
+                    "FROM " +
+                    "    ActiveHost JOIN " +
+                    "    Node ON Node.HostRegistrationID = ActiveHost.ID JOIN " +
+                    "    NodeType ON Node.NodeTypeID = NodeType.ID " +
+                    "WHERE NodeType.TypeName = {0}";
+
+                return connection.ExecuteScalar<int?>(QueryFormat, nodeTypeName);
+            }
+        }
+
+        #endregion
+
+        #region [ Static ]
+
+        // Static Fields
+        private static readonly ILog Log = LogManager.GetLogger(typeof(AnalysisNode));
+
+        // Static Methods
+        private static void ApplyRoot2Adjustment(MeterDataSet meterDataSet)
+        {
+            double adjustment = Math.Sqrt(2.0D);
+
+            foreach (DataSeries analogSeries in meterDataSet.DataSeries)
+            {
+                DataSeries adjusted = analogSeries.Multiply(adjustment);
+                analogSeries.DataPoints = adjusted.DataPoints;
+            }
+        }
+
+        private static void SetDataTimeRange(MeterDataSet meterDataSet)
+        {
+            DateTime dataStartTime = meterDataSet.DataSeries
+                .Concat(meterDataSet.Digitals)
+                .Where(dataSeries => dataSeries.DataPoints.Any())
+                .Select(dataSeries => dataSeries.DataPoints.First().Time)
+                .DefaultIfEmpty()
+                .Min();
+
+            DateTime dataEndTime = meterDataSet.DataSeries
+                .Concat(meterDataSet.Digitals)
+                .Where(dataSeries => dataSeries.DataPoints.Any())
+                .Select(dataSeries => dataSeries.DataPoints.Last().Time)
+                .DefaultIfEmpty()
+                .Max();
+
+            if (dataStartTime != default)
+                meterDataSet.FileGroup.DataStartTime = dataStartTime;
+
+            if (dataEndTime != default)
+                meterDataSet.FileGroup.DataEndTime = dataEndTime;
+        }
+
+        #endregion
+    }
+}

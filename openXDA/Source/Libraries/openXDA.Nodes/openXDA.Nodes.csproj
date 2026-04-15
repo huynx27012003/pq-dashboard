@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{565E38B7-24C0-48B6-9F28-2521B2CCD87D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>openXDA.Nodes</RootNamespace>
+    <AssemblyName>openXDA.Nodes</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\Build\Output\Debug\Libraries\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\Build\Output\Release\Libraries\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GSF.Core">
+      <HintPath>..\..\Dependencies\GSF\GSF.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.PQDIF">
+      <HintPath>..\..\Dependencies\GSF\GSF.PQDIF.dll</HintPath>
+    </Reference>
+    <Reference Include="GSF.Security, Version=2.3.493.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Dependencies\GSF\GSF.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=3.1.0.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\log4net.3.1.0\lib\net462\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Dependencies\GSF\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RabbitMQ.Client, Version=7.0.0.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\RabbitMQ.Client.7.2.0\lib\netstandard2.0\RabbitMQ.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\System.Diagnostics.DiagnosticSource.8.0.1\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Pipelines, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\System.IO.Pipelines.8.0.0\lib\net462\System.IO.Pipelines.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Dependencies\GSF\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Channels, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\System.Threading.Channels.8.0.0\lib\net462\System.Threading.Channels.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.RateLimiting, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\System.Threading.RateLimiting.8.0.0\lib\net462\System.Threading.RateLimiting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\Dependencies\NuGet\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Http">
+      <HintPath>..\..\Dependencies\GSF\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Cors">
+      <HintPath>..\..\Dependencies\GSF\System.Web.Http.Cors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Balancer.cs" />
+    <Compile Include="ICLIRegistry.cs" />
+    <Compile Include="Types\Analysis\AnalysisNode.cs" />
+    <Compile Include="Types\Analysis\AnalysisTask.cs" />
+    <Compile Include="Types\Analysis\AnalysisTaskProcessor.cs" />
+    <Compile Include="Types\Analysis\AnalysisTaskPublisher.cs" />
+    <Compile Include="ConfigurationLoader.cs" />
+    <Compile Include="Types\Authentication\AuthenticationProviderNode.cs" />
+    <Compile Include="Types\DatabaseMaintenance\DatabaseMaintenanceNode.cs" />
+    <Compile Include="Types\DataPusher\DataPusherNode.cs" />
+    <Compile Include="Types\Email\EventEmailNode.cs" />
+    <Compile Include="Types\Email\EventEmailProcessor.cs" />
+    <Compile Include="Types\Email\ScheduledEmailNode.cs" />
+    <Compile Include="Types\EPRICapBankAnalysis\EPRICapBankAnalysisNode.cs" />
+    <Compile Include="Types\FileProcessing\FileGroupInfo.cs" />
+    <Compile Include="Types\FileProcessing\FileProcessingTask.cs" />
+    <Compile Include="Types\FileProcessing\FileProcessorIndex.cs" />
+    <Compile Include="Types\FileProcessing\FileProcessorNode.cs" />
+    <Compile Include="Types\FileProcessing\FileSkippedException.cs" />
+    <Compile Include="Host.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Types\FilePruning\FilePrunerNode.cs" />
+    <Compile Include="INode.cs" />
+    <Compile Include="NodeBase.cs" />
+    <Compile Include="Types\Grafana\GrafanaAuthProxyController.cs" />
+    <Compile Include="Types\Grafana\GrafanaHostingNode.cs" />
+    <Compile Include="Types\Grafana\GrafanaQueryHelper.cs" />
+    <Compile Include="Types\RabbitMQ\EventDataMessage.cs" />
+    <Compile Include="Types\RabbitMQ\EventTagMessage.cs" />
+    <Compile Include="Types\RabbitMQ\RabbitMQNode.cs" />
+    <Compile Include="Types\SSAMS\SSAMSNode.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FaultData\FaultData.csproj">
+      <Project>{11ae594d-2b2b-473c-8550-6bf62914c3e2}</Project>
+      <Name>FaultData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\openXDA.Configuration\openXDA.Configuration.csproj">
+      <Project>{83d8122c-2bcc-4813-b449-224d9f7e5aee}</Project>
+      <Name>openXDA.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\openXDA.DataPusher\openXDA.DataPusher.csproj">
+      <Project>{666EB8A6-FBA9-454C-8537-9113C2EE68D4}</Project>
+      <Name>openXDA.DataPusher</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\openXDA.Model\openXDA.Model.csproj">
+      <Project>{a1a0bc13-50ed-4dc9-8c1e-3293b0b69281}</Project>
+      <Name>openXDA.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Types\Grafana\custom.ini" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

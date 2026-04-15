@@ -1,0 +1,202 @@
+<div class="page-container">
+    <div class="page-header">
+        <h1>Meter Management</h1>
+        <div class="header-actions">
+            <button mat-raised-button color="primary" (click)="showAddForm()" [disabled]="showForm">
+                <mat-icon>add</mat-icon>
+                Add Meter
+            </button>
+        </div>
+    </div>
+
+    <!-- Reading Loop Control -->
+    <!-- <mat-card class="control-card">
+        <div class="control-header">
+            <h3>
+                <mat-icon>sync</mat-icon>
+                Reading Loop Control
+            </h3>
+            <div class="loop-status">
+                <mat-chip-set>
+                    <mat-chip [class.running]="isLoopRunning" [class.stopped]="!isLoopRunning">
+                        {{ isLoopRunning ? 'Running' : 'Stopped' }}
+                    </mat-chip>
+                </mat-chip-set>
+            </div>
+        </div>
+        <div class="control-actions">
+            <span class="selected-count">{{ selectedMeterIds.size }} meter(s) selected</span>
+            <button mat-raised-button color="accent" (click)="startReadingLoop()"
+                [disabled]="selectedMeterIds.size === 0 || isLoopRunning">
+                <mat-icon>play_arrow</mat-icon>
+                Start Reading
+            </button>
+            <button mat-raised-button color="warn" (click)="stopReadingLoop()" [disabled]="!isLoopRunning">
+                <mat-icon>stop</mat-icon>
+                Stop Reading
+            </button>
+        </div>
+    </mat-card> -->
+
+    <!-- Add/Edit Form -->
+    <mat-card class="form-card" *ngIf="showForm">
+        <h3>{{ isEditing ? 'Edit Meter' : 'Add New Meter' }}</h3>
+        <form [formGroup]="meterForm" (ngSubmit)="saveMeter()" autocomplete="off">
+            <div class="form-row">
+                <mat-form-field appearance="outline">
+                    <mat-label>Serial Number</mat-label>
+                    <input matInput formControlName="serial_number" placeholder="e.g. 251308613" [readonly]="isEditing">
+                    <mat-error *ngIf="meterForm.get('serial_number')?.hasError('required')">Serial number is
+                        required</mat-error>
+                    <mat-error *ngIf="meterForm.get('serial_number')?.hasError('pattern')">Must be numeric</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Meter Name</mat-label>
+                    <input matInput formControlName="meter_name" placeholder="e.g. Bao's EDMI">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Outstation</mat-label>
+                    <input matInput formControlName="outstation" placeholder="e.g. 12">
+                    <mat-error *ngIf="meterForm.get('outstation')?.hasError('pattern')">Must be numeric</mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="form-row">
+                <mat-form-field appearance="outline">
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="username" placeholder="e.g. EDMI" autocomplete="off">
+                    <mat-error *ngIf="meterForm.get('username')?.hasError('required')">Username is required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Password</mat-label>
+                    <input matInput formControlName="password" type="password" placeholder="Password"
+                        autocomplete="new-password">
+                    <mat-error *ngIf="meterForm.get('password')?.hasError('required')">Password is required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Type</mat-label>
+                    <input matInput formControlName="type" placeholder="e.g. EDMI">
+                    <mat-error *ngIf="meterForm.get('type')?.hasError('required')">Type is required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Model</mat-label>
+                    <input matInput formControlName="model" placeholder="e.g. Mk6E">
+                    <mat-error *ngIf="meterForm.get('model')?.hasError('required')">Model is required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Role</mat-label>
+                    <mat-select formControlName="role">
+                        <mat-option value="">None</mat-option>
+                        <mat-option *ngFor="let role of roles" [value]="role.id">
+                            {{ role.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>SOURCE ID</mat-label>
+                    <mat-select formControlName="source_id">
+                        <mat-option value="">None</mat-option>
+                        <mat-option *ngFor="let source of sources" [value]="source.id">
+                            {{ source.name }} (ID: {{ source.id }})
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="form-row">
+                <mat-form-field appearance="outline">
+                    <mat-label>Survey Types</mat-label>
+                    <input matInput formControlName="survey_type" placeholder="e.g. LS02, LS03">
+                </mat-form-field>
+            </div>
+
+            <div class="form-actions">
+                <button mat-button type="button" (click)="cancelForm()">Cancel</button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="meterForm.invalid">
+                    {{ isEditing ? 'Update' : 'Add' }} Meter
+                </button>
+            </div>
+        </form>
+    </mat-card>
+
+    <!-- Meters Table -->
+    <mat-card class="table-card">
+        <div class="table-container" *ngIf="!isLoading; else loadingTemplate">
+            <table mat-table [dataSource]="meters" class="meters-table">
+
+                <!-- Meter ID Column -->
+                <ng-container matColumnDef="meter_id">
+                    <th mat-header-cell *matHeaderCellDef>ID</th>
+                    <td mat-cell *matCellDef="let meter">{{ meter.meter_id }}</td>
+                </ng-container>
+
+                <!-- Serial Number Column -->
+                <ng-container matColumnDef="serial_number">
+                    <th mat-header-cell *matHeaderCellDef>Serial Number</th>
+                    <td mat-cell *matCellDef="let meter">{{ meter.serial_number }}</td>
+                </ng-container>
+
+                <!-- Username Column -->
+                <ng-container matColumnDef="username">
+                    <th mat-header-cell *matHeaderCellDef>Username</th>
+                    <td mat-cell *matCellDef="let meter">{{ meter.username }}</td>
+                </ng-container>
+
+                <!-- Password Column -->
+                <ng-container matColumnDef="password">
+                    <th mat-header-cell *matHeaderCellDef>Password</th>
+                    <td mat-cell *matCellDef="let meter">
+                        <span class="password-mask">••••••••</span>
+                    </td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>Status</th>
+                    <td mat-cell *matCellDef="let meter">
+                        <span class="status-badge" [class]="getMeterStatus(meter.meter_id).className">
+                            <span class="status-dot" [class]="getMeterStatus(meter.meter_id).className"></span>
+                            {{ getMeterStatus(meter.meter_id).label }}
+                        </span>
+                    </td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let meter">
+                        <button mat-icon-button color="primary" matTooltip="Edit" (click)="showEditForm(meter)">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteMeter(meter)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+
+            <div class="empty-state" *ngIf="meters.length === 0">
+                <mat-icon>electric_meter</mat-icon>
+                <h3>No meters found</h3>
+                <p>Click "Add Meter" to register your first meter.</p>
+            </div>
+        </div>
+
+        <ng-template #loadingTemplate>
+            <div class="loading-container">
+                <mat-spinner diameter="40"></mat-spinner>
+                <p>Loading meters...</p>
+            </div>
+        </ng-template>
+    </mat-card>
+</div>
